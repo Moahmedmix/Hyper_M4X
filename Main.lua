@@ -843,7 +843,12 @@ local FeatureList = {
     { Path = "Features/Aimbot/Prediction.lua",  Tab = "Aimbot",   Name = "Prediction" },
     
     -- Visuals Features
-    { Path = "Features/Visuals/ESP.lua",        Tab = "Visuals",  Name = "ESP" }
+    { Path = "Features/Visuals/ESP.lua",        Tab = "Visuals",  Name = "ESP" }  
+    { Path = "Features/Visuals/Boxes.lua",      Tab = "Visuals",  Name = "Boxes" },
+    { Path = "Features/Visuals/Skeletons.lua",  Tab = "Visuals",  Name = "Skeletons" },
+    { Path = "Features/Visuals/Chams.lua",      Tab = "Visuals",  Name = "Chams" },
+    { Path = "Features/Visuals/World.lua",      Tab = "Visuals",  Name = "World" },
+    
     -- Movement Features
     { Path = "Features/Movement/Speed.lua",     Tab = "Movement", Name = "Speed" },
     { Path = "Features/Movement/Fly.lua",       Tab = "Movement", Name = "Fly" },
@@ -918,12 +923,6 @@ Logger:Box("HYPER UI READY", {
     "Features Active: " .. featureStats.Loaded .. "/" .. featureStats.Total,
 })
 
-print("")
-print("  ╔══════════════════════════════════════════╗")
-print("  ║       HYPER UI v1.0.0 - ACTIVE          ║")
-print("  ║     By M4X | EVA | AMAL                ║")
-print("  ╚══════════════════════════════════════════╝")
-print("")
 
 -- =============================================
 -- RETURN VALUES
