@@ -4,9 +4,6 @@
     ║              Version: v1.0.0                      ║
     ║         By M4X | EVA | AMAL                      ║
     ╚══════════════════════════════════════════════════╝
-    
-    UI Settings Module - Controls window behavior
-    ToggleKey, transparency, resizable, etc.
 --]]
 
 local Settings = {}
@@ -19,7 +16,6 @@ Settings.Defaults = {
     ScrollBarEnabled = true,
     HideSearchBar = true,
     SideBarWidth = 190,
-    Theme = "Dark",
 }
 
 Settings.Current = {}
@@ -51,17 +47,6 @@ end
 function Settings:BuildUI()
     if not self.Tab then return end
 
-    -- Info Section
-    local infoSection = self.Tab:Section({ 
-        Title = "Information", 
-        Icon = "info",
-        Opened = true 
-    })
-    
-    infoSection:Label({ Title = "Toggle Key: Right Shift" })
-    infoSection:Label({ Title = "Sidebar Width: " .. (Settings.Current.SideBarWidth or 190) .. "px" })
-
-    -- Toggles Section
     local toggleSection = self.Tab:Section({ 
         Title = "Window Toggles", 
         Icon = "toggle-left",
@@ -75,11 +60,7 @@ function Settings:BuildUI()
         Callback = function(state)
             Settings.Current.Transparent = state
             if self.Flags then self.Flags:Set("UITransparent", state) end
-            self.Library:Notify({ 
-                Title = "UI Settings", 
-                Description = "Transparency: " .. (state and "ON" or "OFF"), 
-                Duration = 2 
-            })
+            self.Library:Notify({ Title = "UI Settings", Description = "Transparency: " .. (state and "ON" or "OFF"), Duration = 2 })
         end
     })
 
@@ -90,11 +71,7 @@ function Settings:BuildUI()
         Callback = function(state)
             Settings.Current.Resizable = state
             if self.Flags then self.Flags:Set("UIResizable", state) end
-            self.Library:Notify({ 
-                Title = "UI Settings", 
-                Description = "Resizable: " .. (state and "ON" or "OFF"), 
-                Duration = 2 
-            })
+            self.Library:Notify({ Title = "UI Settings", Description = "Resizable: " .. (state and "ON" or "OFF"), Duration = 2 })
         end
     })
 
@@ -105,11 +82,7 @@ function Settings:BuildUI()
         Callback = function(state)
             Settings.Current.ScrollBarEnabled = state
             if self.Flags then self.Flags:Set("UIScrollBar", state) end
-            self.Library:Notify({ 
-                Title = "UI Settings", 
-                Description = "Scrollbar: " .. (state and "ON" or "OFF"), 
-                Duration = 2 
-            })
+            self.Library:Notify({ Title = "UI Settings", Description = "Scrollbar: " .. (state and "ON" or "OFF"), Duration = 2 })
         end
     })
 
@@ -120,17 +93,12 @@ function Settings:BuildUI()
         Callback = function(state)
             Settings.Current.HideSearchBar = state
             if self.Flags then self.Flags:Set("UIHideSearch", state) end
-            self.Library:Notify({ 
-                Title = "UI Settings", 
-                Description = "Search Bar: " .. (state and "Hidden" or "Visible"), 
-                Duration = 2 
-            })
+            self.Library:Notify({ Title = "UI Settings", Description = "Search Bar: " .. (state and "Hidden" or "Visible"), Duration = 2 })
         end
     })
 
-    -- Slider Section
     local sliderSection = self.Tab:Section({ 
-        Title = "Sidebar", 
+        Title = "Sidebar Width: " .. (Settings.Current.SideBarWidth or 190) .. "px", 
         Icon = "sidebar",
         Opened = true 
     })
@@ -149,7 +117,6 @@ function Settings:BuildUI()
         end
     })
 
-    -- Reset Section
     local resetSection = self.Tab:Section({ 
         Title = "Reset", 
         Icon = "rotate-ccw",
@@ -157,24 +124,20 @@ function Settings:BuildUI()
     })
 
     resetSection:Button({
-        Title = "Reset UI Settings",
-        Description = "Restore all settings to default",
+        Title = "Reset All Settings",
+        Description = "Restore defaults",
         Callback = function()
             for k, v in pairs(Settings.Defaults) do
                 Settings.Current[k] = v
             end
             if self.Flags then
-                self.Flags:Set("UITransparent", Settings.Current.Transparent)
-                self.Flags:Set("UIResizable", Settings.Current.Resizable)
-                self.Flags:Set("UIScrollBar", Settings.Current.ScrollBarEnabled)
-                self.Flags:Set("UIHideSearch", Settings.Current.HideSearchBar)
-                self.Flags:Set("UISideBarWidth", Settings.Current.SideBarWidth)
+                self.Flags:Set("UITransparent", false)
+                self.Flags:Set("UIResizable", true)
+                self.Flags:Set("UIScrollBar", true)
+                self.Flags:Set("UIHideSearch", true)
+                self.Flags:Set("UISideBarWidth", 190)
             end
-            self.Library:Notify({ 
-                Title = "UI Settings", 
-                Description = "All settings reset to default!", 
-                Duration = 3 
-            })
+            self.Library:Notify({ Title = "UI Settings", Description = "Reset to default!", Duration = 3 })
         end
     })
 end
@@ -185,14 +148,6 @@ end
 
 function Settings:Set(key, value)
     Settings.Current[key] = value
-end
-
-function Settings:GetAll()
-    local all = {}
-    for k, v in pairs(Settings.Defaults) do
-        all[k] = Settings.Current[k] or v
-    end
-    return all
 end
 
 return Settings
