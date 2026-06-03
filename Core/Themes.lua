@@ -381,132 +381,60 @@ local ThemeData = {
     },
 }
 
-Themes.List = {}
-for name, _ in pairs(ThemeData) do
-    table.insert(Themes.List, name)
-end
-table.sort(Themes.List)
-
-Themes.CurrentName = "Hyper Dark"
-
--- Register all themes
-for name, data in pairs(ThemeData) do
-    pcall(function()
-        WindUI:AddTheme(data)
-    end)
-end
-
-function Themes:Init(tab, library, flags)
-    local self = setmetatable({}, Themes)
-    self.Tab = tab
-    self.Library = library
-    self.Flags = flags
-
-    if flags then
-        flags:Create("CurrentTheme", Themes.CurrentName)
-    end
-
-    self:BuildUI()
-    return self
-end
-
 function Themes:BuildUI()
-    if not self.Tab then return end
 
-    -- Dropdown Section
-    local selectSection = self.Tab:Section({ 
-        Title = "Select Theme - Current: " .. Themes.CurrentName, 
+    if not self.Tab then
+
+        return
+
+    end
+
+    local ThemeSection = self.Tab:Section({
+
+        Title = "Themes",
+
         Icon = "palette",
-        Opened = true 
+
+        Opened = true
+
     })
 
-    selectSection:Dropdown({
-        Title = "Theme",
+    ThemeSection:Dropdown({
+
+        Title = "Select Theme",
+
         Description = "Choose your theme",
-        Values = Themes.List,
+
+        Values = {
+
+            "Hyper Dark",
+
+            "Hyper Blue",
+
+            "Hyper Purple",
+
+            "Hyper Ocean",
+
+            "Hyper Red",
+
+            "Hyper Green",
+
+            "Hyper Gold",
+
+            "Hyper Pink",
+
+            "Hyper Mint"
+
+        },
+
         Value = Themes.CurrentName,
+
         Callback = function(selected)
+
             self:ApplyTheme(selected)
+
         end
+
     })
 
-    -- Dark Themes
-    local darkSection = self.Tab:Section({ 
-        Title = "Dark Themes", 
-        Icon = "moon",
-        Opened = false 
-    })
-
-    for _, name in ipairs({"Hyper Dark", "Hyper Blue", "Hyper Purple", "Hyper Ocean"}) do
-        darkSection:Button({
-            Title = name,
-            Callback = function() self:ApplyTheme(name) end
-        })
-    end
-
-    -- Colorful Themes
-    local colorSection = self.Tab:Section({ 
-        Title = "Colorful Themes", 
-        Icon = "sun",
-        Opened = false 
-    })
-
-    for _, name in ipairs({"Hyper Red", "Hyper Green", "Hyper Gold"}) do
-        colorSection:Button({
-            Title = name,
-            Callback = function() self:ApplyTheme(name) end
-        })
-    end
-
-    -- Soft Themes
-    local softSection = self.Tab:Section({ 
-        Title = "Soft Themes", 
-        Icon = "heart",
-        Opened = false 
-    })
-
-    for _, name in ipairs({"Hyper Pink", "Hyper Mint"}) do
-        softSection:Button({
-            Title = name,
-            Callback = function() self:ApplyTheme(name) end
-        })
-    end
 end
-
-function Themes:ApplyTheme(name)
-    if not ThemeData[name] then
-        if self.Library then
-            self.Library:Notify({ 
-                Title = "Theme Error", 
-                Description = "Theme not found: " .. name, 
-                Duration = 3 
-            })
-        end
-        return false
-    end
-
-    Themes.CurrentName = name
-
-    if self.Flags then
-        self.Flags:Set("CurrentTheme", name)
-    end
-
-    pcall(function() WindUI:SetTheme(ThemeData[name]) end)
-    pcall(function() WindUI:SetTheme(name) end)
-
-    if self.Library then
-        self.Library:Notify({ 
-            Title = "Theme Applied", 
-            Description = name, 
-            Duration = 2 
-        })
-    end
-
-    return true
-end
-
-function Themes:GetCurrentTheme()
-    return Themes.CurrentName
-end
-
-return Themes
