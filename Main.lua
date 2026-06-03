@@ -918,7 +918,12 @@ Logger:Box("HYPER UI READY", {
     "Features Active: " .. featureStats.Loaded .. "/" .. featureStats.Total,
 })
 
-
+print("")
+print("  ╔══════════════════════════════════════════╗")
+print("  ║       HYPER UI v1.0.0 - ACTIVE          ║")
+print("  ║     By M4X | EVA | AMAL                ║")
+print("  ╚══════════════════════════════════════════╝")
+print("")
 
 -- =============================================
 -- RETURN VALUES
