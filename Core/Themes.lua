@@ -4,22 +4,12 @@
     ║              Version: v1.0.0                      ║
     ║         By M4X | EVA | AMAL                      ║
     ╚══════════════════════════════════════════════════╝
-    
-    Full theme system using WindUI official API.
-    - 10 custom themes registered via WindUI:AddTheme
-    - Dropdown to select theme
-    - Quick switch buttons
-    - Instant theme application
 --]]
 
 local Themes = {}
 Themes.__index = Themes
 
--- =============================================
--- THEME DATA
--- =============================================
 local ThemeData = {
-
     ["Hyper Dark"] = {
         Name = "Hyper Dark",
         Accent = Color3.fromHex("#18181b"),
@@ -61,7 +51,6 @@ local ThemeData = {
         Slider = Color3.fromHex("#3f3f46"),
         SliderThumb = Color3.fromHex("#ffffff"),
     },
-
     ["Hyper Red"] = {
         Name = "Hyper Red",
         Accent = Color3.fromHex("#ef4444"),
@@ -103,7 +92,6 @@ local ThemeData = {
         Slider = Color3.fromHex("#991b1b"),
         SliderThumb = Color3.fromHex("#fef2f2"),
     },
-
     ["Hyper Blue"] = {
         Name = "Hyper Blue",
         Accent = Color3.fromHex("#3b82f6"),
@@ -145,7 +133,6 @@ local ThemeData = {
         Slider = Color3.fromHex("#1d4ed8"),
         SliderThumb = Color3.fromHex("#eff6ff"),
     },
-
     ["Hyper Green"] = {
         Name = "Hyper Green",
         Accent = Color3.fromHex("#22c55e"),
@@ -187,7 +174,6 @@ local ThemeData = {
         Slider = Color3.fromHex("#15803d"),
         SliderThumb = Color3.fromHex("#f0fdf4"),
     },
-
     ["Hyper Purple"] = {
         Name = "Hyper Purple",
         Accent = Color3.fromHex("#a855f7"),
@@ -229,7 +215,6 @@ local ThemeData = {
         Slider = Color3.fromHex("#7c3aed"),
         SliderThumb = Color3.fromHex("#faf5ff"),
     },
-
     ["Hyper Ocean"] = {
         Name = "Hyper Ocean",
         Accent = Color3.fromHex("#06b6d4"),
@@ -271,7 +256,6 @@ local ThemeData = {
         Slider = Color3.fromHex("#0e7490"),
         SliderThumb = Color3.fromHex("#ecfeff"),
     },
-
     ["Hyper Gold"] = {
         Name = "Hyper Gold",
         Accent = Color3.fromHex("#eab308"),
@@ -313,7 +297,6 @@ local ThemeData = {
         Slider = Color3.fromHex("#a16207"),
         SliderThumb = Color3.fromHex("#fefce8"),
     },
-
     ["Hyper Pink"] = {
         Name = "Hyper Pink",
         Accent = Color3.fromHex("#ec4899"),
@@ -355,7 +338,6 @@ local ThemeData = {
         Slider = Color3.fromHex("#be185d"),
         SliderThumb = Color3.fromHex("#fdf2f8"),
     },
-
     ["Hyper Mint"] = {
         Name = "Hyper Mint",
         Accent = Color3.fromHex("#10b981"),
@@ -399,7 +381,6 @@ local ThemeData = {
     },
 }
 
--- Build sorted theme list
 Themes.List = {}
 for name, _ in pairs(ThemeData) do
     table.insert(Themes.List, name)
@@ -408,18 +389,13 @@ table.sort(Themes.List)
 
 Themes.CurrentName = "Hyper Dark"
 
--- =============================================
--- REGISTER ALL THEMES WITH WIND UI
--- =============================================
+-- Register all themes
 for name, data in pairs(ThemeData) do
     pcall(function()
         WindUI:AddTheme(data)
     end)
 end
 
--- =============================================
--- INIT
--- =============================================
 function Themes:Init(tab, library, flags)
     local self = setmetatable({}, Themes)
     self.Tab = tab
@@ -434,24 +410,12 @@ function Themes:Init(tab, library, flags)
     return self
 end
 
--- =============================================
--- BUILD UI
--- =============================================
 function Themes:BuildUI()
     if not self.Tab then return end
 
-    -- Info Section
-    local infoSection = self.Tab:Section({ 
-        Title = "Current Theme", 
-        Icon = "info",
-        Opened = true 
-    })
-    
-    infoSection:Label({ Title = "Theme: " .. Themes.CurrentName })
-
     -- Dropdown Section
     local selectSection = self.Tab:Section({ 
-        Title = "Select Theme", 
+        Title = "Select Theme - Current: " .. Themes.CurrentName, 
         Icon = "palette",
         Opened = true 
     })
@@ -466,7 +430,7 @@ function Themes:BuildUI()
         end
     })
 
-    -- Quick Switch Sections
+    -- Dark Themes
     local darkSection = self.Tab:Section({ 
         Title = "Dark Themes", 
         Icon = "moon",
@@ -476,27 +440,25 @@ function Themes:BuildUI()
     for _, name in ipairs({"Hyper Dark", "Hyper Blue", "Hyper Purple", "Hyper Ocean"}) do
         darkSection:Button({
             Title = name,
-            Callback = function()
-                self:ApplyTheme(name)
-            end
+            Callback = function() self:ApplyTheme(name) end
         })
     end
 
+    -- Colorful Themes
     local colorSection = self.Tab:Section({ 
         Title = "Colorful Themes", 
         Icon = "sun",
         Opened = false 
     })
 
-    for _, name in ipairs({"Hyper Red", "Hyper Green", "Hyper Gold", "Hyper Orange"}) do
+    for _, name in ipairs({"Hyper Red", "Hyper Green", "Hyper Gold"}) do
         colorSection:Button({
             Title = name,
-            Callback = function()
-                self:ApplyTheme(name)
-            end
+            Callback = function() self:ApplyTheme(name) end
         })
     end
 
+    -- Soft Themes
     local softSection = self.Tab:Section({ 
         Title = "Soft Themes", 
         Icon = "heart",
@@ -506,16 +468,11 @@ function Themes:BuildUI()
     for _, name in ipairs({"Hyper Pink", "Hyper Mint"}) do
         softSection:Button({
             Title = name,
-            Callback = function()
-                self:ApplyTheme(name)
-            end
+            Callback = function() self:ApplyTheme(name) end
         })
     end
 end
 
--- =============================================
--- APPLY THEME
--- =============================================
 function Themes:ApplyTheme(name)
     if not ThemeData[name] then
         if self.Library then
@@ -534,25 +491,14 @@ function Themes:ApplyTheme(name)
         self.Flags:Set("CurrentTheme", name)
     end
 
-    -- Try to apply via WindUI
-    local applied = false
-    pcall(function()
-        WindUI:SetTheme(ThemeData[name])
-        applied = true
-    end)
-    
-    if not applied then
-        pcall(function()
-            WindUI:SetTheme(name)
-            applied = true
-        end)
-    end
+    pcall(function() WindUI:SetTheme(ThemeData[name]) end)
+    pcall(function() WindUI:SetTheme(name) end)
 
     if self.Library then
         self.Library:Notify({ 
             Title = "Theme Applied", 
-            Description = name .. (applied and "" or " | Refresh to see full effect"), 
-            Duration = 3 
+            Description = name, 
+            Duration = 2 
         })
     end
 
