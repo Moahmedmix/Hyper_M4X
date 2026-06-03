@@ -382,59 +382,21 @@ local ThemeData = {
 }
 
 function Themes:BuildUI()
+    if not self.Tab then return end
 
-    if not self.Tab then
-
-        return
-
-    end
-
-    local ThemeSection = self.Tab:Section({
-
-        Title = "Themes",
-
+    local section = self.Tab:Section({ 
+        Title = "Themes", 
         Icon = "palette",
-
-        Opened = true
-
+        Opened = true 
     })
 
-    ThemeSection:Dropdown({
-
+    section:Dropdown({
         Title = "Select Theme",
-
-        Description = "Choose your theme",
-
-        Values = {
-
-            "Hyper Dark",
-
-            "Hyper Blue",
-
-            "Hyper Purple",
-
-            "Hyper Ocean",
-
-            "Hyper Red",
-
-            "Hyper Green",
-
-            "Hyper Gold",
-
-            "Hyper Pink",
-
-            "Hyper Mint"
-
-        },
-
+        Description = "Choose your preferred theme",
+        Values = Themes.List,
         Value = Themes.CurrentName,
-
         Callback = function(selected)
-
             self:ApplyTheme(selected)
-
         end
-
     })
-
 end
