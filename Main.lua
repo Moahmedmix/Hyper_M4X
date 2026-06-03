@@ -18,14 +18,19 @@
 -- =============================================
 -- LOAD WIND UI FIRST
 -- =============================================
+-- القديم (غلط):
+
+-- الجديد (صح):
 local WindUI = nil
-local windUISuccess, windUIError = pcall(function()
-    WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+local windOk, windResult = pcall(function()
+    return loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 end)
 
-if not windUISuccess then
-    warn("[Hyper] [X] CRITICAL: Failed to load WindUI: " .. tostring(windUIError))
-    warn("[Hyper] [X] Cannot continue without UI library.")
+if windOk and windResult then
+    WindUI = windResult
+    print("[Hyper] [+] WindUI loaded successfully!")
+else
+    warn("[Hyper] [X] WindUI failed: " .. tostring(windResult))
     return
 end
 
