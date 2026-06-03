@@ -843,12 +843,7 @@ local FeatureList = {
     { Path = "Features/Aimbot/Prediction.lua",  Tab = "Aimbot",   Name = "Prediction" },
     
     -- Visuals Features
-    { Path = "Features/Visuals/ESP.lua",        Tab = "Visuals",  Name = "ESP" },
-    { Path = "Features/Visuals/Boxes.lua",      Tab = "Visuals",  Name = "Boxes" },
-    { Path = "Features/Visuals/Skeletons.lua",  Tab = "Visuals",  Name = "Skeletons" },
-    { Path = "Features/Visuals/Chams.lua",      Tab = "Visuals",  Name = "Chams" },
-    { Path = "Features/Visuals/World.lua",      Tab = "Visuals",  Name = "World" },
-    
+    { Path = "Features/Visuals/ESP.lua",        Tab = "Visuals",  Name = "ESP" }
     -- Movement Features
     { Path = "Features/Movement/Speed.lua",     Tab = "Movement", Name = "Speed" },
     { Path = "Features/Movement/Fly.lua",       Tab = "Movement", Name = "Fly" },
