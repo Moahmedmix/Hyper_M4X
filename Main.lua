@@ -18,9 +18,6 @@
 -- =============================================
 -- LOAD WIND UI FIRST
 -- =============================================
--- القديم (غلط):
-
--- الجديد (صح):
 local WindUI = nil
 local windOk, windResult = pcall(function()
     return loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
@@ -33,8 +30,6 @@ else
     warn("[Hyper] [X] WindUI failed: " .. tostring(windResult))
     return
 end
-
-print("[Hyper] [+] WindUI loaded successfully!")
 
 -- =============================================
 -- ENVIRONMENT SETUP
@@ -69,22 +64,12 @@ local CoreGui = Services.CoreGui
 local REPO_URL = "https://raw.githubusercontent.com/Moahmedmix/Hyper_M4X/main/"
 
 -- =============================================
--- LOGGER SYSTEM (300+ lines of logging)
+-- LOGGER SYSTEM
 -- =============================================
 local Logger = {
     History = {},
     MaxHistory = 500,
     StartTime = os.clock(),
-    ColorMap = {
-        INFO  = "white",
-        OK    = "green",
-        WARN  = "yellow",
-        ERROR = "red",
-        SKIP  = "orange",
-        DEAD  = "darkred",
-        DEBUG = "cyan",
-        TRACE = "gray",
-    }
 }
 
 function Logger:GetTimestamp()
@@ -129,8 +114,6 @@ function Logger:Warn(msg)    return self:Log("WARN",  "!", msg) end
 function Logger:Error(msg)   return self:Log("ERROR", "x", msg) end
 function Logger:Skip(msg)    return self:Log("SKIP",  ">", msg) end
 function Logger:Dead(msg)    return self:Log("DEAD",  "X", msg) end
-function Logger:Debug(msg)   return self:Log("DEBUG", "?", msg) end
-function Logger:Trace(msg)   return self:Log("TRACE", "-", msg) end
 function Logger:Blank()      print("") end
 
 function Logger:Separator(char)
@@ -143,19 +126,11 @@ function Logger:DoubleSeparator()
 end
 
 function Logger:Header(title)
-    local len = #title
-    local pad = string.rep(" ", 4)
     self:Blank()
     self:DoubleSeparator()
-    print("[Hyper] ║" .. pad .. title .. string.rep(" ", 55 - len - #pad - 2) .. "║")
+    print("[Hyper] ║" .. string.rep(" ", 4) .. title)
     self:DoubleSeparator()
     self:Blank()
-end
-
-function Logger:SubHeader(title)
-    self:Separator("-")
-    print("[Hyper] │ " .. title)
-    self:Separator("-")
 end
 
 function Logger:Box(title, lines)
@@ -176,151 +151,23 @@ function Logger:KeyValue(key, value)
     print("[Hyper]   " .. key .. ": " .. tostring(value))
 end
 
-function Logger:List(items, prefix)
-    prefix = prefix or "→"
-    for _, item in ipairs(items) do
-        print("[Hyper]     " .. prefix .. " " .. tostring(item))
-    end
-end
-
-function Logger:Summary()
-    local counts = { Errors = 0, Skips = 0, Success = 0, Info = 0, Warns = 0 }
-    for _, entry in ipairs(self.History) do
-        if entry.Level == "ERROR" or entry.Level == "DEAD" then
-            counts.Errors = counts.Errors + 1
-        elseif entry.Level == "SKIP" then
-            counts.Skips = counts.Skips + 1
-        elseif entry.Level == "OK" then
-            counts.Success = counts.Success + 1
-        elseif entry.Level == "WARN" then
-            counts.Warns = counts.Warns + 1
-        elseif entry.Level == "INFO" then
-            counts.Info = counts.Info + 1
-        end
-    end
-    return counts
-end
-
 function Logger:PrintSummary()
-    local s = self:Summary()
+    local counts = { Errors = 0, Skips = 0, Success = 0, Info = 0 }
+    for _, entry in ipairs(self.History) do
+        if entry.Level == "ERROR" or entry.Level == "DEAD" then counts.Errors = counts.Errors + 1
+        elseif entry.Level == "SKIP" then counts.Skips = counts.Skips + 1
+        elseif entry.Level == "OK" then counts.Success = counts.Success + 1
+        elseif entry.Level == "INFO" then counts.Info = counts.Info + 1 end
+    end
     self:Separator("═")
     print("[Hyper] ║  EXECUTION SUMMARY")
     self:Separator("-")
-    print("[Hyper] ║  ✓ Success: " .. s.Success)
-    print("[Hyper] ║  ℹ Info:    " .. s.Info)
-    print("[Hyper] ║  ⚠ Warns:   " .. s.Warns)
-    print("[Hyper] ║  ✗ Errors:  " .. s.Errors)
-    print("[Hyper] ║  ⏭ Skips:   " .. s.Skips)
-    print("[Hyper] ║  ─ Total:   " .. self:GetTotalEntries())
+    print("[Hyper] ║  + Success: " .. counts.Success)
+    print("[Hyper] ║  i Info:    " .. counts.Info)
+    print("[Hyper] ║  x Errors:  " .. counts.Errors)
+    print("[Hyper] ║  > Skips:   " .. counts.Skips)
     self:Separator("═")
     self:Blank()
-end
-
-function Logger:GetTotalEntries()
-    return #self.History
-end
-
-function Logger:GetErrors()
-    local errors = {}
-    for _, entry in ipairs(self.History) do
-        if entry.Level == "ERROR" or entry.Level == "DEAD" then
-            table.insert(errors, entry)
-        end
-    end
-    return errors
-end
-
-function Logger:GetSkipped()
-    local skipped = {}
-    for _, entry in ipairs(self.History) do
-        if entry.Level == "SKIP" then
-            table.insert(skipped, entry)
-        end
-    end
-    return skipped
-end
-
-function Logger:ExportToString()
-    local lines = {}
-    for _, entry in ipairs(self.History) do
-        table.insert(lines, string.format("[%s] [%s] %s", entry.Timestamp, entry.Icon, entry.Message))
-    end
-    return table.concat(lines, "\n")
-end
-
-function Logger:Clear()
-    self.History = {}
-end
-
-function Logger:GetRecent(count)
-    count = count or 10
-    local start = math.max(1, #self.History - count + 1)
-    local recent = {}
-    for i = start, #self.History do
-        table.insert(recent, self.History[i])
-    end
-    return recent
-end
-
-function Logger:PrintRecent(count)
-    local recent = self:GetRecent(count)
-    self:SubHeader("Recent Logs (Last " .. #recent .. ")")
-    for _, entry in ipairs(recent) do
-        print(string.format("[Hyper]   [%s] [%s] %s", entry.Timestamp, entry.Icon, entry.Message))
-    end
-    self:Separator("-")
-end
-
--- =============================================
--- SAFE CALL SYSTEM
--- =============================================
-local SafeCall = {}
-SafeCall.__index = SafeCall
-
-function SafeCall:New(context)
-    local sc = {
-        Context = context or "Unknown",
-        ErrorCount = 0,
-        SuccessCount = 0,
-        CallCount = 0,
-    }
-    setmetatable(sc, self)
-    return sc
-end
-
-function SafeCall:Execute(func, ...)
-    self.CallCount = self.CallCount + 1
-    local args = {...}
-    local results = {}
-    
-    local ok, err = pcall(function()
-        results = { func(unpack(args)) }
-    end)
-    
-    if not ok then
-        self.ErrorCount = self.ErrorCount + 1
-        Logger:Error(string.format("[%s] Failed: %s", self.Context, tostring(err)))
-        return false, err
-    end
-    
-    self.SuccessCount = self.SuccessCount + 1
-    return true, unpack(results)
-end
-
-function SafeCall:Wrap(func)
-    local self = self
-    return function(...)
-        return self:Execute(func, ...)
-    end
-end
-
-function SafeCall:GetStats()
-    return {
-        Context = self.Context,
-        Calls = self.CallCount,
-        Successes = self.SuccessCount,
-        Errors = self.ErrorCount,
-    }
 end
 
 -- =============================================
@@ -330,21 +177,9 @@ local ModuleLoader = {
     Loaded = {},
     Failed = {},
     Skipped = {},
-    Stats = {
-        Total = 0,
-        Loaded = 0,
-        Failed = 0,
-        Skipped = 0,
-    },
+    Stats = { Total = 0, Loaded = 0, Failed = 0, Skipped = 0 },
     MaxRetries = 2,
 }
-
-function ModuleLoader:Reset()
-    self.Loaded = {}
-    self.Failed = {}
-    self.Skipped = {}
-    self.Stats = { Total = 0, Loaded = 0, Failed = 0, Skipped = 0 }
-end
 
 function ModuleLoader:LoadFromURL(url, moduleName, required, retryCount)
     retryCount = retryCount or 0
@@ -352,13 +187,9 @@ function ModuleLoader:LoadFromURL(url, moduleName, required, retryCount)
     
     Logger:Info("Loading: " .. moduleName .. (required and " [REQUIRED]" or " [OPTIONAL]"))
     
-    -- HTTP Request
-    local httpOk, content = pcall(function()
-        return game:HttpGet(url)
-    end)
+    local httpOk, content = pcall(function() return game:HttpGet(url) end)
     
     if not httpOk then
-        local errMsg = tostring(content)
         if retryCount < self.MaxRetries then
             Logger:Warn("Retrying " .. moduleName .. " (" .. (retryCount + 1) .. "/" .. self.MaxRetries .. ")")
             task.wait(1)
@@ -366,53 +197,51 @@ function ModuleLoader:LoadFromURL(url, moduleName, required, retryCount)
         end
         
         if required then
-            Logger:Dead("NETWORK FAILURE: " .. moduleName .. " - " .. errMsg)
+            Logger:Dead("NETWORK FAILURE: " .. moduleName)
             self.Stats.Failed = self.Stats.Failed + 1
-            table.insert(self.Failed, { Name = moduleName, Reason = "Network: " .. errMsg, Required = true })
+            table.insert(self.Failed, { Name = moduleName, Reason = "Network" })
             return nil
         else
             Logger:Skip("Network: " .. moduleName)
             self.Stats.Skipped = self.Stats.Skipped + 1
-            table.insert(self.Skipped, { Name = moduleName, Reason = "Network", Required = false })
+            table.insert(self.Skipped, { Name = moduleName, Reason = "Network" })
             return nil
         end
     end
     
-    -- Syntax Check
     local chunk, syntaxErr = loadstring(content)
     if not chunk then
         if required then
-            Logger:Dead("SYNTAX FAILURE: " .. moduleName .. " - " .. tostring(syntaxErr))
+            Logger:Dead("SYNTAX FAILURE: " .. moduleName)
             self.Stats.Failed = self.Stats.Failed + 1
-            table.insert(self.Failed, { Name = moduleName, Reason = "Syntax: " .. tostring(syntaxErr), Required = true })
+            table.insert(self.Failed, { Name = moduleName, Reason = "Syntax" })
             return nil
         else
             Logger:Skip("Syntax: " .. moduleName)
             self.Stats.Skipped = self.Stats.Skipped + 1
-            table.insert(self.Skipped, { Name = moduleName, Reason = "Syntax", Required = false })
+            table.insert(self.Skipped, { Name = moduleName, Reason = "Syntax" })
             return nil
         end
     end
     
-    -- Runtime Execution
     local runOk, result = pcall(chunk)
     if not runOk then
         if required then
-            Logger:Dead("RUNTIME FAILURE: " .. moduleName .. " - " .. tostring(result))
+            Logger:Dead("RUNTIME FAILURE: " .. moduleName)
             self.Stats.Failed = self.Stats.Failed + 1
-            table.insert(self.Failed, { Name = moduleName, Reason = "Runtime: " .. tostring(result), Required = true })
+            table.insert(self.Failed, { Name = moduleName, Reason = "Runtime" })
             return nil
         else
             Logger:Skip("Runtime: " .. moduleName)
             self.Stats.Skipped = self.Stats.Skipped + 1
-            table.insert(self.Skipped, { Name = moduleName, Reason = "Runtime", Required = false })
+            table.insert(self.Skipped, { Name = moduleName, Reason = "Runtime" })
             return nil
         end
     end
     
     Logger:Good("Loaded: " .. moduleName)
     self.Stats.Loaded = self.Stats.Loaded + 1
-    table.insert(self.Loaded, { Name = moduleName, Module = result, Required = required })
+    table.insert(self.Loaded, { Name = moduleName, Module = result })
     return result
 end
 
@@ -420,39 +249,6 @@ function ModuleLoader:LoadFromRepo(path, required)
     local name = path:match("([^/]+)%.lua$") or path
     local url = REPO_URL .. path
     return self:LoadFromURL(url, name, required)
-end
-
-function ModuleLoader:HasFailures()
-    for _, fail in ipairs(self.Failed) do
-        if fail.Required then
-            return true
-        end
-    end
-    return false
-end
-
-function ModuleLoader:PrintReport()
-    Logger:SubHeader("Module Loader Report")
-    Logger:KeyValue("Total Attempted", self.Stats.Total)
-    Logger:KeyValue("Successfully Loaded", self.Stats.Loaded)
-    Logger:KeyValue("Failed", self.Stats.Failed)
-    Logger:KeyValue("Skipped", self.Stats.Skipped)
-    
-    if #self.Failed > 0 then
-        Logger:Separator("-")
-        Logger:Warn("Failed Modules:")
-        for _, f in ipairs(self.Failed) do
-            Logger:List({f.Name .. " → " .. f.Reason}, "✗")
-        end
-    end
-    
-    if #self.Skipped > 0 then
-        Logger:Separator("-")
-        Logger:Info("Skipped Modules:")
-        for _, s in ipairs(self.Skipped) do
-            Logger:List({s.Name .. " → " .. s.Reason}, "⏭")
-        end
-    end
 end
 
 -- =============================================
@@ -463,12 +259,6 @@ local FeatureInitializer = {
     Failed = {},
     Skipped = {},
 }
-
-function FeatureInitializer:Reset()
-    self.Initialized = {}
-    self.Failed = {}
-    self.Skipped = {}
-end
 
 function FeatureInitializer:InitFeature(module, tab, library, flags, name)
     if not module then
@@ -510,32 +300,17 @@ Logger:Box("System Information", {
     "Repository: github.com/Moahmedmix/Hyper_M4X",
 })
 
-Logger:SubHeader("Environment Check")
-
--- Check Player
 if LocalPlayer then
     Logger:Good("Player: " .. LocalPlayer.Name)
 else
     Logger:Dead("Player not found!")
 end
 
--- Check Place
-if Services.Players then
-    Logger:Info("Place ID: " .. game.PlaceId)
-    Logger:Info("Place Name: " .. (game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name or "Unknown"))
-end
+Logger:Info("Place ID: " .. game.PlaceId)
+Logger:Info("Executor: " .. (pcall(function() return identifyexecutor() end) and identifyexecutor() or "Unknown"))
 
--- Check Executor
-local executorName = "Unknown"
-pcall(function()
-    executorName = identifyexecutor and identifyexecutor() or getexecutorname and getexecutorname() or "Unknown"
-end)
-Logger:Info("Executor: " .. executorName)
-
--- Check Services
 if #ServicesFailed > 0 then
-    Logger:Warn("Failed Services:")
-    Logger:List(ServicesFailed, "✗")
+    Logger:Warn("Failed Services: " .. table.concat(ServicesFailed, ", "))
 else
     Logger:Good("All services loaded")
 end
@@ -543,15 +318,13 @@ end
 Logger:Separator()
 
 -- =============================================
--- FLAGS SYSTEM (FALLBACK)
+-- FLAGS SYSTEM
 -- =============================================
 local Flags = {}
 local FlagStorage = {}
 
 function Flags:Create(name, default)
-    if FlagStorage[name] then
-        return FlagStorage[name]
-    end
+    if FlagStorage[name] then return FlagStorage[name] end
     
     local flag = {
         Name = name,
@@ -559,83 +332,34 @@ function Flags:Create(name, default)
         Connections = {},
     }
     
-    function flag:Get()
-        return self.Value
-    end
-    
+    function flag:Get() return self.Value end
     function flag:Set(newValue)
         local old = self.Value
         self.Value = newValue
         for _, cb in ipairs(self.Connections) do
-            local ok, _ = pcall(cb, newValue, old)
-            if not ok then
-                -- Silently ignore callback errors
-            end
+            pcall(cb, newValue, old)
         end
     end
-    
-    function flag:Toggle()
-        self:Set(not self.Value)
-    end
-    
+    function flag:Toggle() self:Set(not self.Value) end
     function flag:Connect(callback)
         table.insert(self.Connections, callback)
-        return {
-            Disconnect = function()
-                for i, cb in ipairs(self.Connections) do
-                    if cb == callback then
-                        table.remove(self.Connections, i)
-                        break
-                    end
-                end
+        return { Disconnect = function()
+            for i, cb in ipairs(self.Connections) do
+                if cb == callback then table.remove(self.Connections, i) break end
             end
-        }
+        end }
     end
     
     FlagStorage[name] = flag
     return flag
 end
 
-function Flags:Get(name)
-    return FlagStorage[name]
-end
-
-function Flags:Set(name, value)
-    local flag = FlagStorage[name]
-    if flag then
-        flag:Set(value)
-    end
-end
-
-function Flags:GetValue(name)
-    local flag = FlagStorage[name]
-    return flag and flag:Get() or nil
-end
-
-function Flags:GetAll()
-    local data = {}
-    for name, flag in pairs(FlagStorage) do
-        data[name] = flag:Get()
-    end
-    return data
-end
-
-function Flags:Import(data)
-    if type(data) ~= "table" then return end
-    for name, value in pairs(data) do
-        self:Set(name, value)
-    end
-end
-
-function Flags:Export()
-    return self:GetAll()
-end
-
+function Flags:Get(name) return FlagStorage[name] end
+function Flags:Set(name, value) if FlagStorage[name] then FlagStorage[name]:Set(value) end end
+function Flags:GetValue(name) return FlagStorage[name] and FlagStorage[name]:Get() or nil end
 function Flags:Count()
     local count = 0
-    for _ in pairs(FlagStorage) do
-        count = count + 1
-    end
+    for _ in pairs(FlagStorage) do count = count + 1 end
     return count
 end
 
@@ -661,15 +385,8 @@ local windowSuccess, windowError = pcall(function()
         ToggleKey = Enum.KeyCode.RightShift,
         Transparent = false,
         ScrollBarEnabled = true,
-        
-        ConfigurationSaving = {
-            Enabled = false
-        },
-        
-        Discord = {
-            Enabled = false
-        },
-        
+        ConfigurationSaving = { Enabled = false },
+        Discord = { Enabled = false },
         KeySystem = false,
     })
     windowCreated = true
@@ -677,9 +394,8 @@ end)
 
 if not windowCreated then
     Logger:Dead("Failed to create window: " .. tostring(windowError))
-    Logger:Dead("Attempting simplified window creation...")
+    Logger:Dead("Attempting simplified window...")
     
-    -- Fallback: simplified window
     pcall(function()
         Window = WindUI:CreateWindow({
             Title = "Hyper",
@@ -692,13 +408,12 @@ if not windowCreated then
             KeySystem = false,
         })
         windowCreated = true
-        Logger:Good("Simplified window created successfully!")
+        Logger:Good("Simplified window created!")
     end)
 end
 
 if not windowCreated or not Window then
     Logger:Dead("CRITICAL: Cannot create window. Aborting.")
-    Logger:PrintSummary()
     return
 end
 
@@ -710,8 +425,6 @@ Logger:Good("Window created successfully!")
 Logger:Info("Creating tabs...")
 
 local Tabs = {}
-local tabsCreated = 0
-local tabsFailed = 0
 
 local tabDefinitions = {
     { Name = "Home",     Icon = "home" },
@@ -728,101 +441,74 @@ for _, tabDef in ipairs(tabDefinitions) do
     
     if ok and tab then
         Tabs[tabDef.Name] = tab
-        tabsCreated = tabsCreated + 1
         Logger:Good("Tab created: " .. tabDef.Name)
     else
-        tabsFailed = tabsFailed + 1
-        Logger:Skip("Tab failed: " .. tabDef.Name .. " - " .. tostring(tab))
+        Logger:Skip("Tab failed: " .. tabDef.Name)
     end
 end
-
-Logger:Info(string.format("Tabs: %d created, %d failed", tabsCreated, tabsFailed))
 
 -- =============================================
 -- HOME TAB CONTENT
 -- =============================================
 if Tabs.Home then
-    Logger:Info("Building Home tab...")
+    local welcomeSection = Tabs.Home:Section({ Title = "Welcome", Icon = "info", Opened = true })
     
-    local homeSection = Tabs.Home:Section({ Title = "Welcome", Icon = "info", Opened = true })
-    
-    pcall(function()
-        Tabs.Home:Label({ Title = "Hyper UI Framework v1.0.0" })
-        Tabs.Home:Label({ Title = "By M4X | EVA | AMAL" })
-        Tabs.Home:Label({ Title = "Welcome, " .. (LocalPlayer and LocalPlayer.Name or "User") .. "!" })
-    end)
+    welcomeSection:Button({ Title = "Hyper UI Framework v1.0.0", Callback = function() end })
+    welcomeSection:Button({ Title = "By M4X | EVA | AMAL", Callback = function() end })
+    welcomeSection:Button({ Title = "Welcome, " .. (LocalPlayer and LocalPlayer.Name or "User") .. "!", Callback = function() end })
     
     local quickSection = Tabs.Home:Section({ Title = "Quick Actions", Icon = "activity" })
     
-    pcall(function()
-        quickSection:Button({
-            Title = "Rejoin Server",
-            Description = "Rejoin the current server",
-            Icon = "rotate-cw",
-            Callback = function()
-                if TeleportService and LocalPlayer then
-                    TeleportService:Teleport(game.PlaceId, LocalPlayer)
+    quickSection:Button({
+        Title = "Rejoin Server",
+        Description = "Rejoin the current server",
+        Callback = function()
+            if TeleportService and LocalPlayer then
+                TeleportService:Teleport(game.PlaceId, LocalPlayer)
+            end
+        end
+    })
+    
+    quickSection:Button({
+        Title = "Clean Workspace",
+        Description = "Remove all unnecessary objects",
+        Callback = function()
+            local count = 0
+            for _, obj in ipairs(workspace:GetChildren()) do
+                if obj:IsA("Model") and obj ~= LocalPlayer and obj ~= LocalPlayer.Character then
+                    pcall(function() obj:Destroy() end)
+                    count = count + 1
                 end
             end
-        })
-    end)
+            WindUI:Notify({ Title = "Hyper", Description = "Cleaned " .. count .. " objects!", Duration = 3 })
+        end
+    })
     
-    pcall(function()
-        quickSection:Button({
-            Title = "Clean Workspace",
-            Description = "Remove all unnecessary objects",
-            Icon = "trash-2",
-            Callback = function()
-                local count = 0
-                for _, obj in ipairs(workspace:GetChildren()) do
-                    if obj:IsA("Model") and obj ~= LocalPlayer and obj ~= LocalPlayer.Character then
-                        pcall(function() obj:Destroy() end)
-                        count = count + 1
-                    end
-                end
-                WindUI:Notify({ Title = "Hyper", Description = "Cleaned " .. count .. " objects!", Duration = 3 })
-            end
-        })
-    end)
-    
-    pcall(function()
-        quickSection:Button({
-            Title = "Destroy UI",
-            Description = "Close and destroy the interface",
-            Icon = "x",
-            Callback = function()
-                pcall(function() Window:Destroy() end)
-            end
-        })
-    end)
+    quickSection:Button({
+        Title = "Destroy UI",
+        Description = "Close and destroy the interface",
+        Callback = function()
+            pcall(function() Window:Destroy() end)
+        end
+    })
     
     local toggleSection = Tabs.Home:Section({ Title = "Toggles", Icon = "toggle-left" })
     
-    pcall(function()
-        toggleSection:Toggle({
-            Title = "Auto Updater",
-            Description = "Automatically check for updates",
-            Value = true,
-            Callback = function(state)
-                Flags:Set("AutoUpdater", state)
-            end
-        })
-    end)
+    toggleSection:Toggle({
+        Title = "Auto Updater",
+        Description = "Automatically check for updates",
+        Value = true,
+        Callback = function(state) Flags:Set("AutoUpdater", state) end
+    })
     
-    pcall(function()
-        toggleSection:Toggle({
-            Title = "Anti AFK",
-            Description = "Prevent being kicked for inactivity",
-            Value = false,
-            Callback = function(state)
-                Flags:Set("AntiAFK", state)
-            end
-        })
-    end)
+    toggleSection:Toggle({
+        Title = "Anti AFK",
+        Description = "Prevent being kicked for inactivity",
+        Value = false,
+        Callback = function(state) Flags:Set("AntiAFK", state) end
+    })
     
     Logger:Good("Home tab built!")
-else
-    Logger:Error("Home tab not available, skipping content creation.")
 end
 
 -- =============================================
@@ -834,7 +520,7 @@ Logger:Info("Loading External Feature Modules...")
 local FeatureList = {
     -- Core Systems
     { Path = "Core/Themes.lua",        Tab = "Utility",  Name = "Themes System" },
-    { Path = "Core/Settings.lua",     Tab = "Utility",  Name = "UI Settings" },
+    { Path = "Core/Settings.lua",      Tab = "Utility",  Name = "UI Settings" },
     
     -- Aimbot Features
     { Path = "Features/Aimbot/Silent.lua",      Tab = "Aimbot",   Name = "Silent Aim" },
@@ -843,11 +529,7 @@ local FeatureList = {
     { Path = "Features/Aimbot/Prediction.lua",  Tab = "Aimbot",   Name = "Prediction" },
     
     -- Visuals Features
-    { Path = "Features/Visuals/ESP.lua",        Tab = "Visuals",  Name = "ESP" }  
-    { Path = "Features/Visuals/Boxes.lua",      Tab = "Visuals",  Name = "Boxes" },
-    { Path = "Features/Visuals/Skeletons.lua",  Tab = "Visuals",  Name = "Skeletons" },
-    { Path = "Features/Visuals/Chams.lua",      Tab = "Visuals",  Name = "Chams" },
-    { Path = "Features/Visuals/World.lua",      Tab = "Visuals",  Name = "World" },
+    { Path = "Features/Visuals/ESP.lua",        Tab = "Visuals",  Name = "ESP" },
     
     -- Movement Features
     { Path = "Features/Movement/Speed.lua",     Tab = "Movement", Name = "Speed" },
@@ -862,9 +544,14 @@ local FeatureList = {
     { Path = "Features/Utility/WhiteScreen.lua", Tab = "Utility",  Name = "White Screen" },
 }
 
+ModuleLoader.Stats = { Total = 0, Loaded = 0, Failed = 0, Skipped = 0 }
+ModuleLoader.Loaded = {}
+ModuleLoader.Failed = {}
+ModuleLoader.Skipped = {}
 
-ModuleLoader:Reset()
-FeatureInitializer:Reset()
+FeatureInitializer.Initialized = {}
+FeatureInitializer.Failed = {}
+FeatureInitializer.Skipped = {}
 
 local featureStats = { Loaded = 0, Failed = 0, Skipped = 0, Total = #FeatureList }
 
@@ -881,7 +568,7 @@ for _, feature in ipairs(FeatureList) do
                 featureStats.Failed = featureStats.Failed + 1
             end
         else
-            Logger:Skip("No tab for: " .. feature.Name .. " (Tab: " .. feature.Tab .. " not found)")
+            Logger:Skip("No tab: " .. feature.Name)
             featureStats.Skipped = featureStats.Skipped + 1
         end
     else
@@ -900,10 +587,7 @@ Logger:Box("Loading Report", {
     "Skipped: " .. featureStats.Skipped,
 })
 
-ModuleLoader:PrintReport()
-
 Logger:Info("Total Flags Registered: " .. Flags:Count())
-
 Logger:PrintSummary()
 
 -- =============================================
@@ -923,6 +607,12 @@ Logger:Box("HYPER UI READY", {
     "Features Active: " .. featureStats.Loaded .. "/" .. featureStats.Total,
 })
 
+print("")
+print("  ╔══════════════════════════════════════════╗")
+print("  ║       HYPER UI v1.0.0 - ACTIVE          ║")
+print("  ║     By M4X | EVA | AMAL                ║")
+print("  ╚══════════════════════════════════════════╝")
+print("")
 
 -- =============================================
 -- RETURN VALUES
