@@ -485,6 +485,61 @@ end
 
 -- =============================================
 -- BUILD UI
+function Themes:ApplyTheme(name)
+    local themeData = ThemeDefinitions[name]
+    if not themeData then
+        if self.Library then
+            self.Library:Notify({ 
+                Title = "Theme Error", 
+                Description = "Theme not found: " .. name, 
+                Duration = 3 
+            })
+        end
+        return false
+    end
+    
+    -- Try to apply theme directly
+    local applied = false
+    pcall(function()
+        WindUI:SetTheme(themeData)
+        applied = true
+    end)
+    
+    if not applied then
+        pcall(function()
+            WindUI:SetTheme(name)
+            applied = true
+        end)
+    end
+    
+    -- Update current
+    Themes.CurrentName = name
+    
+    -- Update flag
+    if self.Flags then
+        self.Flags:Set("CurrentTheme", name)
+    end
+    
+    -- Notify
+    if self.Library then
+        if applied then
+            self.Library:Notify({ 
+                Title = "Theme Changed", 
+                Description = "Applied: " .. name, 
+                Duration = 2 
+            })
+        else
+            self.Library:Notify({ 
+                Title = "Theme Saved", 
+                Description = "Theme: " .. name .. " | Refresh to apply.", 
+                Duration = 3 
+            })
+        end
+    end
+    
+    print("[Hyper] [Themes] Selected: " .. name .. (applied and " (applied)" or " (saved)"))
+    return true
+end
 -- =============================================
 function Themes:BuildUI()
     if not self.Tab then return end
