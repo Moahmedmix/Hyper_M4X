@@ -5,24 +5,25 @@
     ║         By M4X | EVA | AMAL                      ║
     ╚══════════════════════════════════════════════════╝
     
-    Full theme system with WindUI:AddTheme support.
-    15+ built-in custom themes, quick switch, dropdown.
+    Full theme system using WindUI official API.
+    - 10 custom themes registered via WindUI:AddTheme
+    - Dropdown to select theme
+    - Quick switch buttons
+    - Instant theme application
 --]]
 
 local Themes = {}
 Themes.__index = Themes
 
-Themes.CurrentName = "Hyper Dark"
-
 -- =============================================
--- THEME DEFINITIONS
+-- THEME DATA
 -- =============================================
-local ThemeDefinitions = {
+local ThemeData = {
 
     ["Hyper Dark"] = {
         Name = "Hyper Dark",
         Accent = Color3.fromHex("#18181b"),
-        Background = Color3.fromHex("#0a0a0a"),
+        Background = Color3.fromHex("#09090b"),
         BackgroundTransparency = 0,
         Outline = Color3.fromHex("#27272a"),
         Text = Color3.fromHex("#ffffff"),
@@ -64,7 +65,7 @@ local ThemeDefinitions = {
     ["Hyper Red"] = {
         Name = "Hyper Red",
         Accent = Color3.fromHex("#ef4444"),
-        Background = Color3.fromHex("#0a0000"),
+        Background = Color3.fromHex("#0c0000"),
         BackgroundTransparency = 0,
         Outline = Color3.fromHex("#450a0a"),
         Text = Color3.fromHex("#fef2f2"),
@@ -72,7 +73,7 @@ local ThemeDefinitions = {
         Button = Color3.fromHex("#991b1b"),
         Icon = Color3.fromHex("#fca5a5"),
         Hover = Color3.fromHex("#fecaca"),
-        WindowBackground = Color3.fromHex("#070000"),
+        WindowBackground = Color3.fromHex("#0c0000"),
         WindowShadow = Color3.fromHex("#000000"),
         WindowTopbarButtonIcon = Color3.fromHex("#fca5a5"),
         WindowTopbarTitle = Color3.fromHex("#fef2f2"),
@@ -85,12 +86,12 @@ local ThemeDefinitions = {
         ElementTitle = Color3.fromHex("#fef2f2"),
         ElementDesc = Color3.fromHex("#fca5a5"),
         ElementIcon = Color3.fromHex("#fca5a5"),
-        PopupBackground = Color3.fromHex("#070000"),
+        PopupBackground = Color3.fromHex("#0c0000"),
         PopupBackgroundTransparency = 0,
         PopupTitle = Color3.fromHex("#fef2f2"),
         PopupContent = Color3.fromHex("#fca5a5"),
         PopupIcon = Color3.fromHex("#fca5a5"),
-        DialogBackground = Color3.fromHex("#070000"),
+        DialogBackground = Color3.fromHex("#0c0000"),
         DialogBackgroundTransparency = 0,
         DialogTitle = Color3.fromHex("#fef2f2"),
         DialogContent = Color3.fromHex("#fca5a5"),
@@ -106,7 +107,7 @@ local ThemeDefinitions = {
     ["Hyper Blue"] = {
         Name = "Hyper Blue",
         Accent = Color3.fromHex("#3b82f6"),
-        Background = Color3.fromHex("#000a1a"),
+        Background = Color3.fromHex("#000814"),
         BackgroundTransparency = 0,
         Outline = Color3.fromHex("#1e3a5f"),
         Text = Color3.fromHex("#eff6ff"),
@@ -148,7 +149,7 @@ local ThemeDefinitions = {
     ["Hyper Green"] = {
         Name = "Hyper Green",
         Accent = Color3.fromHex("#22c55e"),
-        Background = Color3.fromHex("#001a05"),
+        Background = Color3.fromHex("#000d02"),
         BackgroundTransparency = 0,
         Outline = Color3.fromHex("#14532d"),
         Text = Color3.fromHex("#f0fdf4"),
@@ -190,7 +191,7 @@ local ThemeDefinitions = {
     ["Hyper Purple"] = {
         Name = "Hyper Purple",
         Accent = Color3.fromHex("#a855f7"),
-        Background = Color3.fromHex("#0a001a"),
+        Background = Color3.fromHex("#05000d"),
         BackgroundTransparency = 0,
         Outline = Color3.fromHex("#4c1d95"),
         Text = Color3.fromHex("#faf5ff"),
@@ -232,7 +233,7 @@ local ThemeDefinitions = {
     ["Hyper Ocean"] = {
         Name = "Hyper Ocean",
         Accent = Color3.fromHex("#06b6d4"),
-        Background = Color3.fromHex("#001a1a"),
+        Background = Color3.fromHex("#000d0d"),
         BackgroundTransparency = 0,
         Outline = Color3.fromHex("#155e75"),
         Text = Color3.fromHex("#ecfeff"),
@@ -274,7 +275,7 @@ local ThemeDefinitions = {
     ["Hyper Gold"] = {
         Name = "Hyper Gold",
         Accent = Color3.fromHex("#eab308"),
-        Background = Color3.fromHex("#1a1400"),
+        Background = Color3.fromHex("#0d0a00"),
         BackgroundTransparency = 0,
         Outline = Color3.fromHex("#854d0e"),
         Text = Color3.fromHex("#fefce8"),
@@ -316,7 +317,7 @@ local ThemeDefinitions = {
     ["Hyper Pink"] = {
         Name = "Hyper Pink",
         Accent = Color3.fromHex("#ec4899"),
-        Background = Color3.fromHex("#1a0010"),
+        Background = Color3.fromHex("#0d0008"),
         BackgroundTransparency = 0,
         Outline = Color3.fromHex("#9d174d"),
         Text = Color3.fromHex("#fdf2f8"),
@@ -355,52 +356,10 @@ local ThemeDefinitions = {
         SliderThumb = Color3.fromHex("#fdf2f8"),
     },
 
-    ["Hyper Orange"] = {
-        Name = "Hyper Orange",
-        Accent = Color3.fromHex("#f97316"),
-        Background = Color3.fromHex("#1a0c00"),
-        BackgroundTransparency = 0,
-        Outline = Color3.fromHex("#9a3412"),
-        Text = Color3.fromHex("#fff7ed"),
-        Placeholder = Color3.fromHex("#f97316"),
-        Button = Color3.fromHex("#c2410c"),
-        Icon = Color3.fromHex("#fdba74"),
-        Hover = Color3.fromHex("#fed7aa"),
-        WindowBackground = Color3.fromHex("#0d0600"),
-        WindowShadow = Color3.fromHex("#000000"),
-        WindowTopbarButtonIcon = Color3.fromHex("#fdba74"),
-        WindowTopbarTitle = Color3.fromHex("#fff7ed"),
-        WindowTopbarAuthor = Color3.fromHex("#fdba74"),
-        WindowTopbarIcon = Color3.fromHex("#f97316"),
-        TabBackground = Color3.fromHex("#2b1400"),
-        TabTitle = Color3.fromHex("#fff7ed"),
-        TabIcon = Color3.fromHex("#fdba74"),
-        ElementBackground = Color3.fromHex("#2b1400"),
-        ElementTitle = Color3.fromHex("#fff7ed"),
-        ElementDesc = Color3.fromHex("#fdba74"),
-        ElementIcon = Color3.fromHex("#fdba74"),
-        PopupBackground = Color3.fromHex("#0d0600"),
-        PopupBackgroundTransparency = 0,
-        PopupTitle = Color3.fromHex("#fff7ed"),
-        PopupContent = Color3.fromHex("#fdba74"),
-        PopupIcon = Color3.fromHex("#fdba74"),
-        DialogBackground = Color3.fromHex("#0d0600"),
-        DialogBackgroundTransparency = 0,
-        DialogTitle = Color3.fromHex("#fff7ed"),
-        DialogContent = Color3.fromHex("#fdba74"),
-        DialogIcon = Color3.fromHex("#fdba74"),
-        Toggle = Color3.fromHex("#c2410c"),
-        ToggleBar = Color3.fromHex("#fff7ed"),
-        Checkbox = Color3.fromHex("#c2410c"),
-        CheckboxIcon = Color3.fromHex("#fff7ed"),
-        Slider = Color3.fromHex("#c2410c"),
-        SliderThumb = Color3.fromHex("#fff7ed"),
-    },
-
     ["Hyper Mint"] = {
         Name = "Hyper Mint",
         Accent = Color3.fromHex("#10b981"),
-        Background = Color3.fromHex("#001a10"),
+        Background = Color3.fromHex("#000d08"),
         BackgroundTransparency = 0,
         Outline = Color3.fromHex("#065f46"),
         Text = Color3.fromHex("#ecfdf5"),
@@ -440,31 +399,23 @@ local ThemeDefinitions = {
     },
 }
 
--- Build theme list from definitions
+-- Build sorted theme list
 Themes.List = {}
-for name, _ in pairs(ThemeDefinitions) do
+for name, _ in pairs(ThemeData) do
     table.insert(Themes.List, name)
 end
 table.sort(Themes.List)
 
--- =============================================
--- REGISTER ALL THEMES
--- =============================================
-function Themes:RegisterAll()
-    for name, themeData in pairs(ThemeDefinitions) do
-        local success, err = pcall(function()
-            WindUI:AddTheme(themeData)
-        end)
-        if success then
-            print("[Hyper] [Themes] Registered: " .. name)
-        else
-            print("[Hyper] [Themes] Failed: " .. name .. " - " .. tostring(err))
-        end
-    end
-end
+Themes.CurrentName = "Hyper Dark"
 
--- Register themes immediately
-Themes:RegisterAll()
+-- =============================================
+-- REGISTER ALL THEMES WITH WIND UI
+-- =============================================
+for name, data in pairs(ThemeData) do
+    pcall(function()
+        WindUI:AddTheme(data)
+    end)
+end
 
 -- =============================================
 -- INIT
@@ -474,20 +425,99 @@ function Themes:Init(tab, library, flags)
     self.Tab = tab
     self.Library = library
     self.Flags = flags
-    
+
     if flags then
         flags:Create("CurrentTheme", Themes.CurrentName)
     end
-    
+
     self:BuildUI()
     return self
 end
 
 -- =============================================
 -- BUILD UI
+-- =============================================
+function Themes:BuildUI()
+    if not self.Tab then return end
+
+    -- Info Section
+    local infoSection = self.Tab:Section({ 
+        Title = "Current Theme", 
+        Icon = "info",
+        Opened = true 
+    })
+    
+    infoSection:Label({ Title = "Theme: " .. Themes.CurrentName })
+
+    -- Dropdown Section
+    local selectSection = self.Tab:Section({ 
+        Title = "Select Theme", 
+        Icon = "palette",
+        Opened = true 
+    })
+
+    selectSection:Dropdown({
+        Title = "Theme",
+        Description = "Choose your theme",
+        Values = Themes.List,
+        Value = Themes.CurrentName,
+        Callback = function(selected)
+            self:ApplyTheme(selected)
+        end
+    })
+
+    -- Quick Switch Sections
+    local darkSection = self.Tab:Section({ 
+        Title = "Dark Themes", 
+        Icon = "moon",
+        Opened = false 
+    })
+
+    for _, name in ipairs({"Hyper Dark", "Hyper Blue", "Hyper Purple", "Hyper Ocean"}) do
+        darkSection:Button({
+            Title = name,
+            Callback = function()
+                self:ApplyTheme(name)
+            end
+        })
+    end
+
+    local colorSection = self.Tab:Section({ 
+        Title = "Colorful Themes", 
+        Icon = "sun",
+        Opened = false 
+    })
+
+    for _, name in ipairs({"Hyper Red", "Hyper Green", "Hyper Gold", "Hyper Orange"}) do
+        colorSection:Button({
+            Title = name,
+            Callback = function()
+                self:ApplyTheme(name)
+            end
+        })
+    end
+
+    local softSection = self.Tab:Section({ 
+        Title = "Soft Themes", 
+        Icon = "heart",
+        Opened = false 
+    })
+
+    for _, name in ipairs({"Hyper Pink", "Hyper Mint"}) do
+        softSection:Button({
+            Title = name,
+            Callback = function()
+                self:ApplyTheme(name)
+            end
+        })
+    end
+end
+
+-- =============================================
+-- APPLY THEME
+-- =============================================
 function Themes:ApplyTheme(name)
-    local themeData = ThemeDefinitions[name]
-    if not themeData then
+    if not ThemeData[name] then
         if self.Library then
             self.Library:Notify({ 
                 Title = "Theme Error", 
@@ -497,11 +527,17 @@ function Themes:ApplyTheme(name)
         end
         return false
     end
-    
-    -- Try to apply theme directly
+
+    Themes.CurrentName = name
+
+    if self.Flags then
+        self.Flags:Set("CurrentTheme", name)
+    end
+
+    -- Try to apply via WindUI
     local applied = false
     pcall(function()
-        WindUI:SetTheme(themeData)
+        WindUI:SetTheme(ThemeData[name])
         applied = true
     end)
     
@@ -511,151 +547,20 @@ function Themes:ApplyTheme(name)
             applied = true
         end)
     end
-    
-    -- Update current
-    Themes.CurrentName = name
-    
-    -- Update flag
-    if self.Flags then
-        self.Flags:Set("CurrentTheme", name)
-    end
-    
-    -- Notify
-    if self.Library then
-        if applied then
-            self.Library:Notify({ 
-                Title = "Theme Changed", 
-                Description = "Applied: " .. name, 
-                Duration = 2 
-            })
-        else
-            self.Library:Notify({ 
-                Title = "Theme Saved", 
-                Description = "Theme: " .. name .. " | Refresh to apply.", 
-                Duration = 3 
-            })
-        end
-    end
-    
-    print("[Hyper] [Themes] Selected: " .. name .. (applied and " (applied)" or " (saved)"))
-    return true
-end
--- =============================================
-function Themes:BuildUI()
-    if not self.Tab then return end
-    
-    -- Info section
-    local infoSection = self.Tab:Section({ 
-        Title = "Current Theme", 
-        Icon = "info",
-        Opened = true 
-    })
-    
-    infoSection:Label({ Title = "Theme: " .. Themes.CurrentName })
-    
-    -- Dropdown
-    local selectSection = self.Tab:Section({ 
-        Title = "Select Theme", 
-        Icon = "palette",
-        Opened = true 
-    })
-    
-    selectSection:Dropdown({
-        Title = "Theme",
-        Description = "Pick a theme to apply instantly",
-        Values = Themes.List,
-        Value = Themes.CurrentName,
-        Callback = function(selected)
-            self:ApplyTheme(selected)
-        end
-    })
-    
-    -- Quick buttons - Row 1
-    local quickSection1 = self.Tab:Section({ 
-        Title = "Dark Themes", 
-        Icon = "moon",
-        Opened = false 
-    })
-    
-    for _, name in ipairs({"Hyper Dark", "Hyper Blue", "Hyper Purple", "Hyper Ocean"}) do
-        quickSection1:Button({
-            Title = name,
-            Callback = function() self:ApplyTheme(name) end
-        })
-    end
-    
-    -- Quick buttons - Row 2
-    local quickSection2 = self.Tab:Section({ 
-        Title = "Colorful Themes", 
-        Icon = "sun",
-        Opened = false 
-    })
-    
-    for _, name in ipairs({"Hyper Red", "Hyper Green", "Hyper Gold", "Hyper Orange"}) do
-        quickSection2:Button({
-            Title = name,
-            Callback = function() self:ApplyTheme(name) end
-        })
-    end
-    
-    -- Quick buttons - Row 3
-    local quickSection3 = self.Tab:Section({ 
-        Title = "Soft Themes", 
-        Icon = "heart",
-        Opened = false 
-    })
-    
-    for _, name in ipairs({"Hyper Pink", "Hyper Mint"}) do
-        quickSection3:Button({
-            Title = name,
-            Callback = function() self:ApplyTheme(name) end
-        })
-    end
-end
 
--- =============================================
--- APPLY THEME
--- =============================================
-function Themes:ApplyTheme(name)
-    local themeData = ThemeDefinitions[name]
-    if not themeData then
-        if self.Library then
-            self.Library:Notify({ 
-                Title = "Theme Error", 
-                Description = "Theme not found: " .. name, 
-                Duration = 3 
-            })
-        end
-        return false
-    end
-    
-    -- Update current
-    Themes.CurrentName = name
-    
-    -- Update flag
-    if self.Flags then
-        self.Flags:Set("CurrentTheme", name)
-    end
-    
-    -- Notify
     if self.Library then
         self.Library:Notify({ 
             Title = "Theme Applied", 
-            Description = "Theme: " .. name .. " | Refresh UI to see changes.", 
-            Duration = 4 
+            Description = name .. (applied and "" or " | Refresh to see full effect"), 
+            Duration = 3 
         })
     end
-    
-    print("[Hyper] [Themes] Applied: " .. name)
+
     return true
 end
 
 function Themes:GetCurrentTheme()
     return Themes.CurrentName
-end
-
-function Themes:GetThemeData(name)
-    return ThemeDefinitions[name or Themes.CurrentName]
 end
 
 return Themes
