@@ -827,6 +827,10 @@ Logger:Separator()
 Logger:Info("Loading External Feature Modules...")
 
 local FeatureList = {
+    -- Core Systems
+    { Path = "Core/Themes.lua",        Tab = "Utility",  Name = "Themes System" },
+    { Path = "Core/Settings.lua",     Tab = "Utility",  Name = "UI Settings" },
+    
     -- Aimbot Features
     { Path = "Features/Aimbot/Silent.lua",      Tab = "Aimbot",   Name = "Silent Aim" },
     { Path = "Features/Aimbot/FOV.lua",         Tab = "Aimbot",   Name = "FOV Circle" },
@@ -852,6 +856,7 @@ local FeatureList = {
     { Path = "Features/Utility/StreamSniper.lua", Tab = "Utility", Name = "Stream Sniper" },
     { Path = "Features/Utility/WhiteScreen.lua", Tab = "Utility",  Name = "White Screen" },
 }
+
 
 ModuleLoader:Reset()
 FeatureInitializer:Reset()
