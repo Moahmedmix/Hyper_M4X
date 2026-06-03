@@ -215,6 +215,7 @@ end
 -- =============================================
 -- CREATE WINDOW USING WIND UI
 -- =============================================
+
 local Window = WindUI:CreateWindow({
     Name = "Hyper",
     Subtitle = "v1.0.0",
@@ -231,9 +232,8 @@ local Window = WindUI:CreateWindow({
         Invite = ""
     },
     KeySystem = false,
-    SaveOnClose = true
+    SaveOnClose = false  -- غيّرها لـ false عشان نمنع الحفظ التلقائي اللي بيسبب المشكلة
 })
-
 -- =============================================
 -- CREATE TABS
 -- =============================================
