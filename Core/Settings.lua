@@ -12,7 +12,6 @@
 local Settings = {}
 Settings.__index = Settings
 
--- Default settings
 Settings.Defaults = {
     ToggleKey = "RightShift",
     Transparent = false,
@@ -23,7 +22,6 @@ Settings.Defaults = {
     Theme = "Dark",
 }
 
--- Current settings
 Settings.Current = {}
 
 function Settings:Init(tab, library, flags)
@@ -31,15 +29,13 @@ function Settings:Init(tab, library, flags)
     self.Tab = tab
     self.Library = library
     self.Flags = flags
-    
-    -- Load defaults
+
     for k, v in pairs(Settings.Defaults) do
-        if not Settings.Current[k] then
+        if Settings.Current[k] == nil then
             Settings.Current[k] = v
         end
     end
-    
-    -- Register flags
+
     if flags then
         flags:Create("UITransparent", Settings.Current.Transparent or false)
         flags:Create("UIResizable", Settings.Current.Resizable or true)
@@ -47,29 +43,32 @@ function Settings:Init(tab, library, flags)
         flags:Create("UIHideSearch", Settings.Current.HideSearchBar or true)
         flags:Create("UISideBarWidth", Settings.Current.SideBarWidth or 190)
     end
-    
-    -- Build UI
+
     self:BuildUI()
-    
     return self
 end
 
 function Settings:BuildUI()
     if not self.Tab then return end
-    
-    local section = self.Tab:Section({ 
-        Title = "UI Settings", 
-        Icon = "settings",
+
+    -- Info Section
+    local infoSection = self.Tab:Section({ 
+        Title = "Information", 
+        Icon = "info",
         Opened = true 
     })
     
-    -- ToggleKey display (informational)
-    self.Tab:Label({ 
-        Title = "Toggle Key: Right Shift" 
+    infoSection:Label({ Title = "Toggle Key: Right Shift" })
+    infoSection:Label({ Title = "Sidebar Width: " .. (Settings.Current.SideBarWidth or 190) .. "px" })
+
+    -- Toggles Section
+    local toggleSection = self.Tab:Section({ 
+        Title = "Window Toggles", 
+        Icon = "toggle-left",
+        Opened = true 
     })
-    
-    -- Transparency toggle
-    section:Toggle({
+
+    toggleSection:Toggle({
         Title = "Transparent Background",
         Description = "Make the window background transparent",
         Value = Settings.Current.Transparent or false,
@@ -83,9 +82,8 @@ function Settings:BuildUI()
             })
         end
     })
-    
-    -- Resizable toggle
-    section:Toggle({
+
+    toggleSection:Toggle({
         Title = "Resizable Window",
         Description = "Allow window resizing",
         Value = Settings.Current.Resizable or true,
@@ -99,9 +97,8 @@ function Settings:BuildUI()
             })
         end
     })
-    
-    -- Scrollbar toggle
-    section:Toggle({
+
+    toggleSection:Toggle({
         Title = "Scroll Bar",
         Description = "Show scrollbar in tabs",
         Value = Settings.Current.ScrollBarEnabled or true,
@@ -115,9 +112,8 @@ function Settings:BuildUI()
             })
         end
     })
-    
-    -- Hide search bar toggle
-    section:Toggle({
+
+    toggleSection:Toggle({
         Title = "Hide Search Bar",
         Description = "Hide the tab search bar",
         Value = Settings.Current.HideSearchBar or true,
@@ -131,9 +127,15 @@ function Settings:BuildUI()
             })
         end
     })
-    
-    -- Sidebar width slider
-    section:Slider({
+
+    -- Slider Section
+    local sliderSection = self.Tab:Section({ 
+        Title = "Sidebar", 
+        Icon = "sidebar",
+        Opened = true 
+    })
+
+    sliderSection:Slider({
         Title = "Sidebar Width",
         Description = "Adjust the sidebar width",
         Min = 150,
@@ -146,20 +148,27 @@ function Settings:BuildUI()
             if self.Flags then self.Flags:Set("UISideBarWidth", value) end
         end
     })
-    
-    -- Reset to defaults button
+
+    -- Reset Section
     local resetSection = self.Tab:Section({ 
         Title = "Reset", 
         Icon = "rotate-ccw",
         Opened = false 
     })
-    
+
     resetSection:Button({
         Title = "Reset UI Settings",
         Description = "Restore all settings to default",
         Callback = function()
             for k, v in pairs(Settings.Defaults) do
                 Settings.Current[k] = v
+            end
+            if self.Flags then
+                self.Flags:Set("UITransparent", Settings.Current.Transparent)
+                self.Flags:Set("UIResizable", Settings.Current.Resizable)
+                self.Flags:Set("UIScrollBar", Settings.Current.ScrollBarEnabled)
+                self.Flags:Set("UIHideSearch", Settings.Current.HideSearchBar)
+                self.Flags:Set("UISideBarWidth", Settings.Current.SideBarWidth)
             end
             self.Library:Notify({ 
                 Title = "UI Settings", 
