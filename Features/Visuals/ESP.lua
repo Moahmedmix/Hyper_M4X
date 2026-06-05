@@ -4,38 +4,6 @@
     ║    Premium: 10 Styles + Full Customization + 3D Box + Chams  ║
     ║              By M4X | EVA | AMAL                            ║
     ╚══════════════════════════════════════════════════════════════╝
-
-    Features:
-    - 10 Box Styles: Corner, Full, 3D, Circle, Diamond, Crosshair, Triangle, Hexagon, Arrow, Dynamic
-    - Full customization: colors, thickness, transparency, fill, glow
-    - Chams (Highlight) with fill/outline
-    - Off-screen arrows with distance
-    - Dynamic scaling based on distance
-    - Animated effects: pulse, rainbow, gradient
-    - Team check, vis check, wall check
-    - Health bar: left/right/top/bottom + gradient colors
-    - Armor bar, stamina bar
-    - Name: custom font, size, color, outline, shadow
-    - Distance: brackets, units, color by distance
-    - Weapon: icon, name, ammo
-    - Tracers: 5 origins, bezier curves, animated
-    - Snaplines: dynamic color by distance
-    - Skeleton: full body, color by bone, thickness
-    - Info panel: stats, ping, FPS, KDR
-    - Head dot: circle, cross, dot
-    - Look direction: arrow from head
-    - Velocity vector: movement prediction line
-    - Rank/Level display
-    - Status: AFK, reloading, crouching, jumping
-    - Kill feed overlay
-    - Minimap radar
-    - Target priority: closest, lowest HP, weakest, highest rank
-    - FOV circle for ESP targeting
-    - Sound ESP (visual indicators for gunshots)
-    - Loot ESP (items, weapons, ammo)
-    - Vehicle ESP
-    - Objective ESP
-    - All settings save/load
 --]]
 
 local ESP = {}
@@ -66,7 +34,7 @@ ESP.Settings = {
     MaxScale = 1.5,
     
     -- Box Styles
-    BoxStyle = "Corner", -- Corner, Full, 3D, Circle, Diamond, Crosshair, Triangle, Hexagon, Arrow, Dynamic
+    BoxStyle = "Corner",
     BoxColor = Color3.fromRGB(255, 255, 255),
     BoxThickness = 2,
     BoxTransparency = 1,
@@ -95,7 +63,7 @@ ESP.Settings = {
     
     -- Corner Box
     CornerLen = 22,
-    CornerStyle = "Sharp", -- Sharp, Rounded, Gap
+    CornerStyle = "Sharp",
     CornerGap = 4,
     
     -- Circle Box
@@ -120,13 +88,13 @@ ESP.Settings = {
     ArrowHeadSize = 8,
     
     -- Dynamic Box
-    DynamicStyle = "Pulse", -- Pulse, Breathe, Wave
+    DynamicStyle = "Pulse",
     
     -- Name
     Name = true,
     NameColor = Color3.fromRGB(255, 255, 255),
     NameSize = 13,
-    NameFont = 2, -- 0=Legacy, 1=SourceSans, 2=SourceSansBold, 3=Roboto, 4=RobotoMono
+    NameFont = 2,
     NameOutline = true,
     NameOutlineColor = Color3.fromRGB(0, 0, 0),
     NameShadow = false,
@@ -146,7 +114,7 @@ ESP.Settings = {
     DistFont = 2,
     DistOutline = true,
     DistBrackets = true,
-    DistUnits = "m", -- m, ft, studs
+    DistUnits = "m",
     DistColorByRange = false,
     DistCloseColor = Color3.fromRGB(255, 50, 50),
     DistMidColor = Color3.fromRGB(255, 255, 50),
@@ -156,7 +124,7 @@ ESP.Settings = {
     
     -- Health
     HP = true,
-    HPPos = "Left", -- Left, Right, Top, Bottom
+    HPPos = "Left",
     HPThick = 3,
     HPHeight = 40,
     HPWidth = 4,
@@ -188,9 +156,9 @@ ESP.Settings = {
     -- Tracer
     Tracer = false,
     TracerColor = Color3.fromRGB(255, 255, 255),
-    TracerOrigin = "Bottom", -- Bottom, Top, Middle, Mouse, Center
+    TracerOrigin = "Bottom",
     TracerThick = 1,
-    TracerStyle = "Line", -- Line, Bezier, Dashed, Dotted
+    TracerStyle = "Line",
     TracerDashLength = 5,
     TracerGapLength = 3,
     TracerAnimated = false,
@@ -230,7 +198,7 @@ ESP.Settings = {
     HeadDot = false,
     HeadDotColor = Color3.fromRGB(255, 255, 255),
     HeadDotSize = 4,
-    HeadDotStyle = "Circle", -- Circle, Cross, Dot, Square
+    HeadDotStyle = "Circle",
     HeadDotFilled = true,
     HeadDotOutline = true,
     HeadDotOutlineColor = Color3.fromRGB(0, 0, 0),
@@ -310,13 +278,13 @@ ESP.Settings = {
     ObjectiveSize = 14,
     
     -- Target Priority
-    TargetPriority = "Closest", -- Closest, LowestHP, Weakest, HighestRank, FOV
+    TargetPriority = "Closest",
     TargetFOV = 150,
     
     -- Minimap
     Minimap = false,
     MinimapSize = 150,
-    MinimapPos = "TopRight", -- TopLeft, TopRight, BottomLeft, BottomRight
+    MinimapPos = "TopRight",
     MinimapRange = 500,
     MinimapColor = Color3.fromRGB(255, 255, 255),
     MinimapBG = Color3.fromRGB(0, 0, 0),
@@ -336,9 +304,9 @@ ESP.Settings = {
     WaveAmplitude = 5,
     
     -- Performance
-    UpdateRate = 0, -- 0 = every frame, >0 = skip frames
-    MaxRender = 50, -- max players to render
-    LODDist = 1000, -- distance to switch to low detail
+    UpdateRate = 0,
+    MaxRender = 50,
+    LODDist = 1000,
 }
 
 ESP.Boxes = {}
@@ -436,7 +404,6 @@ function ESP:GetHPColor(pct)
         elseif pct > 0.25 then return ESP.Settings.HPColorMid
         else return ESP.Settings.HPColorLow end
     end
-    -- Gradient interpolation
     if pct > 0.5 then
         local t = (pct - 0.5) / 0.5
         return ESP.Settings.HPColorMid:Lerp(ESP.Settings.HPColorHigh, t)
@@ -534,14 +501,12 @@ end
 function ESP:CreatePlayer(p)
     local b = {}
     
-    -- Box lines (max 50 for complex shapes)
     for i = 1, 50 do
         b[i] = Drawing.new("Line")
         b[i].Visible = false
         b[i].Transparency = 1
     end
     
-    -- Text elements
     b.Name = Drawing.new("Text")
     b.Name.Center = true
     b.Name.Visible = false
@@ -578,7 +543,6 @@ function ESP:CreatePlayer(p)
     b.ArmorText.Center = true
     b.ArmorText.Visible = false
     
-    -- Squares
     b.HPBg = Drawing.new("Square")
     b.HPBg.Filled = true
     b.HPBg.Visible = false
@@ -611,14 +575,12 @@ function ESP:CreatePlayer(p)
     b.InfoBG.Filled = true
     b.InfoBG.Visible = false
     
-    -- Circles
     b.HeadDot = Drawing.new("Circle")
     b.HeadDot.Visible = false
     
     b.FOV = Drawing.new("Circle")
     b.FOV.Visible = false
     
-    -- Lines
     b.Tracer = Drawing.new("Line")
     b.Tracer.Visible = false
     
@@ -631,7 +593,6 @@ function ESP:CreatePlayer(p)
     b.Velocity = Drawing.new("Line")
     b.Velocity.Visible = false
     
-    -- Off-screen arrow
     b.OffScreenArrow = Drawing.new("Triangle")
     b.OffScreenArrow.Visible = false
     
@@ -639,17 +600,14 @@ function ESP:CreatePlayer(p)
     b.OffScreenDist.Center = true
     b.OffScreenDist.Visible = false
     
-    -- Chams (Highlight)
-    b.Chams = nil -- Will be created when needed
+    b.Chams = nil
     
-    -- 3D Box corners
     b.Box3D = {}
     for i = 1, 12 do
         b.Box3D[i] = Drawing.new("Line")
         b.Box3D[i].Visible = false
     end
     
-    -- Glow effect
     b.Glow = {}
     for i = 1, 4 do
         b.Glow[i] = Drawing.new("Line")
@@ -705,7 +663,6 @@ function ESP:HidePlayerDrawings(p)
         end
     end
     
-    -- Hide chams
     if b.Chams then
         b.Chams:Destroy()
         b.Chams = nil
@@ -759,7 +716,6 @@ function ESP:DrawCornerBox(b, dims, color, thick, style, gap, animated)
     
     local g = gap or 0
     
-    -- Top left
     b[1].From = Vector2.new(x, y)
     b[1].To = Vector2.new(x + cl, y)
     b[1].Color = color
@@ -772,7 +728,6 @@ function ESP:DrawCornerBox(b, dims, color, thick, style, gap, animated)
     b[2].Thickness = thick
     b[2].Visible = true
     
-    -- Top right
     b[3].From = Vector2.new(x + w - cl, y)
     b[3].To = Vector2.new(x + w, y)
     b[3].Color = color
@@ -785,7 +740,6 @@ function ESP:DrawCornerBox(b, dims, color, thick, style, gap, animated)
     b[4].Thickness = thick
     b[4].Visible = true
     
-    -- Bottom left
     b[5].From = Vector2.new(x, y + h)
     b[5].To = Vector2.new(x + cl, y + h)
     b[5].Color = color
@@ -798,7 +752,6 @@ function ESP:DrawCornerBox(b, dims, color, thick, style, gap, animated)
     b[6].Thickness = thick
     b[6].Visible = true
     
-    -- Bottom right
     b[7].From = Vector2.new(x + w - cl, y + h)
     b[7].To = Vector2.new(x + w, y + h)
     b[7].Color = color
@@ -811,7 +764,6 @@ function ESP:DrawCornerBox(b, dims, color, thick, style, gap, animated)
     b[8].Thickness = thick
     b[8].Visible = true
     
-    -- Gap style extra lines
     if style == "Gap" then
         b[9].From = Vector2.new(x + cl + g, y)
         b[9].To = Vector2.new(x + w - cl - g, y)
@@ -842,7 +794,6 @@ end
 function ESP:DrawFullBox(b, dims, color, thick, fill, fillColor, fillTrans)
     local x, y, w, h = dims.x, dims.y, dims.w, dims.h
     
-    -- Fill
     if fill then
         b.BoxFill.Size = Vector2.new(w, h)
         b.BoxFill.Position = Vector2.new(x, y)
@@ -853,7 +804,6 @@ function ESP:DrawFullBox(b, dims, color, thick, fill, fillColor, fillTrans)
         b.BoxFill.Visible = false
     end
     
-    -- Border
     b[1].From = Vector2.new(x, y)
     b[1].To = Vector2.new(x + w, y)
     b[1].Color = color
@@ -902,7 +852,6 @@ function ESP:Draw3DBox(b, char, color, thick, fill, fillColor, fillTrans)
         local pos = corner.Position
         local sp, _, onScreen = ESP:WorldToScreen(pos)
         if not onScreen then 
-            -- Hide all 3D lines
             for j = 1, 12 do
                 if b.Box3D[j] then b.Box3D[j].Visible = false end
             end
@@ -911,11 +860,10 @@ function ESP:Draw3DBox(b, char, color, thick, fill, fillColor, fillTrans)
         screenCorners[i] = sp
     end
     
-    -- Draw edges
     local edges = {
-        {1,2},{2,3},{3,4},{4,1}, -- front
-        {5,6},{6,7},{7,8},{8,5}, -- back
-        {1,5},{2,6},{3,7},{4,8}, -- connecting
+        {1,2},{2,3},{3,4},{4,1},
+        {5,6},{6,7},{7,8},{8,5},
+        {1,5},{2,6},{3,7},{4,8},
     }
     
     for i, edge in ipairs(edges) do
@@ -982,7 +930,6 @@ function ESP:DrawCrosshairBox(b, dims, color, thick)
     local size = ESP.Settings.CrosshairSize
     local gap = ESP.Settings.CrosshairGap
     
-    -- Horizontal
     b[1].From = Vector2.new(cx - size - gap, cy)
     b[1].To = Vector2.new(cx - gap, cy)
     b[1].Color = color
@@ -995,7 +942,6 @@ function ESP:DrawCrosshairBox(b, dims, color, thick)
     b[2].Thickness = thick
     b[2].Visible = true
     
-    -- Vertical
     b[3].From = Vector2.new(cx, cy - size - gap)
     b[3].To = Vector2.new(cx, cy - gap)
     b[3].Color = color
@@ -1057,14 +1003,12 @@ function ESP:DrawArrowBox(b, dims, color, thick)
     local size = ESP.Settings.ArrowSize
     local headSize = ESP.Settings.ArrowHeadSize
     
-    -- Arrow body
     b[1].From = Vector2.new(cx - size/2, cy)
     b[1].To = Vector2.new(cx + size/2, cy)
     b[1].Color = color
     b[1].Thickness = thick
     b[1].Visible = true
     
-    -- Arrow head
     b[2].From = Vector2.new(cx, cy - headSize)
     b[2].To = Vector2.new(cx - size/2, cy)
     b[2].Color = color
@@ -1100,7 +1044,6 @@ function ESP:DrawDynamicBox(b, dims, color, thick)
         ESP:DrawCornerBox(b, newDims, color, thick, "Sharp", 0, false)
     elseif style == "Wave" then
         ESP:DrawCornerBox(b, dims, color, thick, "Sharp", 0, false)
-        -- Add wave effect on top
         local wave = math.sin(t * ESP.Settings.WaveSpeed) * ESP.Settings.WaveAmplitude
         b[13].From = Vector2.new(dims.x, dims.y + wave)
         b[13].To = Vector2.new(dims.x + dims.w, dims.y + wave)
@@ -1250,7 +1193,6 @@ end
 -- ARMOR BAR
 -- =============================================
 function ESP:DrawArmorBar(b, dims, char, pos, thick, scale)
-    -- Check for armor value in character
     local armorVal = char:FindFirstChild("Armor") or char:FindFirstChild("Shield")
     local armor = 0
     local maxArmor = 100
@@ -1377,12 +1319,6 @@ function ESP:DrawHeadDot(b, head, color, scale)
     b.HeadDot.Filled = ESP.Settings.HeadDotFilled
     b.HeadDot.Thickness = ESP.Settings.HeadDotOutline and 1 or 0
     b.HeadDot.Visible = true
-    
-    -- Outline
-    if ESP.Settings.HeadDotOutline then
-        -- Drawing API doesn't support circle outline color directly, use second circle
-        -- Simplified: just use thickness for outline effect
-    end
 end
 
 -- =============================================
@@ -1468,7 +1404,6 @@ function ESP:DrawTracer(b, targetPos, color, thick, style)
         b.Tracer.Thickness = thick
         b.Tracer.Visible = true
     elseif style == "Bezier" then
-        -- Simplified bezier - use midpoint curve
         local mid = (origin + targetPos) / 2
         mid = mid + Vector2.new(0, math.abs(origin.Y - targetPos.Y) * 0.3)
         
@@ -1478,14 +1413,12 @@ function ESP:DrawTracer(b, targetPos, color, thick, style)
         b.Tracer.Thickness = thick
         b.Tracer.Visible = true
         
-        -- Second line for bezier
         b[20].From = mid
         b[20].To = targetPos
         b[20].Color = color
         b[20].Thickness = thick
         b[20].Visible = true
     elseif style == "Dashed" then
-        -- Draw dashed line using multiple segments
         local dir = (targetPos - origin)
         local dist = dir.Magnitude
         local unit = dir.Unit
@@ -1543,23 +1476,19 @@ function ESP:DrawOffScreenArrow(b, char, color, dist)
     local vp = Camera.ViewportSize
     local cx, cy = vp.X / 2, vp.Y / 2
     
-    -- Calculate angle
     local camCF = Camera.CFrame
     local relativePos = camCF:PointToObjectSpace(pos)
     local angle = math.atan2(relativePos.Z, relativePos.X)
     
-    -- Arrow position on screen edge
     local edgeDist = math.min(vp.X, vp.Y) * 0.4
     local arrowX = cx + math.cos(angle - math.pi/2) * edgeDist
     local arrowY = cy + math.sin(angle - math.pi/2) * edgeDist
     
-    -- Clamp to screen
     arrowX = math.clamp(arrowX, 30, vp.X - 30)
     arrowY = math.clamp(arrowY, 30, vp.Y - 30)
     
     local size = ESP.Settings.OffScreenSize
     
-    -- Draw triangle arrow pointing to target
     b.OffScreenArrow.PointA = Vector2.new(arrowX + math.cos(angle) * size, arrowY + math.sin(angle) * size)
     b.OffScreenArrow.PointB = Vector2.new(arrowX + math.cos(angle + 2.5) * size, arrowY + math.sin(angle + 2.5) * size)
     b.OffScreenArrow.PointC = Vector2.new(arrowX + math.cos(angle - 2.5) * size, arrowY + math.sin(angle - 2.5) * size)
@@ -1567,7 +1496,6 @@ function ESP:DrawOffScreenArrow(b, char, color, dist)
     b.OffScreenArrow.Filled = true
     b.OffScreenArrow.Visible = true
     
-    -- Distance text
     if ESP.Settings.OffScreenDist then
         b.OffScreenDist.Text = math.floor(dist) .. ESP.Settings.DistUnits
         b.OffScreenDist.Color = ESP.Settings.OffScreenDistColor
@@ -1635,7 +1563,6 @@ function ESP:DrawInfoPanel(b, dims, p, char, hum, dist)
     b.Info.Position = Vector2.new(dims.x + dims.w + 10, dims.y)
     b.Info.Visible = true
     
-    -- Background
     if ESP.Settings.InfoBG then
         local textBounds = b.Info.TextBounds or Vector2.new(100, 60)
         b.InfoBG.Size = textBounds + Vector2.new(10, 10)
@@ -1643,11 +1570,6 @@ function ESP:DrawInfoPanel(b, dims, p, char, hum, dist)
         b.InfoBG.Color = ESP.Settings.InfoBG
         b.InfoBG.Transparency = ESP.Settings.InfoBGTransparency
         b.InfoBG.Visible = true
-    end
-    
-    -- Border
-    if ESP.Settings.InfoBorder then
-        -- Simplified border using lines
     end
 end
 
@@ -1681,24 +1603,19 @@ function ESP:DrawStatus(b, dims, char, hum)
     
     local statuses = {}
     
-    -- Check various states
     if hum then
         if hum.Health <= 0 then table.insert(statuses, "DEAD")
         elseif hum.Health < hum.MaxHealth * 0.25 then table.insert(statuses, "CRITICAL")
         end
         
-        -- Movement states
         if hum:GetState() == Enum.HumanoidStateType.Jumping then table.insert(statuses, "Jumping")
         elseif hum:GetState() == Enum.HumanoidStateType.Freefall then table.insert(statuses, "Falling")
         elseif hum:GetState() == Enum.HumanoidStateType.Ragdoll then table.insert(statuses, "Ragdoll")
         end
     end
     
-    -- Check for crouching
     if char:FindFirstChild("Crouching") then table.insert(statuses, "Crouching") end
-    -- Check for sprinting
     if char:FindFirstChild("Sprinting") then table.insert(statuses, "Sprinting") end
-    -- Check for reloading
     if char:FindFirstChild("Reloading") then table.insert(statuses, "Reloading") end
     
     if #statuses > 0 then
@@ -1742,8 +1659,73 @@ function ESP:DrawSkeleton(b, char, color, thick, colorByBone)
         end
     end
     
-    -- Dynamic skeleton (pulse effect)
     if ESP.Settings.SkeletonDynamic then
         local pulse = (math.sin(tick() * 2) + 1) / 2
         for i = 25, si - 1 do
-            if
+            if b[i] then
+                b[i].Color = b[i].Color:Lerp(Color3.fromRGB(255, 255, 255), pulse * 0.3)
+            end
+        end
+    end
+end
+
+-- =============================================
+-- MAIN UPDATE LOOP
+-- =============================================
+function ESP:Update()
+    ESP.FrameCount = ESP.FrameCount + 1
+    if ESP.Settings.UpdateRate > 0 and ESP.FrameCount % (ESP.Settings.UpdateRate + 1) ~= 0 then return end
+    
+    local mt = LocalPlayer.Team
+    local cp = Camera.CFrame.Position
+    local vp = Camera.ViewportSize
+    local proc = {}
+    local renderCount = 0
+    
+    for _, p in ipairs(Players:GetPlayers()) do
+        if renderCount >= ESP.Settings.MaxRender then break end
+        if p == LocalPlayer then ESP:HidePlayerDrawings(p) continue end
+        if ESP.Settings.TeamCheck and p.Team == mt then ESP:HidePlayerDrawings(p) continue end
+        
+        local c = p.Character
+        if not c then ESP:HidePlayerDrawings(p) continue end
+        
+        local h = ESP:FindHead(c)
+        local r = ESP:FindRoot(c)
+        local hum = c:FindFirstChildOfClass("Humanoid")
+        if not h or not r then ESP:HidePlayerDrawings(p) continue end
+        
+        local rp = r.Position
+        local dist = (cp - rp).Magnitude
+        if dist > ESP.Settings.MaxDist then ESP:HidePlayerDrawings(p) continue end
+        
+        if not ESP:CheckVisible(p) then ESP:HidePlayerDrawings(p) continue end
+        if not ESP:CheckWall(p) then ESP:HidePlayerDrawings(p) continue end
+        
+        local rsp, _, ronScreen = ESP:WorldToScreen(rp)
+        if not ronScreen then ESP:HidePlayerDrawings(p) continue end
+        
+        local scale = ESP:GetScale(dist)
+        local dims = ESP:GetBoxDimensions(h, r, scale)
+        if not dims then ESP:HidePlayerDrawings(p) continue end
+        
+        if not ESP.Boxes[p] then ESP:CreatePlayer(p) end
+        local b = ESP.Boxes[p]
+        
+        for i = 1, 50 do if b[i] and b[i].Remove then b[i].Visible = false end end
+        
+        local color = ESP:GetColor(p)
+        local thick = ESP.Settings.BoxThickness
+        
+        -- Box Style
+        if ESP.Settings.BoxStyle == "Corner" then
+            ESP:DrawCornerBox(b, dims, color, thick, ESP.Settings.CornerStyle, ESP.Settings.CornerGap, ESP.Settings.BoxAnimated)
+        elseif ESP.Settings.BoxStyle == "Full" then
+            ESP:DrawFullBox(b, dims, color, thick, ESP.Settings.BoxFill, ESP.Settings.BoxFillColor, ESP.Settings.BoxFillTransparency)
+        elseif ESP.Settings.BoxStyle == "3D" then
+            ESP:Draw3DBox(b, c, ESP.Settings.Box3DColor, ESP.Settings.Box3DThickness, ESP.Settings.Box3DFill, ESP.Settings.Box3DFillColor, ESP.Settings.Box3DFillTransparency)
+        elseif ESP.Settings.BoxStyle == "Circle" then
+            ESP:DrawCircleBox(b, dims, color, thick, ESP.Settings.CircleSegments)
+        elseif ESP.Settings.BoxStyle == "Diamond" then
+            ESP:DrawDiamondBox(b, dims, color, thick)
+        elseif ESP
