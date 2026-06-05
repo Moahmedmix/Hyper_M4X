@@ -1,10 +1,18 @@
 --[[
     ╔══════════════════════════════════════════════════╗
-    ║           HYPER UI - Aimbot System v3 FINAL       ║
-    ║    Silent Aim + FOV + Wall Check + Priority       ║
-    ║    Filled Circle + Sides + Full Customization     ║
-    ║              By M4X | EVA | AMAL                  ║
+    ║           HYPER UI - Aimbot System               ║
+    ║              Version: v1.0.0                      ║
+    ║         By M4X | EVA | AMAL                      ║
     ╚══════════════════════════════════════════════════╝
+
+    Features:
+    - Silent Aim
+    - FOV Circle with full customization
+    - Smooth aim control
+    - Prediction
+    - Team check & Visible check
+    - Color pickers for normal & locked states
+    - Wall check (Raycast) - لا يقفل على الأعداء خلف الجدران
 --]]
 
 local Aimbot = {}
@@ -26,15 +34,9 @@ Aimbot.Settings = {
     LockedColor = Color3.fromRGB(255, 0, 0),
     FOVThickness = 2,
     FOVNumSides = 64,
-    FOVFilled = false,
-    FOVTransparency = 1,
     Prediction = 0,
     VisibleCheck = false,
-    WallCheck = false,
-    Priority = "Distance",
-    AutoShoot = false,
-    Shake = false,
-    ShakeAmount = 1,
+    WallCheck = true, -- جديد: التحقق من الجدران
 }
 
 local Target = nil
@@ -46,22 +48,22 @@ function Aimbot:Init(tab, library, flags)
     self.Library = library
     self.Flags = flags
     self.Connection = nil
-
-    local ss = Camera.ViewportSize
+    
+    -- Create FOV Circle
+    local screenSize = Camera.ViewportSize
     FOVCircle = Drawing.new("Circle")
     FOVCircle.Visible = false
     FOVCircle.Color = Aimbot.Settings.FOVColor
     FOVCircle.Thickness = Aimbot.Settings.FOVThickness
     FOVCircle.NumSides = Aimbot.Settings.FOVNumSides
     FOVCircle.Radius = Aimbot.Settings.FOV
-    FOVCircle.Filled = Aimbot.Settings.FOVFilled
-    FOVCircle.Transparency = Aimbot.Settings.FOVTransparency
-    FOVCircle.Position = Vector2.new(ss.X / 2, ss.Y / 2)
+    FOVCircle.Filled = false
+    FOVCircle.Position = Vector2.new(screenSize.X / 2, screenSize.Y / 2)
     FOVCircle.ZIndex = 10
 
     Camera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
-        local s = Camera.ViewportSize
-        FOVCircle.Position = Vector2.new(s.X / 2, s.Y / 2)
+        local ss = Camera.ViewportSize
+        FOVCircle.Position = Vector2.new(ss.X / 2, ss.Y / 2)
     end)
 
     self:BuildUI()
@@ -75,89 +77,127 @@ function Aimbot:BuildUI()
     -- Main
     local mainSec = self.Tab:Section({ Title = "Main", Icon = "crosshair", Opened = true })
     mainSec:Toggle({ Title = "Enable Aimbot", Value = false, Callback = function(s) Aimbot.Settings.Enabled = s; if not s and FOVCircle then FOVCircle.Visible = false end end })
-    mainSec:Toggle({ Title = "Show FOV Circle", Value = true, Callback = function(s) Aimbot.Settings.ShowFOV = s end })
-    mainSec:Toggle({ Title = "Auto Shoot", Value = false, Callback = function(s) Aimbot.Settings.AutoShoot = s end })
+    mainSec:Toggle({ Title = "Show Circle", Value = true, Callback = function(s) Aimbot.Settings.ShowFOV = s end })
 
-    -- FOV Circle
-    local circleSec = self.Tab:Section({ Title = "FOV Circle", Icon = "circle", Opened = true })
+    -- Circle
+    local circleSec = self.Tab:Section({ Title = "Circle Settings", Icon = "circle", Opened = true })
     circleSec:Slider({ Title = "FOV Radius", Step = 5, Value = { Min = 50, Max = 500, Default = 150 }, Callback = function(v) Aimbot.Settings.FOV = v end })
     circleSec:Slider({ Title = "Thickness", Step = 0.5, Value = { Min = 1, Max = 5, Default = 2 }, Callback = function(v) Aimbot.Settings.FOVThickness = v end })
-    circleSec:Slider({ Title = "Sides", Step = 8, Value = { Min = 8, Max = 128, Default = 64 }, Callback = function(v) Aimbot.Settings.FOVNumSides = v; FOVCircle.NumSides = v end })
-    circleSec:Toggle({ Title = "Filled", Value = false, Callback = function(s) Aimbot.Settings.FOVFilled = s; FOVCircle.Filled = s end })
-    circleSec:Slider({ Title = "Transparency", Step = 0.1, Value = { Min = 0, Max = 1, Default = 1 }, Callback = function(v) Aimbot.Settings.FOVTransparency = 1 - v; FOVCircle.Transparency = 1 - v end })
 
     -- Colors
     local colorSec = self.Tab:Section({ Title = "Colors", Icon = "palette", Opened = true })
-    colorSec:Colorpicker({ Title = "Normal Color", Default = Aimbot.Settings.FOVColor, Transparency = 0, Callback = function(c) Aimbot.Settings.FOVColor = c end })
-    colorSec:Colorpicker({ Title = "Locked Color", Default = Aimbot.Settings.LockedColor, Transparency = 0, Callback = function(c) Aimbot.Settings.LockedColor = c end })
+    colorSec:Colorpicker({
+        Title = "Circle Color",
+        Desc = "Normal color",
+        Default = Aimbot.Settings.FOVColor,
+        Transparency = 0,
+        Callback = function(c) Aimbot.Settings.FOVColor = c end
+    })
+    colorSec:Colorpicker({
+        Title = "Lock Color",
+        Desc = "Color when locked",
+        Default = Aimbot.Settings.LockedColor,
+        Transparency = 0,
+        Callback = function(c) Aimbot.Settings.LockedColor = c end
+    })
 
-    -- Aim Settings
+    -- Aim
     local aimSec = self.Tab:Section({ Title = "Aim Settings", Icon = "target", Opened = true })
     aimSec:Slider({ Title = "Smoothness", Desc = "0 = instant | 1 = slow", Step = 0.01, Value = { Min = 0, Max = 1, Default = 0.1 }, Callback = function(v) Aimbot.Settings.Smoothness = v end })
     aimSec:Slider({ Title = "Prediction", Desc = "Predict movement", Step = 0.01, Value = { Min = 0, Max = 0.5, Default = 0 }, Callback = function(v) Aimbot.Settings.Prediction = v end })
-    aimSec:Dropdown({ Title = "Aim Part", Values = {"Head", "HumanoidRootPart", "UpperTorso", "LowerTorso"}, Value = "Head", Callback = function(v) Aimbot.Settings.AimPart = v end })
-    aimSec:Dropdown({ Title = "Priority", Desc = "How to choose target", Values = {"Distance", "Health", "Angle"}, Value = "Distance", Callback = function(v) Aimbot.Settings.Priority = v end })
+    aimSec:Dropdown({ Title = "Aim Part", Desc = "Where to aim", Values = {"Head", "HumanoidRootPart", "UpperTorso", "LowerTorso"}, Value = "Head", Callback = function(v) Aimbot.Settings.AimPart = v end })
     aimSec:Toggle({ Title = "Team Check", Value = false, Callback = function(s) Aimbot.Settings.TeamCheck = s end })
     aimSec:Toggle({ Title = "Visible Check", Value = false, Callback = function(s) Aimbot.Settings.VisibleCheck = s end })
-    aimSec:Toggle({ Title = "Wall Check", Desc = "Don't aim through walls", Value = false, Callback = function(s) Aimbot.Settings.WallCheck = s end })
-
-    -- Humanizer
-    local shakeSec = self.Tab:Section({ Title = "Humanizer", Icon = "radio", Opened = false })
-    shakeSec:Toggle({ Title = "Shake", Value = false, Callback = function(s) Aimbot.Settings.Shake = s end })
-    shakeSec:Slider({ Title = "Shake Amount", Step = 0.1, Value = { Min = 0.1, Max = 5, Default = 1 }, Callback = function(v) Aimbot.Settings.ShakeAmount = v end })
+    -- جديد: زر التحقق من الجدران
+    aimSec:Toggle({ Title = "Wall Check", Desc = "Don't lock through walls", Value = true, Callback = function(s) Aimbot.Settings.WallCheck = s end })
 end
 
 function Aimbot:StartLoop()
-    self.Connection = RunService.RenderStepped:Connect(function() self:Update() end)
+    self.Connection = RunService.RenderStepped:Connect(function()
+        self:Update()
+    end)
 end
 
 function Aimbot:Update()
-    if not Aimbot.Settings.Enabled then FOVCircle.Visible = false return end
+    if not Aimbot.Settings.Enabled then
+        FOVCircle.Visible = false
+        return
+    end
 
-    local center = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    local screenSize = Camera.ViewportSize
+    local center = Vector2.new(screenSize.X / 2, screenSize.Y / 2)
 
     if Aimbot.Settings.ShowFOV then
         FOVCircle.Visible = true
         FOVCircle.Radius = Aimbot.Settings.FOV
         FOVCircle.Thickness = Aimbot.Settings.FOVThickness
         FOVCircle.NumSides = Aimbot.Settings.FOVNumSides
-        FOVCircle.Filled = Aimbot.Settings.FOVFilled
-        FOVCircle.Transparency = 1 - Aimbot.Settings.FOVTransparency
     else
         FOVCircle.Visible = false
     end
 
-    Target = self:GetBestTarget(center)
+    Target = self:GetClosest(center)
 
     if Target then
         FOVCircle.Color = Aimbot.Settings.LockedColor
         self:AimAt(Target)
-        if Aimbot.Settings.AutoShoot then self:AutoShoot() end
     else
         FOVCircle.Color = Aimbot.Settings.FOVColor
     end
 end
 
-function Aimbot:IsBehindWall(part)
-    if not Aimbot.Settings.WallCheck then return false end
-    local camPos = Camera.CFrame.Position
-    local dir = (part.Position - camPos).Unit * 500
-    local ray = Ray.new(camPos, dir)
-    local hit = workspace:FindPartOnRay(ray, LocalPlayer.Character)
-    return hit and hit.Parent ~= part.Parent
-end
-
-function Aimbot:IsVisible(char, part)
+-- جديد: دالة التحقق من الرؤية عبر Raycast
+function Aimbot:IsVisible(player)
     if not Aimbot.Settings.VisibleCheck then return true end
-    if Aimbot.Settings.WallCheck and self:IsBehindWall(part) then return false end
-    local camPos = Camera.CFrame.Position
-    local ray = Ray.new(camPos, (part.Position - camPos).Unit * 500)
-    local hit = workspace:FindPartOnRay(ray, LocalPlayer.Character)
-    return hit and hit.Parent == char
+    local char = player.Character
+    if not char then return false end
+    local part = char:FindFirstChild(Aimbot.Settings.AimPart) or char:FindFirstChild("Head")
+    if not part then return false end
+
+    -- RaycastParams setup
+    local rayParams = RaycastParams.new()
+    rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+    rayParams.FilterDescendantsInstances = {LocalPlayer.Character}
+    rayParams.IgnoreWater = true
+
+    local origin = Camera.CFrame.Position
+    local direction = (part.Position - origin).Unit * 500
+
+    local result = workspace:Raycast(origin, direction, rayParams)
+    if result then
+        return result.Instance:IsDescendantOf(char)
+    end
+    return true
 end
 
-function Aimbot:GetBestTarget(center)
-    local targets = {}
+-- جديد: دالة التحقق من الجدران (Wall Check)
+function Aimbot:IsNotBehindWall(player)
+    if not Aimbot.Settings.WallCheck then return true end
+    local char = player.Character
+    if not char then return false end
+    local part = char:FindFirstChild(Aimbot.Settings.AimPart) or char:FindFirstChild("Head")
+    if not part then return false end
+
+    -- RaycastParams setup for wall detection
+    local rayParams = RaycastParams.new()
+    rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+    rayParams.FilterDescendantsInstances = {LocalPlayer.Character, char}
+    rayParams.IgnoreWater = true
+
+    local origin = Camera.CFrame.Position
+    local direction = (part.Position - origin).Unit * (part.Position - origin).Magnitude
+
+    local result = workspace:Raycast(origin, direction, rayParams)
+    if result then
+        -- إذا اصطدم شيء بين الكاميرا والهدف، يعني الهدف خلف جدار
+        return false
+    end
+    return true
+end
+
+function Aimbot:GetClosest(center)
+    local closest = nil
+    local shortest = Aimbot.Settings.FOV
 
     for _, player in ipairs(Players:GetPlayers()) do
         if player == LocalPlayer then continue end
@@ -169,32 +209,23 @@ function Aimbot:GetBestTarget(center)
         local part = char:FindFirstChild(Aimbot.Settings.AimPart) or char:FindFirstChild("Head")
         if not part then continue end
 
-        if not self:IsVisible(char, part) then continue end
+        -- Visible check (التحقق من الرؤية العام)
+        if not self:IsVisible(player) then continue end
+
+        -- Wall check (التحقق من الجدران - لا يقفل خلف الجدران)
+        if not self:IsNotBehindWall(player) then continue end
 
         local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position)
         if not onScreen then continue end
 
-        local distToCenter = (Vector2.new(screenPos.X, screenPos.Y) - center).Magnitude
-        if distToCenter > Aimbot.Settings.FOV then continue end
-
-        table.insert(targets, { Player = player, Part = part, DistToCenter = distToCenter })
+        local dist = (Vector2.new(screenPos.X, screenPos.Y) - center).Magnitude
+        if dist < shortest then
+            shortest = dist
+            closest = player
+        end
     end
 
-    if #targets == 0 then return nil end
-
-    if Aimbot.Settings.Priority == "Distance" then
-        table.sort(targets, function(a, b) return a.DistToCenter < b.DistToCenter end)
-    elseif Aimbot.Settings.Priority == "Health" then
-        table.sort(targets, function(a, b)
-            local ha = a.Player.Character and a.Player.Character:FindFirstChildOfClass("Humanoid")
-            local hb = b.Player.Character and b.Player.Character:FindFirstChildOfClass("Humanoid")
-            return (ha and ha.Health or 100) < (hb and hb.Health or 100)
-        end)
-    elseif Aimbot.Settings.Priority == "Angle" then
-        table.sort(targets, function(a, b) return a.DistToCenter < b.DistToCenter end)
-    end
-
-    return targets[1].Player
+    return closest
 end
 
 function Aimbot:AimAt(target)
@@ -210,14 +241,6 @@ function Aimbot:AimAt(target)
         targetPos = targetPos + vel * Aimbot.Settings.Prediction
     end
 
-    if Aimbot.Settings.Shake then
-        targetPos = targetPos + Vector3.new(
-            (math.random() - 0.5) * Aimbot.Settings.ShakeAmount * 0.1,
-            (math.random() - 0.5) * Aimbot.Settings.ShakeAmount * 0.1,
-            (math.random() - 0.5) * Aimbot.Settings.ShakeAmount * 0.1
-        )
-    end
-
     local camPos = Camera.CFrame.Position
     local dir = (targetPos - camPos).Unit
 
@@ -229,18 +252,14 @@ function Aimbot:AimAt(target)
     Camera.CFrame = CFrame.new(camPos, camPos + dir)
 end
 
-function Aimbot:AutoShoot()
-    if not Target then return end
-    pcall(function()
-        mouse1press()
-        task.wait(0.05)
-        mouse1release()
-    end)
-end
-
 function Aimbot:Stop()
-    if self.Connection then self.Connection:Disconnect(); self.Connection = nil end
-    if FOVCircle then FOVCircle.Visible = false end
+    if self.Connection then
+        self.Connection:Disconnect()
+        self.Connection = nil
+    end
+    if FOVCircle then
+        FOVCircle.Visible = false
+    end
 end
 
 return Aimbot
