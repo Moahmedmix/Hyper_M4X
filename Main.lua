@@ -450,155 +450,68 @@ end
 -- =============================================
 -- HOME TAB CONTENT
 -- =============================================
--- =============================================
--- HOME TAB (PROFESSIONAL INTRO UI - WIND UI)
--- =============================================
 if Tabs.Home then
-
-    local introSection = Tabs.Home:Section({
-        Title = "Hyper v1.0.0",
-        Icon = "sparkles",
-        Opened = true
-    })
-
-    introSection:Label({
-        Title = "Welcome to Hyper",
-        Description = "A clean, optimized UI framework built for performance and simplicity."
-    })
-
-    introSection:Label({
-        Title = "Script Name: Hyper v1.0.0",
-    })
-
-    introSection:Label({
-        Title = "By: M4X • EVA • AMAL",
-    })
-
-    introSection:Label({
-        Title = "User: " .. (LocalPlayer and LocalPlayer.Name or "Unknown"),
-    })
-
-
-    local actions = Tabs.Home:Section({
-        Title = "Quick Panel",
-        Icon = "bolt"
-    })
-
-    actions:Button({
+    local welcomeSection = Tabs.Home:Section({ Title = "Welcome", Icon = "info", Opened = true })
+    
+    welcomeSection:Button({ Title = "Hyper UI Framework v1.0.0", Callback = function() end })
+    welcomeSection:Button({ Title = "By M4X | EVA | AMAL", Callback = function() end })
+    welcomeSection:Button({ Title = "Welcome, " .. (LocalPlayer and LocalPlayer.Name or "User") .. "!", Callback = function() end })
+    
+    local quickSection = Tabs.Home:Section({ Title = "Quick Actions", Icon = "activity" })
+    
+    quickSection:Button({
         Title = "Rejoin Server",
-        Description = "Reconnect to the current session",
+        Description = "Rejoin the current server",
         Callback = function()
             if TeleportService and LocalPlayer then
                 TeleportService:Teleport(game.PlaceId, LocalPlayer)
             end
         end
     })
-
-    actions:Button({
-        Title = "Clear Workspace",
-        Description = "Remove unnecessary objects safely",
+    
+    quickSection:Button({
+        Title = "Clean Workspace",
+        Description = "Remove all unnecessary objects",
         Callback = function()
-            local removed = 0
-
+            local count = 0
             for _, obj in ipairs(workspace:GetChildren()) do
-                if obj:IsA("Model") and obj ~= LocalPlayer.Character then
-                    pcall(function()
-if Tabs.Home then
-
-    local introSection = Tabs.Home:Section({
-        Title = "Hyper v1.0.0",
-        Icon = "sparkles",
-        Opened = true
+                if obj:IsA("Model") and obj ~= LocalPlayer and obj ~= LocalPlayer.Character then
+                    pcall(function() obj:Destroy() end)
+                    count = count + 1
+                end
+            end
+            WindUI:Notify({ Title = "Hyper", Description = "Cleaned " .. count .. " objects!", Duration = 3 })
+        end
     })
-
-    introSection:Label({
-        Title = "Welcome to Hyper"
-    })
-
-    introSection:Label({
-        Title = "By: M4X • EVA • AMAL"
-    })
-
-    introSection:Label({
-        Title = "User: " .. (LocalPlayer and LocalPlayer.Name or "Unknown")
-    })
-
-    local actions = Tabs.Home:Section({
-        Title = "Quick Panel",
-        Icon = "bolt"
-    })
-
-    actions:Button({
-        Title = "Rejoin Server",
+    
+    quickSection:Button({
+        Title = "Destroy UI",
+        Description = "Close and destroy the interface",
         Callback = function()
-            if TeleportService and LocalPlayer then
-                TeleportService:Teleport(game.PlaceId, LocalPlayer)
-HOME TAB CONTENT
--- =============================================
-if Tabs.Home then
-local welcomeSection = Tabs.Home:Section({ Title = "Welcome", Icon = "info", Opened = true })
-
-welcomeSection:Button({ Title = "Hyper UI Framework v1.0.0", Callback = function() end })  
-welcomeSection:Button({ Title = "By M4X | EVA | AMAL", Callback = function() end })  
-welcomeSection:Button({ Title = "Welcome, " .. (LocalPlayer and LocalPlayer.Name or "User") .. "!", Callback = function() end })  
-  
-local quickSection = Tabs.Home:Section({ Title = "Quick Actions", Icon = "activity" })  
-  
-quickSection:Button({  
-    Title = "Rejoin Server",  
-    Description = "Rejoin the current server",  
-    Callback = function()  
-        if TeleportService and LocalPlayer then  
-            TeleportService:Teleport(game.PlaceId, LocalPlayer)  
-        end  
-    end  
-})  
-  
-quickSection:Button({  
-    Title = "Clean Workspace",  
-    Description = "Remove all unnecessary objects",  
-    Callback = function()  
-        local count = 0  
-        for _, obj in ipairs(workspace:GetChildren()) do  
-            if obj:IsA("Model") and obj ~= LocalPlayer and obj ~= LocalPlayer.Character then  
-                pcall(function() obj:Destroy() end)  
-                count = count + 1  
-            end  
-        end  
-        WindUI:Notify({ Title = "Hyper", Description = "Cleaned " .. count .. " objects!", Duration = 3 })  
-    end  
-})  
-  
-quickSection:Button({  
-    Title = "Destroy UI",  
-    Description = "Close and destroy the interface",  
-    Callback = function()  
-        pcall(function() Window:Destroy() end)  
-    end  
-})  
-  
-local toggleSection = Tabs.Home:Section({ Title = "Toggles", Icon = "toggle-left" })  
-  
-toggleSection:Toggle({  
-    Title = "Auto Updater",  
-    Description = "Automatically check for updates",  
-    Value = true,  
-    Callback = function(state) Flags:Set("AutoUpdater", state) end  
-})  
-  
-toggleSection:Toggle({  
-    Title = "Anti AFK",  
-    Description = "Prevent being kicked for inactivity",  
-    Value = false,  
-    Callback = function(state) Flags:Set("AntiAFK", state) end  
-})  
-  
-Logger:Good("Home tab built!")
-
+            pcall(function() Window:Destroy() end)
+        end
+    })
+    
+    local toggleSection = Tabs.Home:Section({ Title = "Toggles", Icon = "toggle-left" })
+    
+    toggleSection:Toggle({
+        Title = "Auto Updater",
+        Description = "Automatically check for updates",
+        Value = true,
+        Callback = function(state) Flags:Set("AutoUpdater", state) end
+    })
+    
+    toggleSection:Toggle({
+        Title = "Anti AFK",
+        Description = "Prevent being kicked for inactivity",
+        Value = false,
+        Callback = function(state) Flags:Set("AntiAFK", state) end
+    })
+    
+    Logger:Good("Home tab built!")
 end
-بقولك غير الحته ديه عشان تكون احترافه وي كمان عمولها بي wind ui  الصفحه التعرفيه ليه وي
-اسم السكريبت Hyper v1.0.0
-By M4X EVA amal-- =============================================
+
+-- =============================================
 -- LOAD EXTERNAL FEATURE MODULES
 -- =============================================
 Logger:Separator()
