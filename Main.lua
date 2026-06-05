@@ -533,64 +533,72 @@ if Tabs.Home then
         Callback = function()
             if TeleportService and LocalPlayer then
                 TeleportService:Teleport(game.PlaceId, LocalPlayer)
-            end
-        end
-    })
+HOME TAB CONTENT
+-- =============================================
+if Tabs.Home then
+local welcomeSection = Tabs.Home:Section({ Title = "Welcome", Icon = "info", Opened = true })
 
-    actions:Button({
-        Title = "Clear Workspace",
-        Callback = function()
-            local removed = 0
-            for _, obj in ipairs(workspace:GetChildren()) do
-                if obj:IsA("Model") then
-                    pcall(function()
-                        obj:Destroy()
-                        removed += 1
-                    end)
-                end
-            end
-        end
-    })
-
-    local profile = Tabs.Home:Section({
-        Title = "Profile Card",
-        Icon = "user",
-        Opened = true
-    })
-
-    local function getPing()
-        local ok, result = pcall(function()
-            return game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()
-        end)
-
-        if ok and result then
-            return math.floor(result) .. " ms"
-        end
-
-        return "N/A"
-    end
-
-    profile:Label({
-        Title = "👤 " .. (LocalPlayer and LocalPlayer.Name or "Unknown")
-    })
-
-    profile:Label({
-        Title = "📶 Ping: " .. getPing()
-    })
-
-    profile:Button({
-        Title = "Copy Username",
-        Callback = function()
-            if setclipboard and LocalPlayer then
-                setclipboard(LocalPlayer.Name)
-            end
-        end
-    })
+welcomeSection:Button({ Title = "Hyper UI Framework v1.0.0", Callback = function() end })  
+welcomeSection:Button({ Title = "By M4X | EVA | AMAL", Callback = function() end })  
+welcomeSection:Button({ Title = "Welcome, " .. (LocalPlayer and LocalPlayer.Name or "User") .. "!", Callback = function() end })  
+  
+local quickSection = Tabs.Home:Section({ Title = "Quick Actions", Icon = "activity" })  
+  
+quickSection:Button({  
+    Title = "Rejoin Server",  
+    Description = "Rejoin the current server",  
+    Callback = function()  
+        if TeleportService and LocalPlayer then  
+            TeleportService:Teleport(game.PlaceId, LocalPlayer)  
+        end  
+    end  
+})  
+  
+quickSection:Button({  
+    Title = "Clean Workspace",  
+    Description = "Remove all unnecessary objects",  
+    Callback = function()  
+        local count = 0  
+        for _, obj in ipairs(workspace:GetChildren()) do  
+            if obj:IsA("Model") and obj ~= LocalPlayer and obj ~= LocalPlayer.Character then  
+                pcall(function() obj:Destroy() end)  
+                count = count + 1  
+            end  
+        end  
+        WindUI:Notify({ Title = "Hyper", Description = "Cleaned " .. count .. " objects!", Duration = 3 })  
+    end  
+})  
+  
+quickSection:Button({  
+    Title = "Destroy UI",  
+    Description = "Close and destroy the interface",  
+    Callback = function()  
+        pcall(function() Window:Destroy() end)  
+    end  
+})  
+  
+local toggleSection = Tabs.Home:Section({ Title = "Toggles", Icon = "toggle-left" })  
+  
+toggleSection:Toggle({  
+    Title = "Auto Updater",  
+    Description = "Automatically check for updates",  
+    Value = true,  
+    Callback = function(state) Flags:Set("AutoUpdater", state) end  
+})  
+  
+toggleSection:Toggle({  
+    Title = "Anti AFK",  
+    Description = "Prevent being kicked for inactivity",  
+    Value = false,  
+    Callback = function(state) Flags:Set("AntiAFK", state) end  
+})  
+  
+Logger:Good("Home tab built!")
 
 end
-
-Logger:Good("Hyper UI Home loaded successfully!")
--- =============================================
+بقولك غير الحته ديه عشان تكون احترافه وي كمان عمولها بي wind ui  الصفحه التعرفيه ليه وي
+اسم السكريبت Hyper v1.0.0
+By M4X EVA amal-- =============================================
 -- LOAD EXTERNAL FEATURE MODULES
 -- =============================================
 Logger:Separator()
