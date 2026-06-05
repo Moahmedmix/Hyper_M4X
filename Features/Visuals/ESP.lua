@@ -437,6 +437,89 @@ function ESP:GetScale(dist)
     return scale
 end
 
+function ESP:Init(tab, library, flags)
+    local self = setmetatable({}, ESP)
+    self.Tab = tab
+    self.Library = library
+    self.Flags = flags
+
+    -- ============ MAIN ============
+    local SecMain = tab:Section({ Title = "Main", Icon = "eye", Opened = true })
+    SecMain:Toggle({ Title = "Enable ESP", Value = false, Callback = function(v) ESP.Settings.Enabled = v; if v then ESP:Start() else ESP:Stop() end end })
+    SecMain:Slider({ Title = "Max Distance", Step = 100, Value = { Min = 100, Max = 10000, Default = 3000 }, Callback = function(v) ESP.Settings.MaxDist = v end })
+    SecMain:Toggle({ Title = "Team Check", Value = false, Callback = function(v) ESP.Settings.TeamCheck = v end })
+    SecMain:Toggle({ Title = "Team Color", Value = false, Callback = function(v) ESP.Settings.TeamColor = v end })
+    SecMain:Toggle({ Title = "Rainbow Mode", Value = false, Callback = function(v) ESP.Settings.Rainbow = v end })
+    SecMain:Toggle({ Title = "Visible Check", Value = false, Callback = function(v) ESP.Settings.VisCheck = v end })
+    SecMain:Toggle({ Title = "Wall Check", Value = true, Callback = function(v) ESP.Settings.WallCheck = v end })
+    SecMain:Toggle({ Title = "Dynamic Scale", Value = true, Callback = function(v) ESP.Settings.DynamicScale = v end })
+
+    -- ============ BOX ============
+    local SecBox = tab:Section({ Title = "Box", Icon = "square", Opened = true })
+    SecBox:Dropdown({ Title = "Box Style", Values = { "Corner", "Full", "3D", "Circle", "Diamond", "Crosshair", "Triangle", "Hexagon", "Arrow", "Dynamic" }, Value = "Corner", Callback = function(v) ESP.Settings.BoxStyle = v end })
+    SecBox:Colorpicker({ Title = "Box Color", Default = ESP.Settings.BoxColor, Transparency = 0, Callback = function(v) ESP.Settings.BoxColor = v end })
+    SecBox:Slider({ Title = "Thickness", Step = 0.5, Value = { Min = 1, Max = 6, Default = 2 }, Callback = function(v) ESP.Settings.BoxThickness = v end })
+    SecBox:Toggle({ Title = "Fill Box", Value = false, Callback = function(v) ESP.Settings.BoxFill = v end })
+    SecBox:Colorpicker({ Title = "Fill Color", Default = ESP.Settings.BoxFillColor, Transparency = 0, Callback = function(v) ESP.Settings.BoxFillColor = v end })
+    SecBox:Toggle({ Title = "Glow Effect", Value = false, Callback = function(v) ESP.Settings.BoxGlow = v end })
+    SecBox:Slider({ Title = "Corner Length", Step = 1, Value = { Min = 6, Max = 40, Default = 22 }, Callback = function(v) ESP.Settings.CornerLen = v end })
+
+    -- ============ CHAMS ============
+    local SecChams = tab:Section({ Title = "Chams", Icon = "shirt", Opened = true })
+    SecChams:Toggle({ Title = "Enable Chams", Value = false, Callback = function(v) ESP.Settings.Chams = v end })
+    SecChams:Colorpicker({ Title = "Fill Color", Default = ESP.Settings.ChamsFillColor, Transparency = 0, Callback = function(v) ESP.Settings.ChamsFillColor = v end })
+    SecChams:Slider({ Title = "Fill Alpha", Step = 0.1, Value = { Min = 0, Max = 1, Default = 0.5 }, Callback = function(v) ESP.Settings.ChamsFillTransparency = v end })
+
+    -- ============ INFO ============
+    local SecInfo = tab:Section({ Title = "Info", Icon = "user", Opened = true })
+    SecInfo:Toggle({ Title = "Name", Value = true, Callback = function(v) ESP.Settings.Name = v end })
+    SecInfo:Colorpicker({ Title = "Name Color", Default = ESP.Settings.NameColor, Transparency = 0, Callback = function(v) ESP.Settings.NameColor = v end })
+    SecInfo:Slider({ Title = "Name Size", Step = 1, Value = { Min = 10, Max = 22, Default = 13 }, Callback = function(v) ESP.Settings.NameSize = v end })
+    SecInfo:Toggle({ Title = "Distance", Value = true, Callback = function(v) ESP.Settings.Dist = v end })
+    SecInfo:Colorpicker({ Title = "Dist Color", Default = ESP.Settings.DistColor, Transparency = 0, Callback = function(v) ESP.Settings.DistColor = v end })
+    SecInfo:Toggle({ Title = "Brackets", Value = true, Callback = function(v) ESP.Settings.DistBrackets = v end })
+
+    -- ============ HEALTH ============
+    local SecHP = tab:Section({ Title = "Health", Icon = "heart", Opened = true })
+    SecHP:Toggle({ Title = "HP Bar", Value = true, Callback = function(v) ESP.Settings.HP = v end })
+    SecHP:Dropdown({ Title = "Position", Values = { "Left", "Right", "Top", "Bottom" }, Value = "Left", Callback = function(v) ESP.Settings.HPPos = v end })
+    SecHP:Slider({ Title = "Thickness", Step = 1, Value = { Min = 2, Max = 8, Default = 3 }, Callback = function(v) ESP.Settings.HPThick = v end })
+    SecHP:Colorpicker({ Title = "BG Color", Default = ESP.Settings.HPBG, Transparency = 0, Callback = function(v) ESP.Settings.HPBG = v end })
+    SecHP:Toggle({ Title = "HP Text", Value = true, Callback = function(v) ESP.Settings.HPText = v end })
+    SecHP:Toggle({ Title = "Armor Bar", Value = false, Callback = function(v) ESP.Settings.Armor = v end })
+
+    -- ============ TRACERS ============
+    local SecTracer = tab:Section({ Title = "Tracers", Icon = "trending-up", Opened = true })
+    SecTracer:Toggle({ Title = "Tracers", Value = false, Callback = function(v) ESP.Settings.Tracer = v end })
+    SecTracer:Colorpicker({ Title = "Color", Default = ESP.Settings.TracerColor, Transparency = 0, Callback = function(v) ESP.Settings.TracerColor = v end })
+    SecTracer:Dropdown({ Title = "Origin", Values = { "Bottom", "Top", "Middle" }, Value = "Bottom", Callback = function(v) ESP.Settings.TracerOrigin = v end })
+    SecTracer:Slider({ Title = "Thickness", Step = 0.5, Value = { Min = 0.5, Max = 4, Default = 1 }, Callback = function(v) ESP.Settings.TracerThick = v end })
+
+    -- ============ SNAPLINES ============
+    local SecSnap = tab:Section({ Title = "Snaplines", Icon = "minus", Opened = true })
+    SecSnap:Toggle({ Title = "Snaplines", Value = false, Callback = function(v) ESP.Settings.Snap = v end })
+    SecSnap:Colorpicker({ Title = "Color", Default = ESP.Settings.SnapColor, Transparency = 0, Callback = function(v) ESP.Settings.SnapColor = v end })
+    SecSnap:Slider({ Title = "Thickness", Step = 0.5, Value = { Min = 0.5, Max = 4, Default = 1 }, Callback = function(v) ESP.Settings.SnapThick = v end })
+
+    -- ============ EXTRA ============
+    local SecExtra = tab:Section({ Title = "Extra", Icon = "star", Opened = true })
+    SecExtra:Toggle({ Title = "Weapon", Value = false, Callback = function(v) ESP.Settings.Weapon = v end })
+    SecExtra:Colorpicker({ Title = "Weapon Color", Default = ESP.Settings.WeaponColor, Transparency = 0, Callback = function(v) ESP.Settings.WeaponColor = v end })
+    SecExtra:Toggle({ Title = "Skeleton", Value = false, Callback = function(v) ESP.Settings.Skeleton = v end })
+    SecExtra:Colorpicker({ Title = "Skeleton Color", Default = ESP.Settings.SkeletonColor, Transparency = 0, Callback = function(v) ESP.Settings.SkeletonColor = v end })
+    SecExtra:Slider({ Title = "Skeleton Thick", Step = 0.5, Value = { Min = 0.5, Max = 3, Default = 1 }, Callback = function(v) ESP.Settings.SkeletonThick = v end })
+    SecExtra:Toggle({ Title = "Head Dot", Value = false, Callback = function(v) ESP.Settings.HeadDot = v end })
+    SecExtra:Colorpicker({ Title = "Dot Color", Default = ESP.Settings.HeadDotColor, Transparency = 0, Callback = function(v) ESP.Settings.HeadDotColor = v end })
+    SecExtra:Toggle({ Title = "Look Direction", Value = false, Callback = function(v) ESP.Settings.LookDir = v end })
+    SecExtra:Toggle({ Title = "Velocity", Value = false, Callback = function(v) ESP.Settings.Velocity = v end })
+    SecExtra:Toggle({ Title = "Off-Screen Arrows", Value = false, Callback = function(v) ESP.Settings.OffScreen = v end })
+    SecExtra:Toggle({ Title = "Info Panel", Value = false, Callback = function(v) ESP.Settings.InfoPanel = v end })
+    SecExtra:Toggle({ Title = "Rank/Level", Value = false, Callback = function(v) ESP.Settings.Rank = v end })
+    SecExtra:Toggle({ Title = "Status", Value = false, Callback = function(v) ESP.Settings.Status = v end })
+
+    return self
+end
+
 function ESP:GetBoxDimensions(h, r, scale)
     local headPos = h.Position + Vector3.new(0, 0.5, 0)
     local rootPos = r.Position - Vector3.new(0, 3.5, 0)
