@@ -36,7 +36,6 @@
     - Vehicle ESP
     - Objective ESP
     - All settings save/load
-    - FULL UI with ALL buttons, toggles, sliders, colorpickers, dropdowns
 --]]
 
 local ESP = {}
@@ -48,7 +47,6 @@ local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-local HttpService = game:GetService("HttpService")
 
 -- =============================================
 -- SETTINGS
@@ -1746,4 +1744,6 @@ function ESP:DrawSkeleton(b, char, color, thick, colorByBone)
     
     -- Dynamic skeleton (pulse effect)
     if ESP.Settings.SkeletonDynamic then
-        local pulse = (
+        local pulse = (math.sin(tick() * 2) + 1) / 2
+        for i = 25, si - 1 do
+            if
