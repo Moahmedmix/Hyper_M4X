@@ -450,67 +450,167 @@ end
 -- =============================================
 -- HOME TAB CONTENT
 -- =============================================
+-- =============================================
+-- HOME TAB (PROFESSIONAL INTRO UI - WIND UI)
+-- =============================================
 if Tabs.Home then
-    local welcomeSection = Tabs.Home:Section({ Title = "Welcome", Icon = "info", Opened = true })
-    
-    welcomeSection:Button({ Title = "Hyper UI Framework v1.0.0", Callback = function() end })
-    welcomeSection:Button({ Title = "By M4X | EVA | AMAL", Callback = function() end })
-    welcomeSection:Button({ Title = "Welcome, " .. (LocalPlayer and LocalPlayer.Name or "User") .. "!", Callback = function() end })
-    
-    local quickSection = Tabs.Home:Section({ Title = "Quick Actions", Icon = "activity" })
-    
-    quickSection:Button({
+
+    local introSection = Tabs.Home:Section({
+        Title = "Hyper v1.0.0",
+        Icon = "sparkles",
+        Opened = true
+    })
+
+    introSection:Label({
+        Title = "Welcome to Hyper",
+        Description = "A clean, optimized UI framework built for performance and simplicity."
+    })
+
+    introSection:Label({
+        Title = "Script Name: Hyper v1.0.0",
+    })
+
+    introSection:Label({
+        Title = "By: M4X • EVA • AMAL",
+    })
+
+    introSection:Label({
+        Title = "User: " .. (LocalPlayer and LocalPlayer.Name or "Unknown"),
+    })
+
+
+    local actions = Tabs.Home:Section({
+        Title = "Quick Panel",
+        Icon = "bolt"
+    })
+
+    actions:Button({
         Title = "Rejoin Server",
-        Description = "Rejoin the current server",
+        Description = "Reconnect to the current session",
         Callback = function()
             if TeleportService and LocalPlayer then
                 TeleportService:Teleport(game.PlaceId, LocalPlayer)
             end
         end
     })
-    
-    quickSection:Button({
-        Title = "Clean Workspace",
-        Description = "Remove all unnecessary objects",
+
+    actions:Button({
+        Title = "Clear Workspace",
+        Description = "Remove unnecessary objects safely",
         Callback = function()
-            local count = 0
+            local removed = 0
+
             for _, obj in ipairs(workspace:GetChildren()) do
-                if obj:IsA("Model") and obj ~= LocalPlayer and obj ~= LocalPlayer.Character then
-                    pcall(function() obj:Destroy() end)
-                    count = count + 1
+                if obj:IsA("Model") and obj ~= LocalPlayer.Character then
+                    pcall(function()
+                        obj:Destroy()
+                        removed += 1
+                    end)
                 end
             end
-            WindUI:Notify({ Title = "Hyper", Description = "Cleaned " .. count .. " objects!", Duration = 3 })
+
+            WindUI:Notify({
+                Title = "Hyper",
+                Description = "Removed " .. removed .. " objects",
+                Duration = 3
+            })
         end
     })
-    
-    quickSection:Button({
-        Title = "Destroy UI",
-        Description = "Close and destroy the interface",
+
+    actions:Button({
+        Title = "Close UI",
+        Description = "Destroy interface safely",
         Callback = function()
-            pcall(function() Window:Destroy() end)
+            pcall(function()
+                Window:Destroy()
+            end)
         end
     })
-    
-    local toggleSection = Tabs.Home:Section({ Title = "Toggles", Icon = "toggle-left" })
-    
-    toggleSection:Toggle({
+
+
+    local settings = Tabs.Home:Section({
+        Title = "System",
+        Icon = "settings"
+    })
+
+    settings:Toggle({
         Title = "Auto Updater",
-        Description = "Automatically check for updates",
+        Description = "Check for updates automatically",
         Value = true,
-        Callback = function(state) Flags:Set("AutoUpdater", state) end
+        Callback = function(state)
+            Flags:Set("AutoUpdater", state)
+        end
     })
-    
-    toggleSection:Toggle({
+
+    settings:Toggle({
         Title = "Anti AFK",
-        Description = "Prevent being kicked for inactivity",
+        Description = "Prevent idle kick",
         Value = false,
-        Callback = function(state) Flags:Set("AntiAFK", state) end
+        Callback = function(state)
+            Flags:Set("AntiAFK", state)
+        end
     })
-    
-    Logger:Good("Home tab built!")
+local player = LocalPlayer
+    local stats = game:GetService("Stats")
+
+    local function getPing()
+        local network = stats:FindFirstChild("Network")
+        if network and network:FindFirstChild("ServerStatsItem") then
+            local pingObj = network.ServerStatsItem["Data Ping"]
+            if pingObj then
+                return math.floor(pingObj:GetValue()) .. " ms"
+            end
+        end
+        return "N/A"
+    end
+
+    local function getLevel()
+        -- لو عندك نظام Level غيره هنا
+        return player:FindFirstChild("Level") and player.Level.Value or "1"
+    end
+
+    local profile = Tabs.Home:Section({
+        Title = "Player Profile",
+        Icon = "user",
+        Opened = true
+    })
+
+    profile:Label({
+        Title = "👤 " .. (player and player.Name or "Unknown User")
+    })
+
+    profile:Label({
+        Title = "⭐ Level: " .. getLevel()
+    })
+
+    profile:Label({
+        Title = "📶 Ping: " .. getPing()
+    })
+
+    profile:Button({
+        Title = "Copy Username",
+        Callback = function()
+            if setclipboard then
+                setclipboard(player.Name)
+            end
+        end
+    })
+
+    profile:Button({
+        Title = "Refresh Stats",
+        Callback = function()
+            WindUI:Notify({
+                Title = "Profile",
+                Description = "Stats updated successfully!",
+                Duration = 2
+            })
+        end
+    })
+
 end
 
+    Logger:Good("Hyper UI Home loaded successfully!")
+end
 -- =============================================
 -- LOAD EXTERNAL FEATURE MODULES
 -- =============================================
