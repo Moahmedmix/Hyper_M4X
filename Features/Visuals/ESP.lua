@@ -1,7 +1,7 @@
 --[[
     ╔══════════════════════════════════════════════════════════════╗
-    ║           HYPER UI - ESP SYSTEM (MODULE)                     ║
-    ║         Corner Box | Zero Ghosting | Full Custom             ║
+    ║           HYPER UI - ESP SYSTEM - CORNER PRO                 ║
+    ║         Zero Ghosting | Full Customization                    ║
     ║              By M4X | EVA | AMAL                            ║
     ╚══════════════════════════════════════════════════════════════╝
 --]]
@@ -264,7 +264,7 @@ function ESP:Init(tab, library, flags)
     SecInfo:Toggle({Title="Distance",Value=true,Callback=function(v)ESP.Settings.Dist=v end})
     SecInfo:Colorpicker({Title="Dist Color",Default=ESP.Settings.DistColor,Transparency=0,Callback=function(v)ESP.Settings.DistColor=v end})
     SecInfo:Slider({Title="Dist Size",Step=1,Value={Min=9,Max=18,Default=12},Callback=function(v)ESP.Settings.DistSize=v end})
-    SecInfo:Toggle({Title="Brackets [50m]",Value=true,Callback=function(v)ESP.Settings.DistBrackets=v end})
+    SecInfo:Toggle({Title="Brackets",Value=true,Callback=function(v)ESP.Settings.DistBrackets=v end})
 
     local SecHP=tab:Section({Title="Health",Icon="heart",Opened=true})
     SecHP:Toggle({Title="HP Bar",Value=true,Callback=function(v)ESP.Settings.HP=v end})
