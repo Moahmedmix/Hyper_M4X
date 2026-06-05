@@ -503,84 +503,75 @@ if Tabs.Home then
             for _, obj in ipairs(workspace:GetChildren()) do
                 if obj:IsA("Model") and obj ~= LocalPlayer.Character then
                     pcall(function()
+if Tabs.Home then
+
+    local introSection = Tabs.Home:Section({
+        Title = "Hyper v1.0.0",
+        Icon = "sparkles",
+        Opened = true
+    })
+
+    introSection:Label({
+        Title = "Welcome to Hyper"
+    })
+
+    introSection:Label({
+        Title = "By: M4X • EVA • AMAL"
+    })
+
+    introSection:Label({
+        Title = "User: " .. (LocalPlayer and LocalPlayer.Name or "Unknown")
+    })
+
+    local actions = Tabs.Home:Section({
+        Title = "Quick Panel",
+        Icon = "bolt"
+    })
+
+    actions:Button({
+        Title = "Rejoin Server",
+        Callback = function()
+            if TeleportService and LocalPlayer then
+                TeleportService:Teleport(game.PlaceId, LocalPlayer)
+            end
+        end
+    })
+
+    actions:Button({
+        Title = "Clear Workspace",
+        Callback = function()
+            local removed = 0
+            for _, obj in ipairs(workspace:GetChildren()) do
+                if obj:IsA("Model") then
+                    pcall(function()
                         obj:Destroy()
                         removed += 1
                     end)
                 end
             end
-
-            WindUI:Notify({
-                Title = "Hyper",
-                Description = "Removed " .. removed .. " objects",
-                Duration = 3
-            })
         end
     })
-
-    actions:Button({
-        Title = "Close UI",
-        Description = "Destroy interface safely",
-        Callback = function()
-            pcall(function()
-                Window:Destroy()
-            end)
-        end
-    })
-
-
-    local settings = Tabs.Home:Section({
-        Title = "System",
-        Icon = "settings"
-    })
-
-    settings:Toggle({
-        Title = "Auto Updater",
-        Description = "Check for updates automatically",
-        Value = true,
-        Callback = function(state)
-            Flags:Set("AutoUpdater", state)
-        end
-    })
-
-    settings:Toggle({
-        Title = "Anti AFK",
-        Description = "Prevent idle kick",
-        Value = false,
-        Callback = function(state)
-            Flags:Set("AntiAFK", state)
-        end
-    })
-local player = LocalPlayer
-    local stats = game:GetService("Stats")
-
-    local function getPing()
-        local network = stats:FindFirstChild("Network")
-        if network and network:FindFirstChild("ServerStatsItem") then
-            local pingObj = network.ServerStatsItem["Data Ping"]
-            if pingObj then
-                return math.floor(pingObj:GetValue()) .. " ms"
-            end
-        end
-        return "N/A"
-    end
-
-    local function getLevel()
-        -- لو عندك نظام Level غيره هنا
-        return player:FindFirstChild("Level") and player.Level.Value or "1"
-    end
 
     local profile = Tabs.Home:Section({
-        Title = "Player Profile",
+        Title = "Profile Card",
         Icon = "user",
         Opened = true
     })
 
-    profile:Label({
-        Title = "👤 " .. (player and player.Name or "Unknown User")
-    })
+    local function getPing()
+        local ok, result = pcall(function()
+            return game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()
+        end)
+
+        if ok and result then
+            return math.floor(result) .. " ms"
+        end
+
+        return "N/A"
+    end
 
     profile:Label({
-        Title = "⭐ Level: " .. getLevel()
+        Title = "👤 " .. (LocalPlayer and LocalPlayer.Name or "Unknown")
     })
 
     profile:Label({
@@ -590,27 +581,15 @@ local player = LocalPlayer
     profile:Button({
         Title = "Copy Username",
         Callback = function()
-            if setclipboard then
-                setclipboard(player.Name)
+            if setclipboard and LocalPlayer then
+                setclipboard(LocalPlayer.Name)
             end
         end
     })
 
-    profile:Button({
-        Title = "Refresh Stats",
-        Callback = function()
-            WindUI:Notify({
-                Title = "Profile",
-                Description = "Stats updated successfully!",
-                Duration = 2
-            })
-        end
-    })
-
 end
 
-    Logger:Good("Hyper UI Home loaded successfully!")
-end
+Logger:Good("Hyper UI Home loaded successfully!")
 -- =============================================
 -- LOAD EXTERNAL FEATURE MODULES
 -- =============================================
