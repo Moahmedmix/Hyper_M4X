@@ -20,7 +20,6 @@ ESP.Settings = {
     Name = true, NameColor = Color3.fromRGB(255, 255, 255), NameSize = 13, NameOutline = true,
     Dist = true, DistColor = Color3.fromRGB(180, 180, 180), DistSize = 12, DistBrackets = true,
     HP = true, HPPos = "Left", HPThick = 3, HPBG = Color3.fromRGB(20, 20, 20),
-    HDot = true, HDotColor = Color3.fromRGB(255, 255, 255), HDotSize = 7, HDotGlow = true, HDotGlowAlpha = 0.7,
     Tracer = false, TracerColor = Color3.fromRGB(255, 255, 255), TracerOrigin = "Bottom", TracerThick = 1,
     Snap = false, SnapColor = Color3.fromRGB(255, 255, 255), SnapThick = 1,
     Weapon = false, WeaponColor = Color3.fromRGB(255, 200, 50),
@@ -73,8 +72,6 @@ function ESP:CreatePlayer(p)
     b.HPFill=Drawing.new("Square") b.HPFill.Filled=true b.HPFill.Visible=false
     b.Tracer=Drawing.new("Line") b.Tracer.Visible=false
     b.Snap=Drawing.new("Line") b.Snap.Visible=false
-    b.HDot=Drawing.new("Circle") b.HDot.Filled=true b.HDot.Visible=false
-    b.HDotGlow=Drawing.new("Circle") b.HDotGlow.Filled=true b.HDotGlow.Visible=false
     b._style="Corner"
     ESP.Boxes[p]=b
 end
@@ -167,16 +164,6 @@ function ESP:Update()
             b.HPFill.Size,b.HPFill.Position=Vector2.new(bw2,bh*pct),Vector2.new(hpx,y+bh*(1-pct))
             b.HPFill.Color,b.HPFill.Visible=hc,true
         else b.HPBg.Visible=false b.HPFill.Visible=false end
-
-        if ESP.Settings.HDot then
-            local hcsp=Camera:WorldToViewportPoint(h.Position)
-            b.HDot.Position,b.HDot.Radius=Vector2.new(hcsp.X,hcsp.Y),ESP.Settings.HDotSize
-            b.HDot.Color,b.HDot.Visible=ESP.Settings.HDotColor,true
-            if ESP.Settings.HDotGlow then
-                b.HDotGlow.Position,b.HDotGlow.Radius=Vector2.new(hcsp.X,hcsp.Y),ESP.Settings.HDotSize+4
-                b.HDotGlow.Color,b.HDotGlow.Transparency,b.HDotGlow.Visible=ESP.Settings.HDotColor,ESP.Settings.HDotGlowAlpha,true
-            end
-        else b.HDot.Visible=false b.HDotGlow.Visible=false end
 
         if ESP.Settings.Tracer then
             local sx=cx
@@ -271,13 +258,6 @@ function ESP:Init(tab, library, flags)
     SecHP:Dropdown({Title="Position",Values={"Left","Right"},Value="Left",Callback=function(v)ESP.Settings.HPPos=v end})
     SecHP:Slider({Title="Thickness",Step=1,Value={Min=2,Max=8,Default=3},Callback=function(v)ESP.Settings.HPThick=v end})
     SecHP:Colorpicker({Title="BG Color",Default=ESP.Settings.HPBG,Transparency=0,Callback=function(v)ESP.Settings.HPBG=v end})
-
-    local SecDot=tab:Section({Title="Head Dot",Icon="circle",Opened=true})
-    SecDot:Toggle({Title="Head Dot",Value=true,Callback=function(v)ESP.Settings.HDot=v end})
-    SecDot:Colorpicker({Title="Dot Color",Default=ESP.Settings.HDotColor,Transparency=0,Callback=function(v)ESP.Settings.HDotColor=v end})
-    SecDot:Slider({Title="Dot Size",Step=1,Value={Min=4,Max=16,Default=7},Callback=function(v)ESP.Settings.HDotSize=v end})
-    SecDot:Toggle({Title="Glow",Value=true,Callback=function(v)ESP.Settings.HDotGlow=v end})
-    SecDot:Slider({Title="Glow Alpha",Step=0.1,Value={Min=0.3,Max=1,Default=0.7},Callback=function(v)ESP.Settings.HDotGlowAlpha=v end})
 
     local SecTracer=tab:Section({Title="Tracers",Icon="trending-up",Opened=true})
     SecTracer:Toggle({Title="Tracers",Value=false,Callback=function(v)ESP.Settings.Tracer=v end})
