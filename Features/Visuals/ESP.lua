@@ -1,7 +1,7 @@
 --[[
     ╔══════════════════════════════════════════════════════════════╗
-    ║           HYPER UI - ESP SYSTEM - CORNER PRO                 ║
-    ║         Zero Ghosting | Full Customization                    ║
+    ║           HYPER UI - ESP SYSTEM - CORNER PRO v3              ║
+    ║    Fixed: Ghost ESP + Off-Screen + Settings Change Cleanup    ║
     ║              By M4X | EVA | AMAL                            ║
     ╚══════════════════════════════════════════════════════════════╝
 --]]
@@ -61,6 +61,9 @@ function ESP:GetColor(p)
     return ESP.Settings.CornerColor
 end
 
+-- =============================================
+-- CREATE PLAYER (once)
+-- =============================================
 function ESP:CreatePlayer(p)
     local b={}
     for i=1,30 do b[i]=Drawing.new("Line") b[i].Visible=false end
@@ -76,8 +79,33 @@ function ESP:CreatePlayer(p)
     ESP.Boxes[p]=b
 end
 
+-- =============================================
+-- HIDE ALL DRAWINGS for one player (no delete)
+-- =============================================
+function ESP:HidePlayerDrawings(p)
+    local b=ESP.Boxes[p]
+    if not b then return end
+    for i=1,30 do if b[i] and b[i].Remove then b[i].Visible=false end end
+    if b.Name and b.Name.Remove then b.Name.Visible=false end
+    if b.Dist and b.Dist.Remove then b.Dist.Visible=false end
+    if b.Weapon and b.Weapon.Remove then b.Weapon.Visible=false end
+    if b.Info and b.Info.Remove then b.Info.Visible=false end
+    if b.HPBg and b.HPBg.Remove then b.HPBg.Visible=false end
+    if b.HPFill and b.HPFill.Remove then b.HPFill.Visible=false end
+    if b.Tracer and b.Tracer.Remove then b.Tracer.Visible=false end
+    if b.Snap and b.Snap.Remove then b.Snap.Visible=false end
+end
+
+-- =============================================
+-- CLEAN PLAYER (delete all)
+-- =============================================
 function ESP:CleanPlayer(p)
-    if ESP.Boxes[p] then for _,v in pairs(ESP.Boxes[p]) do if type(v)=="table" and v.Remove then v.Visible=false v:Remove() end end ESP.Boxes[p]=nil end
+    if ESP.Boxes[p] then
+        for _,v in pairs(ESP.Boxes[p]) do
+            if type(v)=="table" and v.Remove then v.Visible=false v:Remove() end
+        end
+        ESP.Boxes[p]=nil
+    end
 end
 
 function ESP:CleanAll()
@@ -85,6 +113,17 @@ function ESP:CleanAll()
     ESP.Boxes={}
 end
 
+-- =============================================
+-- CHECK IF POINT IS ON SCREEN
+-- =============================================
+function ESP:IsOnScreen(sp)
+    local vp=Camera.ViewportSize
+    return sp.Z>0 and sp.X>=-50 and sp.X<=vp.X+50 and sp.Y>=-50 and sp.Y<=vp.Y+50
+end
+
+-- =============================================
+-- UPDATE
+-- =============================================
 function ESP:Update()
     local mt=LocalPlayer.Team
     local cp=Camera.CFrame.Position
@@ -93,32 +132,33 @@ function ESP:Update()
     local proc={}
 
     for _,p in ipairs(Players:GetPlayers()) do
-        if p==LocalPlayer then continue end
-        if ESP.Settings.TeamCheck and p.Team==mt then ESP:CleanPlayer(p) continue end
+        if p==LocalPlayer then ESP:HidePlayerDrawings(p) continue end
+        if ESP.Settings.TeamCheck and p.Team==mt then ESP:HidePlayerDrawings(p) continue end
 
         local c=p.Character
-        if not c then ESP:CleanPlayer(p) continue end
+        if not c then ESP:HidePlayerDrawings(p) continue end
 
         local h=ESP:FindHead(c)
         local r=ESP:FindRoot(c)
         local hum=c:FindFirstChildOfClass("Humanoid")
-        if not h or not r then ESP:CleanPlayer(p) continue end
+        if not h or not r then ESP:HidePlayerDrawings(p) continue end
 
         local rp=r.Position
         local dist=(cp-rp).Magnitude
-        if dist>ESP.Settings.MaxDist then ESP:CleanPlayer(p) continue end
+        if dist>ESP.Settings.MaxDist then ESP:HidePlayerDrawings(p) continue end
 
         if ESP.Settings.VisCheck then
             local ray=Ray.new(cp,(rp-cp).Unit*dist)
             local hit=workspace:FindPartOnRay(ray,LocalPlayer.Character)
-            if hit and hit.Parent~=c then ESP:CleanPlayer(p) continue end
+            if hit and hit.Parent~=c then ESP:HidePlayerDrawings(p) continue end
         end
 
         local rsp=Camera:WorldToViewportPoint(rp)
-        if rsp.Z<=0 then ESP:CleanPlayer(p) continue end
-
         local hsp=Camera:WorldToViewportPoint(h.Position+Vector3.new(0,0.5,0))
         local lsp=Camera:WorldToViewportPoint(rp-Vector3.new(0,3.5,0))
+
+        -- CHECK IF ON SCREEN (both Z AND X/Y bounds)
+        if not ESP:IsOnScreen(rsp) then ESP:HidePlayerDrawings(p) continue end
 
         local bh=math.abs(hsp.Y-lsp.Y)
         local bw=bh*0.5
@@ -128,12 +168,14 @@ function ESP:Update()
         if not ESP.Boxes[p] then ESP:CreatePlayer(p) end
         local b=ESP.Boxes[p]
 
+        -- Hide ALL lines first
         for i=1,30 do if b[i] and b[i].Remove then b[i].Visible=false end end
 
         local color=ESP:GetColor(p)
         local cl=math.clamp(bw*0.25,8,ESP.Settings.CornerLen)
         local ct=ESP.Settings.CornerThick
 
+        -- Corner Box
         b[1].From,b[1].To=Vector2.new(x,y),Vector2.new(x+cl,y) b[1].Color,b[1].Thickness,b[1].Visible=color,ct,true
         b[2].From,b[2].To=Vector2.new(x,y),Vector2.new(x,y+cl) b[2].Color,b[2].Thickness,b[2].Visible=color,ct,true
         b[3].From,b[3].To=Vector2.new(x+bw-cl,y),Vector2.new(x+bw,y) b[3].Color,b[3].Thickness,b[3].Visible=color,ct,true
@@ -143,17 +185,20 @@ function ESP:Update()
         b[7].From,b[7].To=Vector2.new(x+bw-cl,y+bh),Vector2.new(x+bw,y+bh) b[7].Color,b[7].Thickness,b[7].Visible=color,ct,true
         b[8].From,b[8].To=Vector2.new(x+bw,y+bh-cl),Vector2.new(x+bw,y+bh) b[8].Color,b[8].Thickness,b[8].Visible=color,ct,true
 
+        -- Name
         if ESP.Settings.Name then
             b.Name.Text=p.DisplayName b.Name.Color=ESP.Settings.NameColor b.Name.Size=ESP.Settings.NameSize
             b.Name.Position=Vector2.new(rsp.X,y-16) b.Name.Visible=true b.Name.Outline=ESP.Settings.NameOutline
         else b.Name.Visible=false end
 
+        -- Distance
         if ESP.Settings.Dist then
             b.Dist.Text=ESP.Settings.DistBrackets and"["..math.floor(dist).."m]"or math.floor(dist).."m"
             b.Dist.Color=ESP.Settings.DistColor b.Dist.Size=ESP.Settings.DistSize
             b.Dist.Position=Vector2.new(rsp.X,y+bh+14) b.Dist.Visible=true
         else b.Dist.Visible=false end
 
+        -- HP
         if ESP.Settings.HP and hum then
             local pct=math.clamp(hum.Health/hum.MaxHealth,0,1)
             local hc=pct>0.5 and Color3.fromRGB(50,200,50)or pct>0.25 and Color3.fromRGB(255,170,0)or Color3.fromRGB(255,50,50)
@@ -165,6 +210,7 @@ function ESP:Update()
             b.HPFill.Color,b.HPFill.Visible=hc,true
         else b.HPBg.Visible=false b.HPFill.Visible=false end
 
+        -- Tracer
         if ESP.Settings.Tracer then
             local sx=cx
             local sy=ESP.Settings.TracerOrigin=="Bottom"and cy or ESP.Settings.TracerOrigin=="Top"and 0 or cy/2
@@ -172,24 +218,27 @@ function ESP:Update()
             b.Tracer.Color,b.Tracer.Thickness,b.Tracer.Visible=ESP.Settings.TracerColor,ESP.Settings.TracerThick,true
         else b.Tracer.Visible=false end
 
+        -- Snapline
         if ESP.Settings.Snap then
             b.Snap.From,b.Snap.To=Vector2.new(cx,cy),Vector2.new(rsp.X,rsp.Y)
             b.Snap.Color,b.Snap.Thickness,b.Snap.Visible=ESP.Settings.SnapColor,ESP.Settings.SnapThick,true
         else b.Snap.Visible=false end
 
+        -- Weapon
         if ESP.Settings.Weapon then
             local wep=nil
             for _,tool in ipairs(c:GetChildren()) do if tool:IsA("Tool")and tool:FindFirstChild("Handle")then wep=tool.Name break end end
             if wep then b.Weapon.Text="["..wep.."]" b.Weapon.Color=ESP.Settings.WeaponColor b.Weapon.Size=11 b.Weapon.Position=Vector2.new(rsp.X,y+bh+28) b.Weapon.Visible=true end
         else b.Weapon.Visible=false end
 
+        -- Skeleton
         if ESP.Settings.Skeleton then
             local si=20
             for _,bone in ipairs(SkeletonBones) do
                 local p1=c:FindFirstChild(bone[1]) local p2=c:FindFirstChild(bone[2])
                 if p1 and p2 then
                     local sp1=Camera:WorldToViewportPoint(p1.Position) local sp2=Camera:WorldToViewportPoint(p2.Position)
-                    if sp1.Z>0 and sp2.Z>0 then
+                    if ESP:IsOnScreen(sp1) and ESP:IsOnScreen(sp2) then
                         b[si].From,b[si].To=Vector2.new(sp1.X,sp1.Y),Vector2.new(sp2.X,sp2.Y)
                         b[si].Color,b[si].Thickness,b[si].Visible=ESP.Settings.SkeletonColor,ESP.Settings.SkeletonThick,true
                         si=si+1
@@ -198,6 +247,7 @@ function ESP:Update()
             end
         end
 
+        -- Info Panel
         if ESP.Settings.InfoPanel then
             local info=p.DisplayName.."\n"
             if hum then info=info.."HP: "..math.floor(hum.Health).."/"..hum.MaxHealth.."\n" end
@@ -209,7 +259,10 @@ function ESP:Update()
         proc[p]=true
     end
 
-    for p in pairs(ESP.Boxes) do if not proc[p] then ESP:CleanPlayer(p) end end
+    -- Hide players not processed
+    for p in pairs(ESP.Boxes) do
+        if not proc[p] then ESP:HidePlayerDrawings(p) end
+    end
 end
 
 function ESP:Start()
