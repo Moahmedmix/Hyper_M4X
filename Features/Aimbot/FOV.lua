@@ -133,34 +133,50 @@ function Aimbot:Update()
         
         -- Auto Shoot
         if Aimbot.Settings.AutoShoot then
-            self:AutoShoot()
+        -- استبدل دالة AutoShoot القديمة بـ:
+
+function Aimbot:AutoShoot()
+    local now = tick()
+    if now - LastShot < Aimbot.Settings.ShootDelay then return end
+    LastShot = now
+    
+    -- Method 1: Touch simulation (mobile)
+    pcall(function()
+        local TouchInputService = game:GetService("UserInputService")
+        -- Simulate tap
+        local args = {
+            [1] = 0, -- touch ID
+            [2] = true, -- began
+            [3] = Camera.ViewportSize / 2, -- center of screen
+        }
+        -- Fire remote directly if game uses it
+    end)
+    
+    -- Method 2: Direct weapon fire
+    pcall(function()
+        local char = LocalPlayer.Character
+        if not char then return end
+        local tool = char:FindFirstChildOfClass("Tool")
+        if tool and tool:FindFirstChild("Handle") then
+            -- Try to find the fire function
+            if tool.Activate then
+                tool:Activate()
+                task.wait(0.05)
+                if tool.Deactivate then
+                    tool:Deactivate()
+                end
+            end
         end
-    else
-        FOVCircle.Color = Aimbot.Settings.FOVColor
-    end
-end
-
-function Aimbot:IsVisible(player)
-    if not Aimbot.Settings.VisibleCheck then return true end
-    local char = player.Character
-    if not char then return false end
-    local part = char:FindFirstChild(Aimbot.Settings.AimPart) or char:FindFirstChild("Head")
-    if not part then return false end
-
-    local rayParams = RaycastParams.new()
-    rayParams.FilterType = Enum.RaycastFilterType.Blacklist
-    rayParams.FilterDescendantsInstances = {LocalPlayer.Character}
-    rayParams.IgnoreWater = true
-
-    local origin = Camera.CFrame.Position
-    local direction = (part.Position - origin).Unit * 500
-
-    local result = workspace:Raycast(origin, direction, rayParams)
-    if result then
-        return result.Instance:IsDescendantOf(char)
-    end
-    return true
-end
+    end)
+    
+    -- Method 3: Click simulation (works on some mobile executors)
+    pcall(function()
+        local vim = game:GetService("VirtualInputManager")
+        vim:SendMouseButtonEvent(0, 0, 0, true, game, 1)
+        task.wait(0.05)
+        vim:SendMouseButtonEvent(0, 0, 0, false, game, 1)
+    end)
+            end
 
 function Aimbot:IsNotBehindWall(player)
     if not Aimbot.Settings.WallCheck then return true end
