@@ -296,9 +296,9 @@ end
 Logger:Header("HYPER UI v1.0.0")
 Logger:Box("System Information", {
     "Framework: Hyper UI v1.0.0",
-    "Authors: M4X | EVA | AMAL",
+    "Authors: M4X | EVA | AMAL | Jana ",
     "UI Library: WindUI",
-    "Repository: github.com/Moahmedmix/Hyper_M4X",
+    "tik: m4x__4x1",
 })
 
 if LocalPlayer then
@@ -375,7 +375,7 @@ local windowCreated = false
 local windowSuccess, windowError = pcall(function()
     Window = WindUI:CreateWindow({
         Title = "Hyper",
-        Author = "M4X | EVA | AMAL",
+        Author = "M4X | EVA | AMAL | Jana",
         Folder = "Hyper_M4X",
         Icon = "zap",
         Theme = "Red black",
@@ -390,7 +390,7 @@ local windowSuccess, windowError = pcall(function()
         Discord = { Enabled = false },
         KeySystem = {
             Note = "Enter your Hyper key to continue.",
-            Key = { "MIX-M4X", "MIX-M4X-2024", "MIX-M4X-PRO", "HYPER-M4X", "EVA-M4X", "AMAL-M4X" },
+            Key = { "MIX", "M4X", "MIX-M4X", },
             SaveKey = true,
         },
     })
@@ -404,7 +404,7 @@ if not windowCreated then
     pcall(function()
         Window = WindUI:CreateWindow({
             Title = "Hyper",
-            Author = "M4X | EVA | AMAL",
+            Author = "M4X | EVA | AMAL | Jana",
             Folder = "Hyper_M4X",
             Icon = "zap",
             Theme = "Dark",
@@ -412,7 +412,7 @@ if not windowCreated then
             Discord = { Enabled = false },
             KeySystem = {
                 Note = "Enter your Hyper key to continue.",
-                Key = { "MIX-M4X", "MIX-M4X-2024", "MIX-M4X-PRO", "HYPER-M4X", "EVA-M4X", "AMAL-M4X" },
+                Key = { "MIX", "M4X", "MIX-M4X", },
                 SaveKey = false,
             },
         })
@@ -571,7 +571,7 @@ end
 -- =============================================
 -- LOAD CONFIG
 -- =============================================
-local ConfigModule = ModuleLoader:LoadFromRepo("Core/Config.lua", false)
+local ConfigModule = ModuleLoader:LoadFromRepo("Core/Icons.lua", false)
 if ConfigModule then
     ConfigModule:Load(FlagStorage)
     if Flags:GetValue("ConfigAutoSave") ~= false then
@@ -612,12 +612,7 @@ Logger:Box("HYPER UI READY", {
     "Features Active: " .. featureStats.Loaded .. "/" .. featureStats.Total,
 })
 
-print("")
-print("  ╔══════════════════════════════════════════╗")
-print("  ║       HYPER UI v1.0.0 - ACTIVE          ║")
-print("  ║     By M4X | EVA | AMAL                ║")
-print("  ╚══════════════════════════════════════════╝")
-print("")
+
 
 -- =============================================
 -- RETURN VALUES
