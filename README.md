@@ -1,7 +1,6 @@
 
 # ⚡ Hyper UI v1.0.0
 
-> Advanced Roblox Script Hub | روبلوكس سكربت متقدم | Продвинутый скрипт для Roblox
 
 ---
 
