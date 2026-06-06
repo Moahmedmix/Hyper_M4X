@@ -433,6 +433,7 @@ local tabDefinitions = {
     { Name = "Visuals",  Icon = "eye" },
     { Name = "Movement", Icon = "zap" },
     { Name = "Utility",  Icon = "settings" },
+    { Name = "weit for it", Icon = "zap" },
 }
 
 for _, tabDef in ipairs(tabDefinitions) do
