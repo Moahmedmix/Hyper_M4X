@@ -492,16 +492,6 @@ end
     -- ============ SYSTEM INFO ============
     local sysSec = Tabs.Home:Section({ Title = "System Information", Icon = "monitor", Opened = true })
     
-    local device = "PC"
-    pcall(function() if game:GetService("UserInputService").TouchEnabled then device = "Mobile/Tablet" end end)
-    local executor = "Unknown"
-    pcall(function() executor = identifyexecutor() or getexecutorname() or "Unknown" end)
-    local mem = "N/A"
-    pcall(function() mem = math.floor(collectgarbage("count")) .. " KB" end)
-    local robloxVersion = "N/A"
-    pcall(function() robloxVersion = game:GetService("VersionCompatibility"):GetRobloxVersion() end)
-    
-    sysSec:Button({ Title = "Device: " .. device, Callback = function() end })
     sysSec:Button({ Title = "Executor: " .. executor, Callback = function() end })
     sysSec:Button({ Title = "Memory: " .. mem, Callback = function() end })
     sysSec:Button({ Title = "Roblox: " .. robloxVersion, Callback = function() end })
@@ -572,10 +562,7 @@ end
     
     Logger:Good("Home tab built!")
     
-    -- Cleanup on UI destroy
-    Window.ScreenGui.Destroying:Connect(function()
-        if statsConn then statsConn:Disconnect() end
-    end)
+    
 end
 
 -- =============================================
