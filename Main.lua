@@ -568,6 +568,19 @@ for _, feature in ipairs(FeatureList) do
 end
 
 -- =============================================
+-- LOAD CONFIG
+-- =============================================
+local ConfigModule = ModuleLoader:LoadFromRepo("Core/Config.lua", false)
+if ConfigModule then
+    ConfigModule:Load(FlagStorage)
+    if Flags:GetValue("ConfigAutoSave") ~= false then
+        ConfigModule:StartAutoSave(FlagStorage)
+    end
+    Logger:Good("Config system loaded!")
+else
+    Logger:Skip("Config system skipped")
+end
+-- =============================================
 -- FINAL REPORT
 -- =============================================
 Logger:Separator("═")
