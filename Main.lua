@@ -450,6 +450,9 @@ end
 -- =============================================
 -- HOME TAB CONTENT
 -- =============================================
+-- =============================================
+-- HOME TAB CONTENT
+-- =============================================
 if Tabs.Home then
     -- Information
     local infoSec = Tabs.Home:Section({ Title = "Information", Icon = "info", Opened = true })
@@ -457,6 +460,15 @@ if Tabs.Home then
     infoSec:Button({ Title = "By M4X | EVA | AMAL", Description = "Development Team", Callback = function() end })
     infoSec:Button({ Title = "Key: MIX-M4X", Description = "Premium Access", Callback = function() end })
     infoSec:Button({ Title = "Welcome, " .. (LocalPlayer and LocalPlayer.Name or "User") .. "!", Callback = function() end })
+
+    -- System
+    local sysSec = Tabs.Home:Section({ Title = "System", Icon = "monitor", Opened = true })
+    local device = "PC" pcall(function() if game:GetService("UserInputService").TouchEnabled then device = "Mobile/Tablet" end end)
+    local exec = "Unknown" pcall(function() exec = identifyexecutor() or "Unknown" end)
+    sysSec:Button({ Title = "Device: " .. device, Callback = function() end })
+    sysSec:Button({ Title = "Executor: " .. exec, Callback = function() end })
+    sysSec:Button({ Title = "Place: " .. game.PlaceId, Callback = function() end })
+    sysSec:Button({ Title = "Job: " .. game.JobId:sub(1, 12) .. "...", Callback = function() end })
 
     -- Quick Actions
     local quickSec = Tabs.Home:Section({ Title = "Quick Actions", Icon = "zap", Opened = true })
@@ -478,15 +490,6 @@ if Tabs.Home then
     local toggleSec = Tabs.Home:Section({ Title = "Toggles", Icon = "toggle-left", Opened = true })
     toggleSec:Toggle({ Title = "Auto Updater", Value = true, Callback = function(s) Flags:Set("AutoUpdater", s) end })
     toggleSec:Toggle({ Title = "Anti AFK", Value = false, Callback = function(s) Flags:Set("AntiAFK", s) end })
-
-    -- System Info
-    local sysSec = Tabs.Home:Section({ Title = "System", Icon = "monitor", Opened = true })
-    local device = "PC" pcall(function() if game:GetService("UserInputService").TouchEnabled then device = "Mobile/Tablet" end end)
-    local exec = "Unknown" pcall(function() exec = identifyexecutor() or "Unknown" end)
-    sysSec:Button({ Title = "Device: " .. device, Callback = function() end })
-    sysSec:Button({ Title = "Executor: " .. exec, Callback = function() end })
-    sysSec:Button({ Title = "Place: " .. game.PlaceId, Callback = function() end })
-    sysSec:Button({ Title = "Job: " .. game.JobId:sub(1, 12) .. "...", Callback = function() end })
 
     -- Credits
     local credSec = Tabs.Home:Section({ Title = "Credits", Icon = "users", Opened = true })
