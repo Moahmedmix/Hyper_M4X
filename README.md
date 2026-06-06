@@ -112,7 +112,7 @@ Hyper_M4X/
 🔑 Keys | المفاتيح | Ключи
 
 Key
-MIX
+MIX,
 M4X
 
 ---
