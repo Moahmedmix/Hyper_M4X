@@ -535,7 +535,7 @@ local FeatureList = {
     { Path = "Features/Utility/AutoFarm.lua",   Tab = "Utility",  Name = "Auto Farm" },
     { Path = "Features/Utility/StreamSniper.lua", Tab = "Utility", Name = "Stream Sniper" },
     { Path = "Features/Utility/WhiteScreen.lua", Tab = "Utility",  Name = "White Screen" },
-    { Path = "Features/Utility/Fling.lua", Tab = "Utility", Name = "Fling" },
+    { Path = "Features/Utility/Fling.lua", Tab = "More", Name = "Fling" },
 }
 
 ModuleLoader.Stats = { Total = 0, Loaded = 0, Failed = 0, Skipped = 0 }
