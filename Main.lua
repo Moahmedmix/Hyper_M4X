@@ -452,57 +452,42 @@ end
 -- HOME TAB CONTENT
 -- =============================================
 if Tabs.Home then
-    local startTime = tick()
-    
-    -- Helper: get FPS
-    local fps = 0
-    local lastFpsUpdate = 0
-    local frameCount = 0
-    RunService.Stepped:Connect(function()
-        frameCount = frameCount + 1
-        if tick() - lastFpsUpdate >= 1 then
-            fps = frameCount
-            frameCount = 0
-            lastFpsUpdate = tick()
+    local infoSec = Tabs.Home:Section({ Title = "Information", Icon = "info", Opened = true })
+    infoSec:Button({ Title = "Hyper UI Framework v1.0.0", Description = "Advanced Roblox Utility", Callback = function() end })
+    infoSec:Button({ Title = "By M4X | EVA | AMAL", Description = "Development Team", Callback = function() end })
+    infoSec:Button({ Title = "Key: MIX-M4X", Description = "Premium Access", Callback = function() end })
+    infoSec:Button({ Title = "Welcome, " .. (LocalPlayer and LocalPlayer.Name or "User") .. "!", Description = "Player: " .. (LocalPlayer and LocalPlayer.DisplayName or "Unknown"), Callback = function() end })
+
+    local quickSec = Tabs.Home:Section({ Title = "Quick Actions", Icon = "zap", Opened = true })
+    quickSec:Button({ Title = "Rejoin Server", Description = "Rejoin the current server", Callback = function()
+        if TeleportService and LocalPlayer then TeleportService:Teleport(game.PlaceId, LocalPlayer) end
+    end })
+    quickSec:Button({ Title = "Clean Workspace", Description = "Remove unnecessary objects", Callback = function()
+        local count = 0
+        for _, obj in ipairs(workspace:GetChildren()) do
+            if obj:IsA("Model") and obj ~= LocalPlayer and obj ~= LocalPlayer.Character then
+                pcall(function() obj:Destroy() end) count = count + 1
+            end
         end
-    end)
-    
-    -- ============ WELCOME ============
-    local welcomeSec = Tabs.Home:Section({ Title = "Welcome", Icon = "home", Opened = true })
-    welcomeSec:Button({ Title = "Hyper UI Framework v1.0.0", Description = "Premium Roblox Script Hub", Callback = function() end })
-    welcomeSec:Button({ Title = "Welcome back, " .. (LocalPlayer and LocalPlayer.Name or "User"), Description = "Last login: " .. os.date("%H:%M:%S"), Callback = function() end })
-    
-    -- ============ STATISTICS ============
-    local statsSec = Tabs.Home:Section({ Title = "Statistics", Icon = "bar-chart", Opened = true })
-    
-    -- Live stats updates
-    local statsConn
-    local function UpdateStats()
-        local online = #Players:GetPlayers()
-        local maxPlayers = Players.MaxPlayers or "?"
-        local ping = "N/A"
-        pcall(function() ping = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString() end)
-        local mem = "N/A"
-        pcall(function() mem = math.floor(collectgarbage("count")) .. " KB" end)
-        local sessionTime = math.floor((tick() - startTime) / 60) .. "m " .. math.floor((tick() - startTime) % 60) .. "s"
-        local accountAge = "N/A"
-        pcall(function() accountAge = math.floor((os.time() - LocalPlayer.AccountAge * 86400) / 86400) .. " days" end)
-        local device = "PC"
-        pcall(function() if game:GetService("UserInputService").TouchEnabled then device = "Mobile/Tablet" end end)
-        local executor = "Unknown"
-        pcall(function() executor = identifyexecutor() or getexecutorname() or "Unknown" end)
-        local robloxVersion = game:GetService("VersionCompatibility"):GetRobloxVersion()
-        
-        -- Update buttons
-        statsSec:Button({ Title = "Player: " .. LocalPlayer.Name .. " (@" .. LocalPlayer.DisplayName .. ")", Description = "User ID: " .. LocalPlayer.UserId, Callback = function() end })
-        statsSec:Button({ Title = "Account Age: " .. accountAge, Callback = function() end })
-        statsSec:Button({ Title = "Online: " .. online .. "/" .. maxPlayers .. " players", Callback = function() end })
-        statsSec:Button({ Title = "FPS: " .. fps .. " | Ping: " .. ping, Callback = function() end })
-        statsSec:Button({ Title = "Session: " .. sessionTime, Callback = function() end })
-    end
-    
-    UpdateStats()
-    statsConn = RunService.Heartbeat:Connect(UpdateStats)
+        WindUI:Notify({ Title = "Hyper", Description = "Cleaned " .. count .. " objects!", Duration = 3 })
+    end })
+    quickSec:Button({ Title = "Copy Discord Invite", Description = "Join our community", Callback = function()
+        pcall(function() setclipboard("discord.gg/hyper") end)
+        WindUI:Notify({ Title = "Hyper", Description = "Discord copied!", Duration = 3 })
+    end })
+    quickSec:Button({ Title = "Refresh UI", Description = "Reload the interface", Callback = function()
+        loadstring(game:HttpGet(REPO_URL .. "Main.lua"))()
+    end })
+    quickSec:Button({ Title = "Destroy UI", Description = "Close Hyper UI", Callback = function()
+        pcall(function() Window:Destroy() end)
+    end })
+
+    local toggleSec = Tabs.Home:Section({ Title = "Toggles", Icon = "toggle-left", Opened = true })
+    toggleSec:Toggle({ Title = "Auto Updater", Description = "Check for updates automatically", Value = true, Callback = function(s) Flags:Set("AutoUpdater", s) end })
+    toggleSec:Toggle({ Title = "Anti AFK", Description = "Prevent being kicked for inactivity", Value = false, Callback = function(s) Flags:Set("AntiAFK", s) end })
+
+    Logger:Good("Home tab built!")
+end
     
     -- ============ SYSTEM INFO ============
     local sysSec = Tabs.Home:Section({ Title = "System Information", Icon = "monitor", Opened = true })
