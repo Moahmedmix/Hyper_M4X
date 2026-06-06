@@ -388,7 +388,11 @@ local windowSuccess, windowError = pcall(function()
         ScrollBarEnabled = true,
         ConfigurationSaving = { Enabled = false },
         Discord = { Enabled = false },
-        KeySystem = true,
+        KeySystem = {
+            Note = "Enter your Hyper key to continue.",
+            Key = { "MIX-M4X", "MIX-M4X-2024", "MIX-M4X-PRO", "HYPER-M4X", "EVA-M4X", "AMAL-M4X" },
+            SaveKey = true,
+        },
     })
     windowCreated = true
 end)
@@ -406,26 +410,16 @@ if not windowCreated then
             Theme = "Dark",
             ConfigurationSaving = { Enabled = false },
             Discord = { Enabled = false },
-        
-         KeySystem = {
-        Note = "Enter your Hyper key to continue.",
-        Key = { "MIX-M4X", "MIX-M4X-2024", "MIX-M4X-PRO", "HYPER-M4X", "EVA-M4X", "AMAL-M4X" },
-        SaveKey = true,
-    },
-})
+            KeySystem = {
+                Note = "Enter your Hyper key to continue.",
+                Key = { "MIX-M4X", "MIX-M4X-2024", "MIX-M4X-PRO", "HYPER-M4X", "EVA-M4X", "AMAL-M4X" },
+                SaveKey = true,
+            },
         })
         windowCreated = true
         Logger:Good("Simplified window created!")
     end)
 end
-
-if not windowCreated or not Window then
-    Logger:Dead("CRITICAL: Cannot create window. Aborting.")
-    return
-end
-
-Logger:Good("Window created successfully!")
-
 -- =============================================
 -- CREATE TABS
 -- =============================================
