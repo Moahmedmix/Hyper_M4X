@@ -432,7 +432,7 @@ local tabDefinitions = {
     { Name = "Aimbot",   Icon = "crosshair" },
     { Name = "Visuals",  Icon = "eye" },
     { Name = "Movement", Icon = "zap" },
-    { Name = "Utility",  Icon = "settings" },
+    { Name = "Settings",  Icon = "settings" },
     { Name = "More", Icon = "ellipsis" },
     { Name = "weit for it", Icon = "zap" },
 }
@@ -512,8 +512,8 @@ Logger:Info("Loading External Feature Modules...")
 
 local FeatureList = {
     -- Core Systems
-    { Path = "Core/Themes.lua",        Tab = "Utility",  Name = "Themes System" },
-    { Path = "Core/Settings.lua",      Tab = "Utility",  Name = "UI Settings" },
+    { Path = "Core/Themes.lua",        Tab = "Settings",  Name = "Themes System" },
+    { Path = "Core/Settings.lua",      Tab = "Settings",  Name = "UI Settings" },
     
     -- Aimbot Features
     { Path = "Features/Aimbot/Silent.lua",      Tab = "Aimbot",   Name = "Silent Aim" },
