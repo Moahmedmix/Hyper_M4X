@@ -413,7 +413,7 @@ if not windowCreated then
             KeySystem = {
                 Note = "Enter your Hyper key to continue.",
                 Key = { "MIX-M4X", "MIX-M4X-2024", "MIX-M4X-PRO", "HYPER-M4X", "EVA-M4X", "AMAL-M4X" },
-                SaveKey = true,
+                SaveKey = false,
             },
         })
         windowCreated = true
