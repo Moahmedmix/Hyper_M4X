@@ -452,64 +452,145 @@ end
 -- HOME TAB CONTENT
 -- =============================================
 if Tabs.Home then
-    local welcomeSection = Tabs.Home:Section({ Title = "Welcome", Icon = "info", Opened = true })
+    local startTime = tick()
     
-    welcomeSection:Button({ Title = "Hyper UI Framework v1.0.0", Callback = function() end })
-    welcomeSection:Button({ Title = "By M4X | EVA | AMAL", Callback = function() end })
-    welcomeSection:Button({ Title = "Welcome, " .. (LocalPlayer and LocalPlayer.Name or "User") .. "!", Callback = function() end })
+    -- Helper: get FPS
+    local fps = 0
+    local lastFpsUpdate = 0
+    local frameCount = 0
+    RunService.Stepped:Connect(function()
+        frameCount = frameCount + 1
+        if tick() - lastFpsUpdate >= 1 then
+            fps = frameCount
+            frameCount = 0
+            lastFpsUpdate = tick()
+        end
+    end)
     
-    local quickSection = Tabs.Home:Section({ Title = "Quick Actions", Icon = "activity" })
+    -- ============ WELCOME ============
+    local welcomeSec = Tabs.Home:Section({ Title = "Welcome", Icon = "home", Opened = true })
+    welcomeSec:Button({ Title = "Hyper UI Framework v1.0.0", Description = "Premium Roblox Script Hub", Callback = function() end })
+    welcomeSec:Button({ Title = "Welcome back, " .. (LocalPlayer and LocalPlayer.Name or "User"), Description = "Last login: " .. os.date("%H:%M:%S"), Callback = function() end })
     
-    quickSection:Button({
-        Title = "Rejoin Server",
-        Description = "Rejoin the current server",
-        Callback = function()
-            if TeleportService and LocalPlayer then
-                TeleportService:Teleport(game.PlaceId, LocalPlayer)
+    -- ============ STATISTICS ============
+    local statsSec = Tabs.Home:Section({ Title = "Statistics", Icon = "bar-chart", Opened = true })
+    
+    -- Live stats updates
+    local statsConn
+    local function UpdateStats()
+        local online = #Players:GetPlayers()
+        local maxPlayers = Players.MaxPlayers or "?"
+        local ping = "N/A"
+        pcall(function() ping = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString() end)
+        local mem = "N/A"
+        pcall(function() mem = math.floor(collectgarbage("count")) .. " KB" end)
+        local sessionTime = math.floor((tick() - startTime) / 60) .. "m " .. math.floor((tick() - startTime) % 60) .. "s"
+        local accountAge = "N/A"
+        pcall(function() accountAge = math.floor((os.time() - LocalPlayer.AccountAge * 86400) / 86400) .. " days" end)
+        local device = "PC"
+        pcall(function() if game:GetService("UserInputService").TouchEnabled then device = "Mobile/Tablet" end end)
+        local executor = "Unknown"
+        pcall(function() executor = identifyexecutor() or getexecutorname() or "Unknown" end)
+        local robloxVersion = game:GetService("VersionCompatibility"):GetRobloxVersion()
+        
+        -- Update buttons
+        statsSec:Button({ Title = "Player: " .. LocalPlayer.Name .. " (@" .. LocalPlayer.DisplayName .. ")", Description = "User ID: " .. LocalPlayer.UserId, Callback = function() end })
+        statsSec:Button({ Title = "Account Age: " .. accountAge, Callback = function() end })
+        statsSec:Button({ Title = "Online: " .. online .. "/" .. maxPlayers .. " players", Callback = function() end })
+        statsSec:Button({ Title = "FPS: " .. fps .. " | Ping: " .. ping, Callback = function() end })
+        statsSec:Button({ Title = "Session: " .. sessionTime, Callback = function() end })
+    end
+    
+    UpdateStats()
+    statsConn = RunService.Heartbeat:Connect(UpdateStats)
+    
+    -- ============ SYSTEM INFO ============
+    local sysSec = Tabs.Home:Section({ Title = "System Information", Icon = "monitor", Opened = true })
+    
+    local device = "PC"
+    pcall(function() if game:GetService("UserInputService").TouchEnabled then device = "Mobile/Tablet" end end)
+    local executor = "Unknown"
+    pcall(function() executor = identifyexecutor() or getexecutorname() or "Unknown" end)
+    local mem = "N/A"
+    pcall(function() mem = math.floor(collectgarbage("count")) .. " KB" end)
+    local robloxVersion = "N/A"
+    pcall(function() robloxVersion = game:GetService("VersionCompatibility"):GetRobloxVersion() end)
+    
+    sysSec:Button({ Title = "Device: " .. device, Callback = function() end })
+    sysSec:Button({ Title = "Executor: " .. executor, Callback = function() end })
+    sysSec:Button({ Title = "Memory: " .. mem, Callback = function() end })
+    sysSec:Button({ Title = "Roblox: " .. robloxVersion, Callback = function() end })
+    sysSec:Button({ Title = "Place ID: " .. game.PlaceId, Callback = function() end })
+    sysSec:Button({ Title = "Job ID: " .. (game.JobId:sub(1, 12) .. "..."), Callback = function() end })
+    
+    -- ============ SCRIPT INFO ============
+    local scriptSec = Tabs.Home:Section({ Title = "Script Information", Icon = "file-text", Opened = true })
+    scriptSec:Button({ Title = "Script: Hyper", Callback = function() end })
+    scriptSec:Button({ Title = "Version: v1.0.0", Callback = function() end })
+    scriptSec:Button({ Title = "Build: 2024.06.06", Callback = function() end })
+    scriptSec:Button({ Title = "UI Library: WindUI", Callback = function() end })
+    scriptSec:Button({ Title = "Repository: github.com/Moahmedmix/Hyper_M4X", Callback = function() end })
+    
+    -- ============ QUICK ACTIONS ============
+    local quickSec = Tabs.Home:Section({ Title = "Quick Actions", Icon = "zap", Opened = true })
+    
+    quickSec:Button({ Title = "Rejoin Server", Description = "Rejoin current server", Callback = function()
+        if TeleportService and LocalPlayer then
+            TeleportService:Teleport(game.PlaceId, LocalPlayer)
+        end
+    end })
+    
+    quickSec:Button({ Title = "Copy Job ID", Description = "Copy server Job ID", Callback = function()
+        pcall(function() setclipboard(game.JobId) end)
+        WindUI:Notify({ Title = "Hyper", Description = "Job ID copied!", Duration = 3 })
+    end })
+    
+    quickSec:Button({ Title = "Copy Place ID", Description = "Copy Place ID: " .. game.PlaceId, Callback = function()
+        pcall(function() setclipboard(tostring(game.PlaceId)) end)
+        WindUI:Notify({ Title = "Hyper", Description = "Place ID copied!", Duration = 3 })
+    end })
+    
+    quickSec:Button({ Title = "Clean Workspace", Description = "Remove unnecessary objects", Callback = function()
+        local count = 0
+        for _, obj in ipairs(workspace:GetChildren()) do
+            if obj:IsA("Model") and obj ~= LocalPlayer and obj ~= LocalPlayer.Character then
+                pcall(function() obj:Destroy() end) count = count + 1
             end
         end
-    })
+        WindUI:Notify({ Title = "Hyper", Description = "Cleaned " .. count .. " objects!", Duration = 3 })
+    end })
     
-    quickSection:Button({
-        Title = "Clean Workspace",
-        Description = "Remove all unnecessary objects",
-        Callback = function()
-            local count = 0
-            for _, obj in ipairs(workspace:GetChildren()) do
-                if obj:IsA("Model") and obj ~= LocalPlayer and obj ~= LocalPlayer.Character then
-                    pcall(function() obj:Destroy() end)
-                    count = count + 1
-                end
-            end
-            WindUI:Notify({ Title = "Hyper", Description = "Cleaned " .. count .. " objects!", Duration = 3 })
-        end
-    })
+    quickSec:Button({ Title = "Refresh UI", Description = "Reload script", Callback = function()
+        loadstring(game:HttpGet(REPO_URL .. "Main.lua"))()
+    end })
     
-    quickSection:Button({
-        Title = "Destroy UI",
-        Description = "Close and destroy the interface",
-        Callback = function()
-            pcall(function() Window:Destroy() end)
-        end
-    })
+    quickSec:Button({ Title = "Destroy UI", Description = "Close interface", Callback = function()
+        pcall(function() Window:Destroy() end)
+    end })
     
-    local toggleSection = Tabs.Home:Section({ Title = "Toggles", Icon = "toggle-left" })
+    -- ============ CREDITS ============
+    local creditsSec = Tabs.Home:Section({ Title = "Credits", Icon = "users", Opened = true })
+    creditsSec:Button({ Title = "M4X - Lead Developer", Callback = function() end })
+    creditsSec:Button({ Title = "EVA - UI/UX Designer", Callback = function() end })
+    creditsSec:Button({ Title = "AMAL - Feature Developer", Callback = function() end })
+    creditsSec:Button({ Title = "Discord: discord.gg/hyper", Callback = function() pcall(function() setclipboard("discord.gg/hyper") end) WindUI:Notify({ Title = "Hyper", Description = "Discord copied!", Duration = 3 }) end })
+    creditsSec:Button({ Title = "GitHub: github.com/Moahmedmix/Hyper_M4X", Callback = function() pcall(function() setclipboard("https://github.com/Moahmedmix/Hyper_M4X") end) WindUI:Notify({ Title = "Hyper", Description = "GitHub copied!", Duration = 3 }) end })
     
-    toggleSection:Toggle({
-        Title = "Auto Updater",
-        Description = "Automatically check for updates",
-        Value = true,
-        Callback = function(state) Flags:Set("AutoUpdater", state) end
-    })
-    
-    toggleSection:Toggle({
-        Title = "Anti AFK",
-        Description = "Prevent being kicked for inactivity",
-        Value = false,
-        Callback = function(state) Flags:Set("AntiAFK", state) end
-    })
+    -- ============ CHANGELOG ============
+    local changelogSec = Tabs.Home:Section({ Title = "Changelog v1.0.0", Icon = "clipboard", Opened = false })
+    changelogSec:Button({ Title = "+ Added Home Dashboard", Callback = function() end })
+    changelogSec:Button({ Title = "+ Added Key System (MIX-M4X)", Callback = function() end })
+    changelogSec:Button({ Title = "+ Added ESP System", Callback = function() end })
+    changelogSec:Button({ Title = "+ Added Aimbot System", Callback = function() end })
+    changelogSec:Button({ Title = "+ Added Movement Pack", Callback = function() end })
+    changelogSec:Button({ Title = "+ Added Themes System", Callback = function() end })
     
     Logger:Good("Home tab built!")
+    
+    -- Cleanup on UI destroy
+    Window.ScreenGui.Destroying:Connect(function()
+        if statsConn then statsConn:Disconnect() end
+    end)
 end
 
 -- =============================================
