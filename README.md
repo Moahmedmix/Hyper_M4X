@@ -1,4 +1,4 @@
-```markdown
+
 # ⚡ Hyper UI v1.0.0
 
 > Advanced Roblox Script Hub | روبلوكس سكربت متقدم | Продвинутый скрипт для Roblox
@@ -77,37 +77,8 @@ loadstring(game:HttpGet(""))()
 
 Авторы: M4X | EVA | AMAL
 
----
 
-📁 Structure | الهيكل | Структура
 
-```
-Hyper_M4X/
-├── Main.lua
-├── Core/
-│   ├── Config.lua
-│   ├── Themes.lua
-│   ├── Flags.lua
-│   └── Settings.lua
-├── Features/
-│   ├── Aimbot/
-│   │   └── Silent.lua
-│   ├── Visuals/
-│   │   └── ESP.lua
-│   ├── Movement/
-│   │   ├── Fly.lua
-│   │   ├── Jump.lua
-│   │   ├── Speed.lua
-│   │   └── Teleport.lua
-│   └── Utility/
-│       ├── AntiAFK.lua
-│       ├── AutoFarm.lua
-│       ├── Fling.lua
-│       └── WhiteScreen.lua
-└── README.md
-```
-
----
 
 🔑 Keys | المفاتيح | Ключи
 
