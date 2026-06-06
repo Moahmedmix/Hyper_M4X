@@ -428,7 +428,7 @@ Logger:Info("Creating tabs...")
 local Tabs = {}
 
 local tabDefinitions = {
-    { Name = "Home",     Icon = "home" },
+    { Name = "Home",     Icon = "atom" },
     { Name = "Aimbot",   Icon = "crosshair" },
     { Name = "Visuals",  Icon = "eye" },
     { Name = "Movement", Icon = "zap" },
