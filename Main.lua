@@ -12,7 +12,6 @@
     ║  - External feature loader with fallbacks                    ║
     ║  - Thread-safe module initialization                         ║
     ║  - Auto-recovery from failures                               ║
-    ║  - Key System: MIX-M4X                                       ║
     ╚══════════════════════════════════════════════════════════════╝
 --]]
 
@@ -64,48 +63,6 @@ local CoreGui = Services.CoreGui
 
 local REPO_URL = "https://raw.githubusercontent.com/Moahmedmix/Hyper_M4X/main/"
 
--- =============================================
--- KEY SYSTEM
--- =============================================
-local VALID_KEYS = {
-    "MIX-M4X",
-    "MIX-M4X-2024",
-    "MIX-M4X-PRO",
-    "HYPER-M4X",
-    "EVA-M4X",
-    "AMAL-M4X",
-}
-
-local function CheckKey()
-    local savedKey = nil
-    if readfile and isfile and isfolder and writefile then
-        local folder = "Hyper_M4X"
-        if not isfolder(folder) then makefolder(folder) end
-        local keyFile = folder .. "/key.txt"
-        if isfile(keyFile) then
-            savedKey = readfile(keyFile)
-            savedKey = savedKey:gsub("%s+", "")
-        end
-    end
-    
-    if savedKey then
-        for _, validKey in ipairs(VALID_KEYS) do
-            if savedKey == validKey then
-                return true
-            end
-        end
-    end
-    
-    return false
-end
-
-local function SaveKey(key)
-    if writefile and isfolder and makefolder then
-        local folder = "Hyper_M4X"
-        if not isfolder(folder) then makefolder(folder) end
-        writefile(folder .. "/key.txt", key)
-    end
-end
 
 -- =============================================
 -- LOGGER SYSTEM
@@ -342,7 +299,6 @@ Logger:Box("System Information", {
     "Authors: M4X | EVA | AMAL",
     "UI Library: WindUI",
     "Repository: github.com/Moahmedmix/Hyper_M4X",
-    "Key System: MIX-M4X",
 })
 
 if LocalPlayer then
@@ -409,61 +365,6 @@ function Flags:Count()
 end
 
 -- =============================================
--- KEY CHECK BEFORE WINDOW
--- =============================================
-local keyValid = CheckKey()
-
-if not keyValid then
-    -- Show key input dialog
-    local KeyWindow = WindUI:CreateWindow({
-        Title = "Hyper - Key System",
-        Author = "M4X | EVA | AMAL",
-        Folder = "Hyper_Key",
-        Icon = "key",
-        Theme = "Dark",
-        KeySystem = false,
-    })
-    
-    local KeyTab = KeyWindow:Tab({ Title = "Key", Icon = "key" })
-    local KeySec = KeyTab:Section({ Title = "Enter Key", Icon = "lock", Opened = true })
-    
-    KeySec:Textbox({
-        Title = "Key",
-        Description = "Enter your key (MIX-M4X)",
-        Placeholder = "MIX-M4X",
-        Callback = function(text)
-            text = text:gsub("%s+", "")
-            for _, validKey in ipairs(VALID_KEYS) do
-                if text == validKey then
-                    SaveKey(text)
-                    WindUI:Notify({ Title = "Key System", Description = "Key Accepted! Restarting...", Duration = 3 })
-                    task.wait(1)
-                    loadstring(game:HttpGet(REPO_URL .. "Main.lua"))()
-                    return
-                end
-            end
-            WindUI:Notify({ Title = "Key System", Description = "Invalid Key!", Duration = 3 })
-        end
-    })
-    
-    KeySec:Button({
-        Title = "Get Key",
-        Description = "Join Discord for key",
-        Callback = function()
-            pcall(function() setclipboard("MIX-M4X") end)
-            WindUI:Notify({ Title = "Key System", Description = "Key copied! Default: MIX-M4X", Duration = 5 })
-        end
-    })
-    
-    KeySec:Label({ Title = " " })
-    KeySec:Label({ Title = "Default Key: MIX-M4X" })
-    
-    return
-end
-
-Logger:Good("Key verified: " .. (CheckKey() and "Valid" or "Invalid"))
-
--- =============================================
 -- CREATE HYPER WINDOW
 -- =============================================
 Logger:Info("Creating Hyper UI Window...")
@@ -487,7 +388,7 @@ local windowSuccess, windowError = pcall(function()
         ScrollBarEnabled = true,
         ConfigurationSaving = { Enabled = false },
         Discord = { Enabled = false },
-        KeySystem = false,
+        KeySystem = true,
     })
     windowCreated = true
 end)
@@ -505,7 +406,13 @@ if not windowCreated then
             Theme = "Dark",
             ConfigurationSaving = { Enabled = false },
             Discord = { Enabled = false },
-            KeySystem = false,
+        
+         KeySystem = {
+        Note = "Enter your Hyper key to continue.",
+        Key = { "MIX-M4X", "MIX-M4X-2024", "MIX-M4X-PRO", "HYPER-M4X", "EVA-M4X", "AMAL-M4X" },
+        SaveKey = true,
+    },
+})
         })
         windowCreated = true
         Logger:Good("Simplified window created!")
@@ -548,46 +455,182 @@ for _, tabDef in ipairs(tabDefinitions) do
 end
 
 -- =============================================
--- HOME TAB - Professional
+-- HOME TAB CONTENT
 -- =============================================
 if Tabs.Home then
-    -- Info Section
-    local infoSec = Tabs.Home:Section({ Title = "Information", Icon = "info", Opened = true })
-    infoSec:Button({ Title = "Hyper UI Framework v1.0.0", Description = "Advanced Roblox Utility", Callback = function() end })
-    infoSec:Button({ Title = "By M4X | EVA | AMAL", Description = "Development Team", Callback = function() end })
-    infoSec:Button({ Title = "Key: MIX-M4X", Description = "Premium Access", Callback = function() end })
-    infoSec:Button({ Title = "Welcome, " .. (LocalPlayer and LocalPlayer.Name or "User") .. "!", Description = "Player: " .. (LocalPlayer and LocalPlayer.DisplayName or "Unknown"), Callback = function() end })
-
-    -- Quick Actions
-    local quickSec = Tabs.Home:Section({ Title = "Quick Actions", Icon = "zap", Opened = true })
-    quickSec:Button({ Title = "Rejoin Server", Description = "Rejoin the current server", Callback = function()
-        if TeleportService and LocalPlayer then TeleportService:Teleport(game.PlaceId, LocalPlayer) end
-    end })
-    quickSec:Button({ Title = "Clean Workspace", Description = "Remove unnecessary objects", Callback = function()
-        local count = 0
-        for _, obj in ipairs(workspace:GetChildren()) do
-            if obj:IsA("Model") and obj ~= LocalPlayer and obj ~= LocalPlayer.Character then
-                pcall(function() obj:Destroy() end) count = count + 1
+    local welcomeSection = Tabs.Home:Section({ Title = "Welcome", Icon = "info", Opened = true })
+    
+    welcomeSection:Button({ Title = "Hyper UI Framework v1.0.0", Callback = function() end })
+    welcomeSection:Button({ Title = "By M4X | EVA | AMAL", Callback = function() end })
+    welcomeSection:Button({ Title = "Welcome, " .. (LocalPlayer and LocalPlayer.Name or "User") .. "!", Callback = function() end })
+    
+    local quickSection = Tabs.Home:Section({ Title = "Quick Actions", Icon = "activity" })
+    
+    quickSection:Button({
+        Title = "Rejoin Server",
+        Description = "Rejoin the current server",
+        Callback = function()
+            if TeleportService and LocalPlayer then
+                TeleportService:Teleport(game.PlaceId, LocalPlayer)
             end
         end
-        WindUI:Notify({ Title = "Hyper", Description = "Cleaned " .. count .. " objects!", Duration = 3 })
-    end })
-    quickSec:Button({ Title = "Copy Discord Invite", Description = "Join our community", Callback = function()
-        pcall(function() setclipboard("discord.gg/hyper") end)
-        WindUI:Notify({ Title = "Hyper", Description = "Discord copied!", Duration = 3 })
-    end })
-    quickSec:Button({ Title = "Refresh UI", Description = "Reload the interface", Callback = function()
-        loadstring(game:HttpGet(REPO_URL .. "Main.lua"))()
-    end })
-    quickSec:Button({ Title = "Destroy UI", Description = "Close Hyper UI", Callback = function()
-        pcall(function() Window:Destroy() end)
-    end })
+    })
+    
+    quickSection:Button({
+        Title = "Clean Workspace",
+        Description = "Remove all unnecessary objects",
+        Callback = function()
+            local count = 0
+            for _, obj in ipairs(workspace:GetChildren()) do
+                if obj:IsA("Model") and obj ~= LocalPlayer and obj ~= LocalPlayer.Character then
+                    pcall(function() obj:Destroy() end)
+                    count = count + 1
+                end
+            end
+            WindUI:Notify({ Title = "Hyper", Description = "Cleaned " .. count .. " objects!", Duration = 3 })
+        end
+    })
+    
+    quickSection:Button({
+        Title = "Destroy UI",
+        Description = "Close and destroy the interface",
+        Callback = function()
+            pcall(function() Window:Destroy() end)
+        end
+    })
+    
+    local toggleSection = Tabs.Home:Section({ Title = "Toggles", Icon = "toggle-left" })
+    
+    toggleSection:Toggle({
+        Title = "Auto Updater",
+        Description = "Automatically check for updates",
+        Value = true,
+        Callback = function(state) Flags:Set("AutoUpdater", state) end
+    })
+    
+    toggleSection:Toggle({
+        Title = "Anti AFK",
+        Description = "Prevent being kicked for inactivity",
+        Value = false,
+        Callback = function(state) Flags:Set("AntiAFK", state) end
+    })
+    
+    Logger:Good("Home tab built!")
+end
 
-    -- Toggles
-    local toggleSec = Tabs.Home:Section({ Title = "Toggles", Icon = "toggle-left", Opened = true })
-    toggleSec:Toggle({ Title = "Auto Updater", Description = "Check for updates automatically", Value = true, Callback = function(s) Flags:Set("AutoUpdater", s) end })
-    toggleSec:Toggle({ Title = "Anti AFK", Description = "Prevent being kicked for inactivity", Value = false, Callback = function(s) Flags:Set("AntiAFK", s) end })
-    toggleSec:Toggle({ Title = "White Screen", Description = "Toggle white screen mode", Value = false, Callback = function(s) Flags:Set("WhiteScreen", s) end })
+-- =============================================
+-- LOAD EXTERNAL FEATURE MODULES
+-- =============================================
+Logger:Separator()
+Logger:Info("Loading External Feature Modules...")
 
-    -- Stats
-    local sta
+local FeatureList = {
+    -- Core Systems
+    { Path = "Core/Themes.lua",        Tab = "Utility",  Name = "Themes System" },
+    { Path = "Core/Settings.lua",      Tab = "Utility",  Name = "UI Settings" },
+    
+    -- Aimbot Features
+    { Path = "Features/Aimbot/Silent.lua",      Tab = "Aimbot",   Name = "Silent Aim" },
+    { Path = "Features/Aimbot/FOV.lua",         Tab = "Aimbot",   Name = "FOV Circle" },
+    { Path = "Features/Aimbot/Trigger.lua",     Tab = "Aimbot",   Name = "Trigger Bot" },
+    { Path = "Features/Aimbot/Prediction.lua",  Tab = "Aimbot",   Name = "Prediction" },
+    
+    -- Visuals Features
+    { Path = "Features/Visuals/ESP.lua",        Tab = "Visuals",  Name = "ESP" },
+    
+    -- Movement Features
+    { Path = "Features/Movement/Speed.lua",     Tab = "Movement", Name = "Speed" },
+    { Path = "Features/Movement/Fly.lua",       Tab = "Movement", Name = "Fly" },
+    { Path = "Features/Movement/Jump.lua",      Tab = "Movement", Name = "Jump" },
+    { Path = "Features/Movement/Teleport.lua",  Tab = "Movement", Name = "Teleport" },
+    
+    -- Utility Features
+    { Path = "Features/Utility/AntiAFK.lua",    Tab = "Utility",  Name = "Anti AFK" },
+    { Path = "Features/Utility/AutoFarm.lua",   Tab = "Utility",  Name = "Auto Farm" },
+    { Path = "Features/Utility/StreamSniper.lua", Tab = "Utility", Name = "Stream Sniper" },
+    { Path = "Features/Utility/WhiteScreen.lua", Tab = "Utility",  Name = "White Screen" },
+}
+
+ModuleLoader.Stats = { Total = 0, Loaded = 0, Failed = 0, Skipped = 0 }
+ModuleLoader.Loaded = {}
+ModuleLoader.Failed = {}
+ModuleLoader.Skipped = {}
+
+FeatureInitializer.Initialized = {}
+FeatureInitializer.Failed = {}
+FeatureInitializer.Skipped = {}
+
+local featureStats = { Loaded = 0, Failed = 0, Skipped = 0, Total = #FeatureList }
+
+for _, feature in ipairs(FeatureList) do
+    local module = ModuleLoader:LoadFromRepo(feature.Path, false)
+    
+    if module then
+        local tab = Tabs[feature.Tab]
+        if tab then
+            local initOk = FeatureInitializer:InitFeature(module, tab, WindUI, Flags, feature.Name)
+            if initOk then
+                featureStats.Loaded = featureStats.Loaded + 1
+            else
+                featureStats.Failed = featureStats.Failed + 1
+            end
+        else
+            Logger:Skip("No tab: " .. feature.Name)
+            featureStats.Skipped = featureStats.Skipped + 1
+        end
+    else
+        featureStats.Skipped = featureStats.Skipped + 1
+    end
+end
+
+-- =============================================
+-- FINAL REPORT
+-- =============================================
+Logger:Separator("═")
+Logger:Box("Loading Report", {
+    "Total Features: " .. featureStats.Total,
+    "Successfully Loaded: " .. featureStats.Loaded,
+    "Failed: " .. featureStats.Failed,
+    "Skipped: " .. featureStats.Skipped,
+})
+
+Logger:Info("Total Flags Registered: " .. Flags:Count())
+Logger:PrintSummary()
+
+-- =============================================
+-- DONE
+-- =============================================
+pcall(function()
+    WindUI:Notify({
+        Title = "Hyper UI",
+        Description = string.format("Ready! %d/%d features loaded.", featureStats.Loaded, featureStats.Total),
+        Duration = 5
+    })
+end)
+
+Logger:Box("HYPER UI READY", {
+    "Version: v1.0.0",
+    "By M4X | EVA | AMAL",
+    "Features Active: " .. featureStats.Loaded .. "/" .. featureStats.Total,
+})
+
+print("")
+print("  ╔══════════════════════════════════════════╗")
+print("  ║       HYPER UI v1.0.0 - ACTIVE          ║")
+print("  ║     By M4X | EVA | AMAL                ║")
+print("  ╚══════════════════════════════════════════╝")
+print("")
+
+-- =============================================
+-- RETURN VALUES
+-- =============================================
+return {
+    Window = Window,
+    WindUI = WindUI,
+    Flags = Flags,
+    Logger = Logger,
+    ModuleLoader = ModuleLoader,
+    FeatureInitializer = FeatureInitializer,
+    Tabs = Tabs,
+    Services = Services,
+}
