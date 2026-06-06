@@ -1,7 +1,7 @@
 --[[
     ╔══════════════════════════════════════════════════════════════╗
-    ║           HYPER UI - ESP SYSTEM - ULTRA PRO v4               ║
-    ║    Premium: 10 Styles + Full Customization + 3D Box + Chams  ║
+    ║           HYPER UI - ESP SYSTEM - v5 FINAL                   ║
+    ║    10 Box Styles + Chams + Full Customization                ║
     ║              By M4X | EVA | AMAL                            ║
     ╚══════════════════════════════════════════════════════════════╝
 --]]
@@ -13,373 +13,49 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
 
--- =============================================
--- SETTINGS
--- =============================================
 ESP.Settings = {
-    -- Main
-    Enabled = false,
-    MaxDist = 3000,
-    TeamCheck = false,
-    TeamColor = false,
-    Rainbow = false,
-    RainbowSpeed = 0.003,
-    VisCheck = false,
-    WallCheck = true,
-    DynamicScale = true,
-    MinScale = 0.3,
-    MaxScale = 1.5,
-    
-    -- Box Styles
-    BoxStyle = "Corner",
-    BoxColor = Color3.fromRGB(255, 255, 255),
-    BoxThickness = 2,
-    BoxTransparency = 1,
-    BoxFill = false,
-    BoxFillColor = Color3.fromRGB(255, 255, 255),
-    BoxFillTransparency = 0.8,
-    BoxGlow = false,
-    BoxGlowColor = Color3.fromRGB(255, 255, 255),
-    BoxGlowThickness = 4,
-    BoxAnimated = false,
-    BoxAnimationSpeed = 2,
-    
-    -- 3D Box
-    Box3DThickness = 1,
-    Box3DColor = Color3.fromRGB(255, 255, 255),
-    Box3DFill = false,
-    Box3DFillColor = Color3.fromRGB(100, 100, 100),
-    Box3DFillTransparency = 0.9,
-    
-    -- Chams
-    Chams = false,
-    ChamsFillColor = Color3.fromRGB(255, 0, 0),
-    ChamsFillTransparency = 0.5,
-    ChamsOutlineColor = Color3.fromRGB(255, 255, 255),
-    ChamsOutlineTransparency = 0,
-    
-    -- Corner Box
-    CornerLen = 22,
-    CornerStyle = "Sharp",
-    CornerGap = 4,
-    
-    -- Circle Box
-    CircleSegments = 32,
-    CircleRadius = 1.0,
-    
-    -- Diamond Box
-    DiamondSize = 1.0,
-    
-    -- Crosshair Box
-    CrosshairSize = 15,
-    CrosshairGap = 5,
-    
-    -- Triangle Box
-    TriangleSize = 1.0,
-    
-    -- Hexagon Box
-    HexagonSize = 1.0,
-    
-    -- Arrow Box
-    ArrowSize = 1.0,
-    ArrowHeadSize = 8,
-    
-    -- Dynamic Box
-    DynamicStyle = "Pulse",
-    
-    -- Name
-    Name = true,
-    NameColor = Color3.fromRGB(255, 255, 255),
-    NameSize = 13,
-    NameFont = 2,
-    NameOutline = true,
-    NameOutlineColor = Color3.fromRGB(0, 0, 0),
-    NameShadow = false,
-    NameShadowColor = Color3.fromRGB(0, 0, 0),
-    NameShadowOffset = Vector2.new(1, 1),
-    NameBold = false,
-    NameItalic = false,
-    NameUppercase = false,
-    NameGlow = false,
-    NameGlowColor = Color3.fromRGB(255, 255, 255),
-    NameGlowRadius = 5,
-    
-    -- Distance
-    Dist = true,
-    DistColor = Color3.fromRGB(180, 180, 180),
-    DistSize = 12,
-    DistFont = 2,
-    DistOutline = true,
-    DistBrackets = true,
-    DistUnits = "m",
-    DistColorByRange = false,
-    DistCloseColor = Color3.fromRGB(255, 50, 50),
-    DistMidColor = Color3.fromRGB(255, 255, 50),
-    DistFarColor = Color3.fromRGB(50, 255, 50),
-    DistCloseRange = 50,
-    DistMidRange = 150,
-    
-    -- Health
-    HP = true,
-    HPPos = "Left",
-    HPThick = 3,
-    HPHeight = 40,
-    HPWidth = 4,
-    HPBG = Color3.fromRGB(20, 20, 20),
-    HPGradient = true,
-    HPColorHigh = Color3.fromRGB(50, 200, 50),
-    HPColorMid = Color3.fromRGB(255, 170, 0),
-    HPColorLow = Color3.fromRGB(255, 50, 50),
-    HPText = true,
-    HPTextColor = Color3.fromRGB(255, 255, 255),
-    HPTextSize = 10,
-    HPSmooth = true,
-    HPSmoothSpeed = 0.1,
-    
-    -- Armor
-    Armor = false,
-    ArmorPos = "Right",
-    ArmorThick = 3,
-    ArmorColor = Color3.fromRGB(0, 150, 255),
-    ArmorBG = Color3.fromRGB(20, 20, 20),
-    ArmorText = true,
-    
-    -- Stamina
-    Stamina = false,
-    StaminaPos = "Bottom",
-    StaminaColor = Color3.fromRGB(255, 200, 0),
-    StaminaBG = Color3.fromRGB(20, 20, 20),
-    
-    -- Tracer
-    Tracer = false,
-    TracerColor = Color3.fromRGB(255, 255, 255),
-    TracerOrigin = "Bottom",
-    TracerThick = 1,
-    TracerStyle = "Line",
-    TracerDashLength = 5,
-    TracerGapLength = 3,
-    TracerAnimated = false,
-    TracerAnimationSpeed = 2,
-    TracerGradient = false,
-    TracerGradientStart = Color3.fromRGB(255, 0, 0),
-    TracerGradientEnd = Color3.fromRGB(0, 0, 255),
-    
-    -- Snapline
-    Snap = false,
-    SnapColor = Color3.fromRGB(255, 255, 255),
-    SnapThick = 1,
-    SnapStyle = "Line",
-    SnapAnimated = false,
-    SnapColorByDist = false,
-    
-    -- Weapon
-    Weapon = false,
-    WeaponColor = Color3.fromRGB(255, 200, 50),
-    WeaponSize = 11,
-    WeaponIcon = false,
-    WeaponAmmo = false,
-    WeaponAmmoColor = Color3.fromRGB(200, 200, 200),
-    
-    -- Skeleton
-    Skeleton = false,
-    SkeletonColor = Color3.fromRGB(255, 255, 255),
-    SkeletonThick = 1,
-    SkeletonColorByBone = false,
-    SkeletonHeadColor = Color3.fromRGB(255, 0, 0),
-    SkeletonTorsoColor = Color3.fromRGB(0, 255, 0),
-    SkeletonArmColor = Color3.fromRGB(0, 0, 255),
-    SkeletonLegColor = Color3.fromRGB(255, 255, 0),
-    SkeletonDynamic = false,
-    
-    -- Head Dot
-    HeadDot = false,
-    HeadDotColor = Color3.fromRGB(255, 255, 255),
-    HeadDotSize = 4,
-    HeadDotStyle = "Circle",
-    HeadDotFilled = true,
-    HeadDotOutline = true,
-    HeadDotOutlineColor = Color3.fromRGB(0, 0, 0),
-    
-    -- Look Direction
-    LookDir = false,
-    LookDirColor = Color3.fromRGB(255, 255, 255),
-    LookDirLength = 50,
-    LookDirThick = 1,
-    
-    -- Velocity
-    Velocity = false,
-    VelocityColor = Color3.fromRGB(255, 255, 0),
-    VelocityThick = 1,
-    VelocityLength = 30,
-    
-    -- Info Panel
-    InfoPanel = false,
-    InfoColor = Color3.fromRGB(255, 255, 255),
-    InfoSize = 11,
-    InfoBG = Color3.fromRGB(0, 0, 0),
-    InfoBGTransparency = 0.7,
-    InfoBorder = true,
-    InfoBorderColor = Color3.fromRGB(255, 255, 255),
-    InfoItems = {"Name", "Health", "Distance", "Weapon", "Armor", "Rank"},
-    
-    -- Rank/Level
-    Rank = false,
-    RankColor = Color3.fromRGB(255, 215, 0),
-    RankSize = 10,
-    
-    -- Status
-    Status = false,
-    StatusColor = Color3.fromRGB(200, 200, 200),
-    StatusSize = 10,
-    StatusItems = {"AFK", "Reloading", "Crouching", "Jumping", "Sprinting"},
-    
-    -- Off-Screen Arrows
-    OffScreen = false,
-    OffScreenColor = Color3.fromRGB(255, 255, 255),
-    OffScreenSize = 15,
-    OffScreenDist = true,
-    OffScreenDistColor = Color3.fromRGB(180, 180, 180),
-    OffScreenDistSize = 10,
-    
-    -- FOV Circle
-    FOV = false,
-    FOVColor = Color3.fromRGB(255, 255, 255),
-    FOVLockedColor = Color3.fromRGB(255, 0, 0),
-    FOVRadius = 150,
-    FOVThick = 2,
-    FOVFilled = false,
-    FOVFillColor = Color3.fromRGB(255, 255, 255),
-    FOVFillTransparency = 0.9,
-    
-    -- Sound ESP
-    SoundESP = false,
-    SoundColor = Color3.fromRGB(255, 0, 0),
-    SoundSize = 10,
-    SoundDuration = 2,
-    SoundMaxDist = 500,
-    
-    -- Loot ESP
-    LootESP = false,
-    LootColor = Color3.fromRGB(0, 255, 255),
-    LootSize = 12,
-    LootItems = {"Gun", "Ammo", "Medkit", "Armor", "Key"},
-    
-    -- Vehicle ESP
-    VehicleESP = false,
-    VehicleColor = Color3.fromRGB(255, 100, 0),
-    VehicleSize = 12,
-    
-    -- Objective ESP
-    ObjectiveESP = false,
-    ObjectiveColor = Color3.fromRGB(0, 255, 0),
-    ObjectiveSize = 14,
-    
-    -- Target Priority
-    TargetPriority = "Closest",
-    TargetFOV = 150,
-    
-    -- Minimap
-    Minimap = false,
-    MinimapSize = 150,
-    MinimapPos = "TopRight",
-    MinimapRange = 500,
-    MinimapColor = Color3.fromRGB(255, 255, 255),
-    MinimapBG = Color3.fromRGB(0, 0, 0),
-    MinimapBGTransparency = 0.5,
-    
-    -- Kill Feed
-    KillFeed = false,
-    KillFeedColor = Color3.fromRGB(255, 255, 255),
-    KillFeedSize = 12,
-    KillFeedDuration = 5,
-    KillFeedMax = 5,
-    
-    -- Animation
-    PulseSpeed = 2,
-    BreatheSpeed = 1,
-    WaveSpeed = 3,
-    WaveAmplitude = 5,
-    
-    -- Performance
-    UpdateRate = 0,
-    MaxRender = 50,
-    LODDist = 1000,
+    Enabled = false, MaxDist = 3000, TeamCheck = false, TeamColor = false, Rainbow = false, VisCheck = false, WallCheck = true,
+    BoxStyle = "Corner", BoxColor = Color3.fromRGB(255, 255, 255), BoxThickness = 2, BoxFill = false, BoxFillColor = Color3.fromRGB(255, 255, 255), BoxGlow = false, CornerLen = 22,
+    Chams = false, ChamsFillColor = Color3.fromRGB(255, 0, 0), ChamsFillTransparency = 0.5,
+    Name = true, NameColor = Color3.fromRGB(255, 255, 255), NameSize = 13, NameOutline = true,
+    Dist = true, DistColor = Color3.fromRGB(180, 180, 180), DistSize = 12, DistBrackets = true,
+    HP = true, HPPos = "Left", HPThick = 3, HPBG = Color3.fromRGB(20, 20, 20), HPText = true, Armor = false,
+    Tracer = false, TracerColor = Color3.fromRGB(255, 255, 255), TracerOrigin = "Bottom", TracerThick = 1,
+    Snap = false, SnapColor = Color3.fromRGB(255, 255, 255), SnapThick = 1,
+    Weapon = false, WeaponColor = Color3.fromRGB(255, 200, 50),
+    Skeleton = false, SkeletonColor = Color3.fromRGB(255, 255, 255), SkeletonThick = 1,
+    HeadDot = false, HeadDotColor = Color3.fromRGB(255, 255, 255), HeadDotSize = 4,
+    LookDir = false, Velocity = false, OffScreen = false, InfoPanel = false, Rank = false, Status = false,
 }
 
 ESP.Boxes = {}
 ESP.Conn = nil
 ESP.RainbowHue = 0
-ESP.FrameCount = 0
-ESP.KillFeedList = {}
-ESP.SoundIndicators = {}
-ESP.MinimapDrawings = {}
 
 local RootNames = {"HumanoidRootPart","UpperTorso","Torso","LowerTorso","RootPart","Root","Chest","Body","Base","Main","Center","Core","Hip","Waist","Spine","Pelvis"}
 local HeadNames = {"Head","head","HEAD","Hat","Helmet","Face","Skull","Cranium","Brain","Top"}
-
 local SkeletonBones = {
-    {"Head","UpperTorso"},{"UpperTorso","LowerTorso"},
-    {"UpperTorso","LeftUpperArm"},{"LeftUpperArm","LeftLowerArm"},{"LeftLowerArm","LeftHand"},
-    {"UpperTorso","RightUpperArm"},{"RightUpperArm","RightLowerArm"},{"RightLowerArm","RightHand"},
-    {"LowerTorso","LeftUpperLeg"},{"LeftUpperLeg","LeftLowerLeg"},{"LeftLowerLeg","LeftFoot"},
-    {"LowerTorso","RightUpperLeg"},{"RightUpperLeg","RightLowerLeg"},{"RightLowerLeg","RightFoot"},
+    {"Head","UpperTorso"},{"UpperTorso","LowerTorso"},{"UpperTorso","LeftUpperArm"},{"LeftUpperArm","LeftLowerArm"},{"LeftLowerArm","LeftHand"},
+    {"UpperTorso","RightUpperArm"},{"RightUpperArm","RightLowerArm"},{"RightLowerArm","RightHand"},{"LowerTorso","LeftUpperLeg"},{"LeftUpperLeg","LeftLowerLeg"},
+    {"LeftLowerLeg","LeftFoot"},{"LowerTorso","RightUpperLeg"},{"RightUpperLeg","RightLowerLeg"},{"RightLowerLeg","RightFoot"},
 }
 
-local BoneColors = {
-    Head = Color3.fromRGB(255, 0, 0),
-    UpperTorso = Color3.fromRGB(0, 255, 0),
-    LowerTorso = Color3.fromRGB(0, 255, 0),
-    LeftUpperArm = Color3.fromRGB(0, 0, 255),
-    LeftLowerArm = Color3.fromRGB(0, 0, 255),
-    LeftHand = Color3.fromRGB(0, 0, 255),
-    RightUpperArm = Color3.fromRGB(0, 0, 255),
-    RightLowerArm = Color3.fromRGB(0, 0, 255),
-    RightHand = Color3.fromRGB(0, 0, 255),
-    LeftUpperLeg = Color3.fromRGB(255, 255, 0),
-    LeftLowerLeg = Color3.fromRGB(255, 255, 0),
-    LeftFoot = Color3.fromRGB(255, 255, 0),
-    RightUpperLeg = Color3.fromRGB(255, 255, 0),
-    RightLowerLeg = Color3.fromRGB(255, 255, 0),
-    RightFoot = Color3.fromRGB(255, 255, 0),
-}
-
--- =============================================
--- UTILITY FUNCTIONS
--- =============================================
 function ESP:FindRoot(c)
-    for _,n in ipairs(RootNames) do 
-        local p=c:FindFirstChild(n) 
-        if p and p:IsA("BasePart") then return p end 
-    end
-    for _,p in ipairs(c:GetChildren()) do 
-        if p:IsA("BasePart") and p.Name~="Head" then return p end 
-    end
+    for _,n in ipairs(RootNames) do local p=c:FindFirstChild(n) if p and p:IsA("BasePart") then return p end end
+    for _,p in ipairs(c:GetChildren()) do if p:IsA("BasePart") and p.Name~="Head" then return p end end
     return nil
 end
 
 function ESP:FindHead(c)
-    for _,n in ipairs(HeadNames) do 
-        local p=c:FindFirstChild(n) 
-        if p and p:IsA("BasePart") then return p end 
-    end
+    for _,n in ipairs(HeadNames) do local p=c:FindFirstChild(n) if p and p:IsA("BasePart") then return p end end
     local hi,hy=nil,-math.huge
-    for _,p in ipairs(c:GetChildren()) do 
-        if p:IsA("BasePart") then 
-            local y=p.Position.Y 
-            if y>hy then hy=y hi=p end 
-        end 
-    end
+    for _,p in ipairs(c:GetChildren()) do if p:IsA("BasePart") then local y=p.Position.Y if y>hy then hy=y hi=p end end end
     return hi
 end
 
 function ESP:GetColor(p)
-    if ESP.Settings.Rainbow then 
-        ESP.RainbowHue=(ESP.RainbowHue+ESP.Settings.RainbowSpeed)%1 
-        return Color3.fromHSV(ESP.RainbowHue,1,1) 
-    end
+    if ESP.Settings.Rainbow then ESP.RainbowHue=(ESP.RainbowHue+0.003)%1 return Color3.fromHSV(ESP.RainbowHue,1,1) end
     if ESP.Settings.TeamColor and p.Team and LocalPlayer.Team then
         if p.Team==LocalPlayer.Team then return Color3.fromRGB(50,255,50) end
         return Color3.fromRGB(255,50,50)
@@ -387,1428 +63,277 @@ function ESP:GetColor(p)
     return ESP.Settings.BoxColor
 end
 
-function ESP:GetDistColor(dist)
-    if not ESP.Settings.DistColorByRange then return ESP.Settings.DistColor end
-    if dist <= ESP.Settings.DistCloseRange then
-        return ESP.Settings.DistCloseColor
-    elseif dist <= ESP.Settings.DistMidRange then
-        return ESP.Settings.DistMidColor
-    else
-        return ESP.Settings.DistFarColor
-    end
-end
-
-function ESP:GetHPColor(pct)
-    if not ESP.Settings.HPGradient then
-        if pct > 0.5 then return ESP.Settings.HPColorHigh
-        elseif pct > 0.25 then return ESP.Settings.HPColorMid
-        else return ESP.Settings.HPColorLow end
-    end
-    if pct > 0.5 then
-        local t = (pct - 0.5) / 0.5
-        return ESP.Settings.HPColorMid:Lerp(ESP.Settings.HPColorHigh, t)
-    else
-        local t = pct / 0.5
-        return ESP.Settings.HPColorLow:Lerp(ESP.Settings.HPColorMid, t)
-    end
-end
-
-function ESP:LerpColor(c1, c2, t)
-    return Color3.new(
-        c1.R + (c2.R - c1.R) * t,
-        c1.G + (c2.G - c1.G) * t,
-        c1.B + (c2.B - c1.B) * t
-    )
-end
-
-function ESP:WorldToScreen(pos)
-    local sp, onScreen = Camera:WorldToViewportPoint(pos)
-    return Vector2.new(sp.X, sp.Y), sp.Z, onScreen
-end
-
 function ESP:IsOnScreen(sp)
-    local vp = Camera.ViewportSize
-    return sp.Z > 0 and sp.X >= -100 and sp.X <= vp.X + 100 and sp.Y >= -100 and sp.Y <= vp.Y + 100
+    local vp=Camera.ViewportSize
+    return sp.Z>0 and sp.X>=-100 and sp.X<=vp.X+100 and sp.Y>=-100 and sp.Y<=vp.Y+100
 end
 
-function ESP:GetScale(dist)
-    if not ESP.Settings.DynamicScale then return 1 end
-    local scale = math.clamp(1 - (dist / ESP.Settings.MaxDist), ESP.Settings.MinScale, ESP.Settings.MaxScale)
-    return scale
-end
-
-function ESP:Init(tab, library, flags)
-    local self = setmetatable({}, ESP)
-    self.Tab = tab
-    self.Library = library
-    self.Flags = flags
-
-    -- ============ MAIN ============
-    local SecMain = tab:Section({ Title = "Main", Icon = "eye", Opened = true })
-    SecMain:Toggle({ Title = "Enable ESP", Value = false, Callback = function(v) ESP.Settings.Enabled = v; if v then ESP:Start() else ESP:Stop() end end })
-    SecMain:Slider({ Title = "Max Distance", Step = 100, Value = { Min = 100, Max = 10000, Default = 3000 }, Callback = function(v) ESP.Settings.MaxDist = v end })
-    SecMain:Toggle({ Title = "Team Check", Value = false, Callback = function(v) ESP.Settings.TeamCheck = v end })
-    SecMain:Toggle({ Title = "Team Color", Value = false, Callback = function(v) ESP.Settings.TeamColor = v end })
-    SecMain:Toggle({ Title = "Rainbow Mode", Value = false, Callback = function(v) ESP.Settings.Rainbow = v end })
-    SecMain:Toggle({ Title = "Visible Check", Value = false, Callback = function(v) ESP.Settings.VisCheck = v end })
-    SecMain:Toggle({ Title = "Wall Check", Value = true, Callback = function(v) ESP.Settings.WallCheck = v end })
-    SecMain:Toggle({ Title = "Dynamic Scale", Value = true, Callback = function(v) ESP.Settings.DynamicScale = v end })
-
-    -- ============ BOX ============
-    local SecBox = tab:Section({ Title = "Box", Icon = "square", Opened = true })
-    SecBox:Dropdown({ Title = "Box Style", Values = { "Corner", "Full", "3D", "Circle", "Diamond", "Crosshair", "Triangle", "Hexagon", "Arrow", "Dynamic" }, Value = "Corner", Callback = function(v) ESP.Settings.BoxStyle = v end })
-    SecBox:Colorpicker({ Title = "Box Color", Default = ESP.Settings.BoxColor, Transparency = 0, Callback = function(v) ESP.Settings.BoxColor = v end })
-    SecBox:Slider({ Title = "Thickness", Step = 0.5, Value = { Min = 1, Max = 6, Default = 2 }, Callback = function(v) ESP.Settings.BoxThickness = v end })
-    SecBox:Toggle({ Title = "Fill Box", Value = false, Callback = function(v) ESP.Settings.BoxFill = v end })
-    SecBox:Colorpicker({ Title = "Fill Color", Default = ESP.Settings.BoxFillColor, Transparency = 0, Callback = function(v) ESP.Settings.BoxFillColor = v end })
-    SecBox:Toggle({ Title = "Glow Effect", Value = false, Callback = function(v) ESP.Settings.BoxGlow = v end })
-    SecBox:Slider({ Title = "Corner Length", Step = 1, Value = { Min = 6, Max = 40, Default = 22 }, Callback = function(v) ESP.Settings.CornerLen = v end })
-
-    -- ============ CHAMS ============
-    local SecChams = tab:Section({ Title = "Chams", Icon = "shirt", Opened = true })
-    SecChams:Toggle({ Title = "Enable Chams", Value = false, Callback = function(v) ESP.Settings.Chams = v end })
-    SecChams:Colorpicker({ Title = "Fill Color", Default = ESP.Settings.ChamsFillColor, Transparency = 0, Callback = function(v) ESP.Settings.ChamsFillColor = v end })
-    SecChams:Slider({ Title = "Fill Alpha", Step = 0.1, Value = { Min = 0, Max = 1, Default = 0.5 }, Callback = function(v) ESP.Settings.ChamsFillTransparency = v end })
-
-    -- ============ INFO ============
-    local SecInfo = tab:Section({ Title = "Info", Icon = "user", Opened = true })
-    SecInfo:Toggle({ Title = "Name", Value = true, Callback = function(v) ESP.Settings.Name = v end })
-    SecInfo:Colorpicker({ Title = "Name Color", Default = ESP.Settings.NameColor, Transparency = 0, Callback = function(v) ESP.Settings.NameColor = v end })
-    SecInfo:Slider({ Title = "Name Size", Step = 1, Value = { Min = 10, Max = 22, Default = 13 }, Callback = function(v) ESP.Settings.NameSize = v end })
-    SecInfo:Toggle({ Title = "Distance", Value = true, Callback = function(v) ESP.Settings.Dist = v end })
-    SecInfo:Colorpicker({ Title = "Dist Color", Default = ESP.Settings.DistColor, Transparency = 0, Callback = function(v) ESP.Settings.DistColor = v end })
-    SecInfo:Toggle({ Title = "Brackets", Value = true, Callback = function(v) ESP.Settings.DistBrackets = v end })
-
-    -- ============ HEALTH ============
-    local SecHP = tab:Section({ Title = "Health", Icon = "heart", Opened = true })
-    SecHP:Toggle({ Title = "HP Bar", Value = true, Callback = function(v) ESP.Settings.HP = v end })
-    SecHP:Dropdown({ Title = "Position", Values = { "Left", "Right", "Top", "Bottom" }, Value = "Left", Callback = function(v) ESP.Settings.HPPos = v end })
-    SecHP:Slider({ Title = "Thickness", Step = 1, Value = { Min = 2, Max = 8, Default = 3 }, Callback = function(v) ESP.Settings.HPThick = v end })
-    SecHP:Colorpicker({ Title = "BG Color", Default = ESP.Settings.HPBG, Transparency = 0, Callback = function(v) ESP.Settings.HPBG = v end })
-    SecHP:Toggle({ Title = "HP Text", Value = true, Callback = function(v) ESP.Settings.HPText = v end })
-    SecHP:Toggle({ Title = "Armor Bar", Value = false, Callback = function(v) ESP.Settings.Armor = v end })
-
-    -- ============ TRACERS ============
-    local SecTracer = tab:Section({ Title = "Tracers", Icon = "trending-up", Opened = true })
-    SecTracer:Toggle({ Title = "Tracers", Value = false, Callback = function(v) ESP.Settings.Tracer = v end })
-    SecTracer:Colorpicker({ Title = "Color", Default = ESP.Settings.TracerColor, Transparency = 0, Callback = function(v) ESP.Settings.TracerColor = v end })
-    SecTracer:Dropdown({ Title = "Origin", Values = { "Bottom", "Top", "Middle" }, Value = "Bottom", Callback = function(v) ESP.Settings.TracerOrigin = v end })
-    SecTracer:Slider({ Title = "Thickness", Step = 0.5, Value = { Min = 0.5, Max = 4, Default = 1 }, Callback = function(v) ESP.Settings.TracerThick = v end })
-
-    -- ============ SNAPLINES ============
-    local SecSnap = tab:Section({ Title = "Snaplines", Icon = "minus", Opened = true })
-    SecSnap:Toggle({ Title = "Snaplines", Value = false, Callback = function(v) ESP.Settings.Snap = v end })
-    SecSnap:Colorpicker({ Title = "Color", Default = ESP.Settings.SnapColor, Transparency = 0, Callback = function(v) ESP.Settings.SnapColor = v end })
-    SecSnap:Slider({ Title = "Thickness", Step = 0.5, Value = { Min = 0.5, Max = 4, Default = 1 }, Callback = function(v) ESP.Settings.SnapThick = v end })
-
-    -- ============ EXTRA ============
-    local SecExtra = tab:Section({ Title = "Extra", Icon = "star", Opened = true })
-    SecExtra:Toggle({ Title = "Weapon", Value = false, Callback = function(v) ESP.Settings.Weapon = v end })
-    SecExtra:Colorpicker({ Title = "Weapon Color", Default = ESP.Settings.WeaponColor, Transparency = 0, Callback = function(v) ESP.Settings.WeaponColor = v end })
-    SecExtra:Toggle({ Title = "Skeleton", Value = false, Callback = function(v) ESP.Settings.Skeleton = v end })
-    SecExtra:Colorpicker({ Title = "Skeleton Color", Default = ESP.Settings.SkeletonColor, Transparency = 0, Callback = function(v) ESP.Settings.SkeletonColor = v end })
-    SecExtra:Slider({ Title = "Skeleton Thick", Step = 0.5, Value = { Min = 0.5, Max = 3, Default = 1 }, Callback = function(v) ESP.Settings.SkeletonThick = v end })
-    SecExtra:Toggle({ Title = "Head Dot", Value = false, Callback = function(v) ESP.Settings.HeadDot = v end })
-    SecExtra:Colorpicker({ Title = "Dot Color", Default = ESP.Settings.HeadDotColor, Transparency = 0, Callback = function(v) ESP.Settings.HeadDotColor = v end })
-    SecExtra:Toggle({ Title = "Look Direction", Value = false, Callback = function(v) ESP.Settings.LookDir = v end })
-    SecExtra:Toggle({ Title = "Velocity", Value = false, Callback = function(v) ESP.Settings.Velocity = v end })
-    SecExtra:Toggle({ Title = "Off-Screen Arrows", Value = false, Callback = function(v) ESP.Settings.OffScreen = v end })
-    SecExtra:Toggle({ Title = "Info Panel", Value = false, Callback = function(v) ESP.Settings.InfoPanel = v end })
-    SecExtra:Toggle({ Title = "Rank/Level", Value = false, Callback = function(v) ESP.Settings.Rank = v end })
-    SecExtra:Toggle({ Title = "Status", Value = false, Callback = function(v) ESP.Settings.Status = v end })
-
-    return self
-end
-
-function ESP:GetBoxDimensions(h, r, scale)
-    local headPos = h.Position + Vector3.new(0, 0.5, 0)
-    local rootPos = r.Position - Vector3.new(0, 3.5, 0)
-    local hsp, _, honScreen = ESP:WorldToScreen(headPos)
-    local rsp, _, ronScreen = ESP:WorldToScreen(rootPos)
-    
-    if not honScreen or not ronScreen then return nil end
-    
-    local bh = math.abs(hsp.Y - rsp.Y) * scale
-    local bw = bh * 0.5 * scale
-    local x = rsp.X - bw / 2
-    local y = hsp.Y
-    
-    return {x = x, y = y, w = bw, h = bh, centerX = rsp.X, centerY = rsp.Y}
-end
-
-function ESP:CheckWall(player)
-    if not ESP.Settings.WallCheck then return true end
-    local char = player.Character
-    if not char then return false end
-    local part = ESP:FindHead(char) or ESP:FindRoot(char)
-    if not part then return false end
-    
-    local rayParams = RaycastParams.new()
-    rayParams.FilterType = Enum.RaycastFilterType.Blacklist
-    rayParams.FilterDescendantsInstances = {LocalPlayer.Character, char}
-    rayParams.IgnoreWater = true
-    
-    local origin = Camera.CFrame.Position
-    local direction = (part.Position - origin).Unit * (part.Position - origin).Magnitude
-    
-    local result = workspace:Raycast(origin, direction, rayParams)
-    if result then return false end
-    return true
-end
-
-function ESP:CheckVisible(player)
-    if not ESP.Settings.VisCheck then return true end
-    local char = player.Character
-    if not char then return false end
-    local part = ESP:FindHead(char) or ESP:FindRoot(char)
-    if not part then return false end
-    
-    local rayParams = RaycastParams.new()
-    rayParams.FilterType = Enum.RaycastFilterType.Blacklist
-    rayParams.FilterDescendantsInstances = {LocalPlayer.Character}
-    rayParams.IgnoreWater = true
-    
-    local origin = Camera.CFrame.Position
-    local direction = (part.Position - origin).Unit * 500
-    
-    local result = workspace:Raycast(origin, direction, rayParams)
-    if result then
-        return result.Instance:IsDescendantOf(char)
-    end
-    return true
-end
-
--- =============================================
--- CREATE PLAYER DRAWINGS
--- =============================================
 function ESP:CreatePlayer(p)
-    local b = {}
-    
-    for i = 1, 50 do
-        b[i] = Drawing.new("Line")
-        b[i].Visible = false
-        b[i].Transparency = 1
-    end
-    
-    b.Name = Drawing.new("Text")
-    b.Name.Center = true
-    b.Name.Visible = false
-    
-    b.Dist = Drawing.new("Text")
-    b.Dist.Center = true
-    b.Dist.Visible = false
-    
-    b.Weapon = Drawing.new("Text")
-    b.Weapon.Center = true
-    b.Weapon.Visible = false
-    
-    b.WeaponAmmo = Drawing.new("Text")
-    b.WeaponAmmo.Center = true
-    b.WeaponAmmo.Visible = false
-    
-    b.Info = Drawing.new("Text")
-    b.Info.Center = false
-    b.Info.Visible = false
-    
-    b.Rank = Drawing.new("Text")
-    b.Rank.Center = true
-    b.Rank.Visible = false
-    
-    b.Status = Drawing.new("Text")
-    b.Status.Center = true
-    b.Status.Visible = false
-    
-    b.HPText = Drawing.new("Text")
-    b.HPText.Center = true
-    b.HPText.Visible = false
-    
-    b.ArmorText = Drawing.new("Text")
-    b.ArmorText.Center = true
-    b.ArmorText.Visible = false
-    
-    b.HPBg = Drawing.new("Square")
-    b.HPBg.Filled = true
-    b.HPBg.Visible = false
-    
-    b.HPFill = Drawing.new("Square")
-    b.HPFill.Filled = true
-    b.HPFill.Visible = false
-    
-    b.ArmorBg = Drawing.new("Square")
-    b.ArmorBg.Filled = true
-    b.ArmorBg.Visible = false
-    
-    b.ArmorFill = Drawing.new("Square")
-    b.ArmorFill.Filled = true
-    b.ArmorFill.Visible = false
-    
-    b.StaminaBg = Drawing.new("Square")
-    b.StaminaBg.Filled = true
-    b.StaminaBg.Visible = false
-    
-    b.StaminaFill = Drawing.new("Square")
-    b.StaminaFill.Filled = true
-    b.StaminaFill.Visible = false
-    
-    b.BoxFill = Drawing.new("Square")
-    b.BoxFill.Filled = true
-    b.BoxFill.Visible = false
-    
-    b.InfoBG = Drawing.new("Square")
-    b.InfoBG.Filled = true
-    b.InfoBG.Visible = false
-    
-    b.HeadDot = Drawing.new("Circle")
-    b.HeadDot.Visible = false
-    
-    b.FOV = Drawing.new("Circle")
-    b.FOV.Visible = false
-    
-    b.Tracer = Drawing.new("Line")
-    b.Tracer.Visible = false
-    
-    b.Snap = Drawing.new("Line")
-    b.Snap.Visible = false
-    
-    b.LookDir = Drawing.new("Line")
-    b.LookDir.Visible = false
-    
-    b.Velocity = Drawing.new("Line")
-    b.Velocity.Visible = false
-    
-    b.OffScreenArrow = Drawing.new("Triangle")
-    b.OffScreenArrow.Visible = false
-    
-    b.OffScreenDist = Drawing.new("Text")
-    b.OffScreenDist.Center = true
-    b.OffScreenDist.Visible = false
-    
-    b.Chams = nil
-    
-    b.Box3D = {}
-    for i = 1, 12 do
-        b.Box3D[i] = Drawing.new("Line")
-        b.Box3D[i].Visible = false
-    end
-    
-    b.Glow = {}
-    for i = 1, 4 do
-        b.Glow[i] = Drawing.new("Line")
-        b.Glow[i].Visible = false
-        b.Glow[i].Transparency = 0.3
-    end
-    
-    ESP.Boxes[p] = b
+    local b={}
+    for i=1,50 do b[i]=Drawing.new("Line") b[i].Visible=false end
+    b.Name=Drawing.new("Text") b.Name.Center=true b.Name.Visible=false
+    b.Dist=Drawing.new("Text") b.Dist.Center=true b.Dist.Visible=false
+    b.Weapon=Drawing.new("Text") b.Weapon.Center=true b.Weapon.Visible=false
+    b.Info=Drawing.new("Text") b.Info.Center=false b.Info.Visible=false
+    b.Rank=Drawing.new("Text") b.Rank.Center=true b.Rank.Visible=false
+    b.Status=Drawing.new("Text") b.Status.Center=true b.Status.Visible=false
+    b.HPText=Drawing.new("Text") b.HPText.Center=true b.HPText.Visible=false
+    b.ArmorText=Drawing.new("Text") b.ArmorText.Center=true b.ArmorText.Visible=false
+    b.HPBg=Drawing.new("Square") b.HPBg.Filled=true b.HPBg.Visible=false
+    b.HPFill=Drawing.new("Square") b.HPFill.Filled=true b.HPFill.Visible=false
+    b.ArmorBg=Drawing.new("Square") b.ArmorBg.Filled=true b.ArmorBg.Visible=false
+    b.ArmorFill=Drawing.new("Square") b.ArmorFill.Filled=true b.ArmorFill.Visible=false
+    b.BoxFill=Drawing.new("Square") b.BoxFill.Filled=true b.BoxFill.Visible=false
+    b.HeadDot=Drawing.new("Circle") b.HeadDot.Visible=false
+    b.Tracer=Drawing.new("Line") b.Tracer.Visible=false
+    b.Snap=Drawing.new("Line") b.Snap.Visible=false
+    b.LookDir=Drawing.new("Line") b.LookDir.Visible=false
+    b.Velocity=Drawing.new("Line") b.Velocity.Visible=false
+    b.OffScreenArrow=Drawing.new("Triangle") b.OffScreenArrow.Visible=false
+    b.OffScreenDist=Drawing.new("Text") b.OffScreenDist.Center=true b.OffScreenDist.Visible=false
+    b.Chams=nil
+    b.Glow={}
+    for i=1,4 do b.Glow[i]=Drawing.new("Line") b.Glow[i].Visible=false end
+    ESP.Boxes[p]=b
 end
 
--- =============================================
--- HIDE ALL DRAWINGS
--- =============================================
 function ESP:HidePlayerDrawings(p)
-    local b = ESP.Boxes[p]
-    if not b then return end
-    
-    for i = 1, 50 do
-        if b[i] and b[i].Remove then b[i].Visible = false end
-    end
-    
-    local textElements = {"Name", "Dist", "Weapon", "WeaponAmmo", "Info", "Rank", "Status", "HPText", "ArmorText", "OffScreenDist"}
-    for _, name in ipairs(textElements) do
-        if b[name] and b[name].Remove then b[name].Visible = false end
-    end
-    
-    local squareElements = {"HPBg", "HPFill", "ArmorBg", "ArmorFill", "StaminaBg", "StaminaFill", "BoxFill", "InfoBG"}
-    for _, name in ipairs(squareElements) do
-        if b[name] and b[name].Remove then b[name].Visible = false end
-    end
-    
-    local circleElements = {"HeadDot", "FOV"}
-    for _, name in ipairs(circleElements) do
-        if b[name] and b[name].Remove then b[name].Visible = false end
-    end
-    
-    local lineElements = {"Tracer", "Snap", "LookDir", "Velocity"}
-    for _, name in ipairs(lineElements) do
-        if b[name] and b[name].Remove then b[name].Visible = false end
-    end
-    
-    if b.OffScreenArrow and b.OffScreenArrow.Remove then b.OffScreenArrow.Visible = false end
-    
-    if b.Box3D then
-        for i = 1, 12 do
-            if b.Box3D[i] and b.Box3D[i].Remove then b.Box3D[i].Visible = false end
-        end
-    end
-    
-    if b.Glow then
-        for i = 1, 4 do
-            if b.Glow[i] and b.Glow[i].Remove then b.Glow[i].Visible = false end
-        end
-    end
-    
-    if b.Chams then
-        b.Chams:Destroy()
-        b.Chams = nil
-    end
+    local b=ESP.Boxes[p] if not b then return end
+    for i=1,50 do if b[i] and b[i].Remove then b[i].Visible=false end end
+    local texts={"Name","Dist","Weapon","Info","Rank","Status","HPText","ArmorText","OffScreenDist"}
+    for _,n in ipairs(texts) do if b[n] and b[n].Remove then b[n].Visible=false end end
+    local squares={"HPBg","HPFill","ArmorBg","ArmorFill","BoxFill"}
+    for _,n in ipairs(squares) do if b[n] and b[n].Remove then b[n].Visible=false end end
+    if b.HeadDot and b.HeadDot.Remove then b.HeadDot.Visible=false end
+    local lines={"Tracer","Snap","LookDir","Velocity"}
+    for _,n in ipairs(lines) do if b[n] and b[n].Remove then b[n].Visible=false end end
+    if b.OffScreenArrow and b.OffScreenArrow.Remove then b.OffScreenArrow.Visible=false end
+    for i=1,4 do if b.Glow[i] and b.Glow[i].Remove then b.Glow[i].Visible=false end end
+    if b.Chams then b.Chams:Destroy() b.Chams=nil end
 end
 
--- =============================================
--- CLEAN PLAYER
--- =============================================
 function ESP:CleanPlayer(p)
-    if ESP.Boxes[p] then
-        for _, v in pairs(ESP.Boxes[p]) do
-            if type(v) == "table" and v.Remove then
-                v.Visible = false
-                v:Remove()
-            end
-        end
-        if ESP.Boxes[p].Box3D then
-            for _, v in ipairs(ESP.Boxes[p].Box3D) do
-                if v.Remove then v:Remove() end
-            end
-        end
-        if ESP.Boxes[p].Glow then
-            for _, v in ipairs(ESP.Boxes[p].Glow) do
-                if v.Remove then v:Remove() end
-            end
-        end
-        if ESP.Boxes[p].Chams then
-            ESP.Boxes[p].Chams:Destroy()
-        end
-        ESP.Boxes[p] = nil
-    end
+    if ESP.Boxes[p] then for _,v in pairs(ESP.Boxes[p]) do if type(v)=="table" and v.Remove then v.Visible=false v:Remove() end end ESP.Boxes[p]=nil end
 end
 
 function ESP:CleanAll()
     for p in pairs(ESP.Boxes) do ESP:CleanPlayer(p) end
-    ESP.Boxes = {}
+    ESP.Boxes={}
 end
 
 -- =============================================
--- BOX STYLE DRAWERS
+-- BOX DRAWING
 -- =============================================
-function ESP:DrawCornerBox(b, dims, color, thick, style, gap, animated)
-    local x, y, w, h = dims.x, dims.y, dims.w, dims.h
-    local cl = math.clamp(w * 0.25, 8, ESP.Settings.CornerLen)
-    
-    if animated then
-        local pulse = (math.sin(tick() * ESP.Settings.PulseSpeed) + 1) / 2
-        cl = cl * (0.8 + pulse * 0.4)
-    end
-    
-    local g = gap or 0
-    
-    b[1].From = Vector2.new(x, y)
-    b[1].To = Vector2.new(x + cl, y)
-    b[1].Color = color
-    b[1].Thickness = thick
-    b[1].Visible = true
-    
-    b[2].From = Vector2.new(x, y)
-    b[2].To = Vector2.new(x, y + cl)
-    b[2].Color = color
-    b[2].Thickness = thick
-    b[2].Visible = true
-    
-    b[3].From = Vector2.new(x + w - cl, y)
-    b[3].To = Vector2.new(x + w, y)
-    b[3].Color = color
-    b[3].Thickness = thick
-    b[3].Visible = true
-    
-    b[4].From = Vector2.new(x + w, y)
-    b[4].To = Vector2.new(x + w, y + cl)
-    b[4].Color = color
-    b[4].Thickness = thick
-    b[4].Visible = true
-    
-    b[5].From = Vector2.new(x, y + h)
-    b[5].To = Vector2.new(x + cl, y + h)
-    b[5].Color = color
-    b[5].Thickness = thick
-    b[5].Visible = true
-    
-    b[6].From = Vector2.new(x, y + h - cl)
-    b[6].To = Vector2.new(x, y + h)
-    b[6].Color = color
-    b[6].Thickness = thick
-    b[6].Visible = true
-    
-    b[7].From = Vector2.new(x + w - cl, y + h)
-    b[7].To = Vector2.new(x + w, y + h)
-    b[7].Color = color
-    b[7].Thickness = thick
-    b[7].Visible = true
-    
-    b[8].From = Vector2.new(x + w, y + h - cl)
-    b[8].To = Vector2.new(x + w, y + h)
-    b[8].Color = color
-    b[8].Thickness = thick
-    b[8].Visible = true
-    
-    if style == "Gap" then
-        b[9].From = Vector2.new(x + cl + g, y)
-        b[9].To = Vector2.new(x + w - cl - g, y)
-        b[9].Color = color
-        b[9].Thickness = thick
-        b[9].Visible = true
-        
-        b[10].From = Vector2.new(x + cl + g, y + h)
-        b[10].To = Vector2.new(x + w - cl - g, y + h)
-        b[10].Color = color
-        b[10].Thickness = thick
-        b[10].Visible = true
-        
-        b[11].From = Vector2.new(x, y + cl + g)
-        b[11].To = Vector2.new(x, y + h - cl - g)
-        b[11].Color = color
-        b[11].Thickness = thick
-        b[11].Visible = true
-        
-        b[12].From = Vector2.new(x + w, y + cl + g)
-        b[12].To = Vector2.new(x + w, y + h - cl - g)
-        b[12].Color = color
-        b[12].Thickness = thick
-        b[12].Visible = true
-    end
-end
+function ESP:DrawBox(b, dims, color, thick, style)
+    local x,y,w,h=dims.x,dims.y,dims.w,dims.h
+    local cl=math.clamp(w*0.25,8,ESP.Settings.CornerLen)
 
-function ESP:DrawFullBox(b, dims, color, thick, fill, fillColor, fillTrans)
-    local x, y, w, h = dims.x, dims.y, dims.w, dims.h
-    
-    if fill then
-        b.BoxFill.Size = Vector2.new(w, h)
-        b.BoxFill.Position = Vector2.new(x, y)
-        b.BoxFill.Color = fillColor
-        b.BoxFill.Transparency = fillTrans
-        b.BoxFill.Visible = true
-    else
-        b.BoxFill.Visible = false
-    end
-    
-    b[1].From = Vector2.new(x, y)
-    b[1].To = Vector2.new(x + w, y)
-    b[1].Color = color
-    b[1].Thickness = thick
-    b[1].Visible = true
-    
-    b[2].From = Vector2.new(x + w, y)
-    b[2].To = Vector2.new(x + w, y + h)
-    b[2].Color = color
-    b[2].Thickness = thick
-    b[2].Visible = true
-    
-    b[3].From = Vector2.new(x + w, y + h)
-    b[3].To = Vector2.new(x, y + h)
-    b[3].Color = color
-    b[3].Thickness = thick
-    b[3].Visible = true
-    
-    b[4].From = Vector2.new(x, y + h)
-    b[4].To = Vector2.new(x, y)
-    b[4].Color = color
-    b[4].Thickness = thick
-    b[4].Visible = true
-end
-
-function ESP:Draw3DBox(b, char, color, thick, fill, fillColor, fillTrans)
-    local hrp = char:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
-    
-    local cf = hrp.CFrame
-    local size = hrp.Size + Vector3.new(2, 3, 1)
-    
-    local corners = {
-        cf * CFrame.new(size.X/2, size.Y/2, size.Z/2),
-        cf * CFrame.new(-size.X/2, size.Y/2, size.Z/2),
-        cf * CFrame.new(-size.X/2, -size.Y/2, size.Z/2),
-        cf * CFrame.new(size.X/2, -size.Y/2, size.Z/2),
-        cf * CFrame.new(size.X/2, size.Y/2, -size.Z/2),
-        cf * CFrame.new(-size.X/2, size.Y/2, -size.Z/2),
-        cf * CFrame.new(-size.X/2, -size.Y/2, -size.Z/2),
-        cf * CFrame.new(size.X/2, -size.Y/2, -size.Z/2),
-    }
-    
-    local screenCorners = {}
-    for i, corner in ipairs(corners) do
-        local pos = corner.Position
-        local sp, _, onScreen = ESP:WorldToScreen(pos)
-        if not onScreen then 
-            for j = 1, 12 do
-                if b.Box3D[j] then b.Box3D[j].Visible = false end
-            end
-            return 
+    if style=="Corner" then
+        b[1].From,b[1].To=Vector2.new(x,y),Vector2.new(x+cl,y) b[1].Color,b[1].Thickness,b[1].Visible=color,thick,true
+        b[2].From,b[2].To=Vector2.new(x,y),Vector2.new(x,y+cl) b[2].Color,b[2].Thickness,b[2].Visible=color,thick,true
+        b[3].From,b[3].To=Vector2.new(x+w-cl,y),Vector2.new(x+w,y) b[3].Color,b[3].Thickness,b[3].Visible=color,thick,true
+        b[4].From,b[4].To=Vector2.new(x+w,y),Vector2.new(x+w,y+cl) b[4].Color,b[4].Thickness,b[4].Visible=color,thick,true
+        b[5].From,b[5].To=Vector2.new(x,y+h),Vector2.new(x+cl,y+h) b[5].Color,b[5].Thickness,b[5].Visible=color,thick,true
+        b[6].From,b[6].To=Vector2.new(x,y+h-cl),Vector2.new(x,y+h) b[6].Color,b[6].Thickness,b[6].Visible=color,thick,true
+        b[7].From,b[7].To=Vector2.new(x+w-cl,y+h),Vector2.new(x+w,y+h) b[7].Color,b[7].Thickness,b[7].Visible=color,thick,true
+        b[8].From,b[8].To=Vector2.new(x+w,y+h-cl),Vector2.new(x+w,y+h) b[8].Color,b[8].Thickness,b[8].Visible=color,thick,true
+    elseif style=="Full" then
+        b[1].From,b[1].To=Vector2.new(x,y),Vector2.new(x+w,y) b[1].Color,b[1].Thickness,b[1].Visible=color,thick,true
+        b[2].From,b[2].To=Vector2.new(x+w,y),Vector2.new(x+w,y+h) b[2].Color,b[2].Thickness,b[2].Visible=color,thick,true
+        b[3].From,b[3].To=Vector2.new(x+w,y+h),Vector2.new(x,y+h) b[3].Color,b[3].Thickness,b[3].Visible=color,thick,true
+        b[4].From,b[4].To=Vector2.new(x,y+h),Vector2.new(x,y) b[4].Color,b[4].Thickness,b[4].Visible=color,thick,true
+        if ESP.Settings.BoxFill then
+            b.BoxFill.Size=Vector2.new(w,h) b.BoxFill.Position=Vector2.new(x,y) b.BoxFill.Color=ESP.Settings.BoxFillColor b.BoxFill.Transparency=0.8 b.BoxFill.Visible=true
+        else b.BoxFill.Visible=false end
+    elseif style=="Circle" then
+        local cx,cy=dims.centerX,dims.centerY
+        local r=math.min(w,h)/2
+        local seg=32
+        for i=1,seg do
+            local a1=(i-1)*2*math.pi/seg local a2=i*2*math.pi/seg
+            b[i].From=Vector2.new(cx+math.cos(a1)*r,cy+math.sin(a1)*r)
+            b[i].To=Vector2.new(cx+math.cos(a2)*r,cy+math.sin(a2)*r)
+            b[i].Color,b[i].Thickness,b[i].Visible=color,thick,true
         end
-        screenCorners[i] = sp
-    end
-    
-    local edges = {
-        {1,2},{2,3},{3,4},{4,1},
-        {5,6},{6,7},{7,8},{8,5},
-        {1,5},{2,6},{3,7},{4,8},
-    }
-    
-    for i, edge in ipairs(edges) do
-        if b.Box3D[i] then
-            b.Box3D[i].From = screenCorners[edge[1]]
-            b.Box3D[i].To = screenCorners[edge[2]]
-            b.Box3D[i].Color = color
-            b.Box3D[i].Thickness = thick
-            b.Box3D[i].Visible = true
-        end
+    elseif style=="Diamond" then
+        local cx,cy=dims.centerX,dims.centerY local s=math.min(w,h)/2
+        b[1].From,b[1].To=Vector2.new(cx,cy-s),Vector2.new(cx+s,cy) b[1].Color,b[1].Thickness,b[1].Visible=color,thick,true
+        b[2].From,b[2].To=Vector2.new(cx+s,cy),Vector2.new(cx,cy+s) b[2].Color,b[2].Thickness,b[2].Visible=color,thick,true
+        b[3].From,b[3].To=Vector2.new(cx,cy+s),Vector2.new(cx-s,cy) b[3].Color,b[3].Thickness,b[3].Visible=color,thick,true
+        b[4].From,b[4].To=Vector2.new(cx-s,cy),Vector2.new(cx,cy-s) b[4].Color,b[4].Thickness,b[4].Visible=color,thick,true
+    elseif style=="Crosshair" then
+        local cx,cy=dims.centerX,dims.centerY local s=15 local g=5
+        b[1].From,b[1].To=Vector2.new(cx-s-g,cy),Vector2.new(cx-g,cy) b[1].Color,b[1].Thickness,b[1].Visible=color,thick,true
+        b[2].From,b[2].To=Vector2.new(cx+g,cy),Vector2.new(cx+s+g,cy) b[2].Color,b[2].Thickness,b[2].Visible=color,thick,true
+        b[3].From,b[3].To=Vector2.new(cx,cy-s-g),Vector2.new(cx,cy-g) b[3].Color,b[3].Thickness,b[3].Visible=color,thick,true
+        b[4].From,b[4].To=Vector2.new(cx,cy+g),Vector2.new(cx,cy+s+g) b[4].Color,b[4].Thickness,b[4].Visible=color,thick,true
     end
 end
 
-function ESP:DrawCircleBox(b, dims, color, thick, segments)
-    local cx, cy = dims.centerX, dims.centerY
-    local r = math.min(dims.w, dims.h) / 2 * ESP.Settings.CircleRadius
-    
-    local angleStep = 2 * math.pi / segments
-    for i = 1, segments do
-        local angle1 = (i - 1) * angleStep
-        local angle2 = i * angleStep
-        
-        if b[i] then
-            b[i].From = Vector2.new(cx + math.cos(angle1) * r, cy + math.sin(angle1) * r)
-            b[i].To = Vector2.new(cx + math.cos(angle2) * r, cy + math.sin(angle2) * r)
-            b[i].Color = color
-            b[i].Thickness = thick
-            b[i].Visible = true
-        end
-    end
-end
-
-function ESP:DrawDiamondBox(b, dims, color, thick)
-    local cx, cy = dims.centerX, dims.centerY
-    local size = math.min(dims.w, dims.h) / 2 * ESP.Settings.DiamondSize
-    
-    b[1].From = Vector2.new(cx, cy - size)
-    b[1].To = Vector2.new(cx + size, cy)
-    b[1].Color = color
-    b[1].Thickness = thick
-    b[1].Visible = true
-    
-    b[2].From = Vector2.new(cx + size, cy)
-    b[2].To = Vector2.new(cx, cy + size)
-    b[2].Color = color
-    b[2].Thickness = thick
-    b[2].Visible = true
-    
-    b[3].From = Vector2.new(cx, cy + size)
-    b[3].To = Vector2.new(cx - size, cy)
-    b[3].Color = color
-    b[3].Thickness = thick
-    b[3].Visible = true
-    
-    b[4].From = Vector2.new(cx - size, cy)
-    b[4].To = Vector2.new(cx, cy - size)
-    b[4].Color = color
-    b[4].Thickness = thick
-    b[4].Visible = true
-end
-
-function ESP:DrawCrosshairBox(b, dims, color, thick)
-    local cx, cy = dims.centerX, dims.centerY
-    local size = ESP.Settings.CrosshairSize
-    local gap = ESP.Settings.CrosshairGap
-    
-    b[1].From = Vector2.new(cx - size - gap, cy)
-    b[1].To = Vector2.new(cx - gap, cy)
-    b[1].Color = color
-    b[1].Thickness = thick
-    b[1].Visible = true
-    
-    b[2].From = Vector2.new(cx + gap, cy)
-    b[2].To = Vector2.new(cx + size + gap, cy)
-    b[2].Color = color
-    b[2].Thickness = thick
-    b[2].Visible = true
-    
-    b[3].From = Vector2.new(cx, cy - size - gap)
-    b[3].To = Vector2.new(cx, cy - gap)
-    b[3].Color = color
-    b[3].Thickness = thick
-    b[3].Visible = true
-    
-    b[4].From = Vector2.new(cx, cy + gap)
-    b[4].To = Vector2.new(cx, cy + size + gap)
-    b[4].Color = color
-    b[4].Thickness = thick
-    b[4].Visible = true
-end
-
-function ESP:DrawTriangleBox(b, dims, color, thick)
-    local cx, cy = dims.centerX, dims.centerY
-    local size = math.min(dims.w, dims.h) / 2 * ESP.Settings.TriangleSize
-    
-    b[1].From = Vector2.new(cx, cy - size)
-    b[1].To = Vector2.new(cx + size, cy + size)
-    b[1].Color = color
-    b[1].Thickness = thick
-    b[1].Visible = true
-    
-    b[2].From = Vector2.new(cx + size, cy + size)
-    b[2].To = Vector2.new(cx - size, cy + size)
-    b[2].Color = color
-    b[2].Thickness = thick
-    b[2].Visible = true
-    
-    b[3].From = Vector2.new(cx - size, cy + size)
-    b[3].To = Vector2.new(cx, cy - size)
-    b[3].Color = color
-    b[3].Thickness = thick
-    b[3].Visible = true
-end
-
-function ESP:DrawHexagonBox(b, dims, color, thick)
-    local cx, cy = dims.centerX, dims.centerY
-    local r = math.min(dims.w, dims.h) / 2 * ESP.Settings.HexagonSize
-    
-    local points = {}
-    for i = 0, 5 do
-        local angle = i * math.pi / 3
-        table.insert(points, Vector2.new(cx + math.cos(angle) * r, cy + math.sin(angle) * r))
-    end
-    
-    for i = 1, 6 do
-        local nextI = i % 6 + 1
-        b[i].From = points[i]
-        b[i].To = points[nextI]
-        b[i].Color = color
-        b[i].Thickness = thick
-        b[i].Visible = true
-    end
-end
-
-function ESP:DrawArrowBox(b, dims, color, thick)
-    local cx, cy = dims.centerY, dims.centerY
-    local size = ESP.Settings.ArrowSize
-    local headSize = ESP.Settings.ArrowHeadSize
-    
-    b[1].From = Vector2.new(cx - size/2, cy)
-    b[1].To = Vector2.new(cx + size/2, cy)
-    b[1].Color = color
-    b[1].Thickness = thick
-    b[1].Visible = true
-    
-    b[2].From = Vector2.new(cx, cy - headSize)
-    b[2].To = Vector2.new(cx - size/2, cy)
-    b[2].Color = color
-    b[2].Thickness = thick
-    b[2].Visible = true
-    
-    b[3].From = Vector2.new(cx, cy - headSize)
-    b[3].To = Vector2.new(cx + size/2, cy)
-    b[3].Color = color
-    b[3].Thickness = thick
-    b[3].Visible = true
-end
-
-function ESP:DrawDynamicBox(b, dims, color, thick)
-    local style = ESP.Settings.DynamicStyle
-    local t = tick()
-    
-    if style == "Pulse" then
-        local pulse = (math.sin(t * ESP.Settings.PulseSpeed) + 1) / 2
-        local newColor = color:Lerp(Color3.fromRGB(255, 255, 255), pulse * 0.5)
-        ESP:DrawCornerBox(b, dims, newColor, thick, "Sharp", 0, true)
-    elseif style == "Breathe" then
-        local breathe = (math.sin(t * ESP.Settings.BreatheSpeed) + 1) / 2
-        local scale = 0.9 + breathe * 0.2
-        local newDims = {
-            x = dims.x + dims.w * (1 - scale) / 2,
-            y = dims.y + dims.h * (1 - scale) / 2,
-            w = dims.w * scale,
-            h = dims.h * scale,
-            centerX = dims.centerX,
-            centerY = dims.centerY
-        }
-        ESP:DrawCornerBox(b, newDims, color, thick, "Sharp", 0, false)
-    elseif style == "Wave" then
-        ESP:DrawCornerBox(b, dims, color, thick, "Sharp", 0, false)
-        local wave = math.sin(t * ESP.Settings.WaveSpeed) * ESP.Settings.WaveAmplitude
-        b[13].From = Vector2.new(dims.x, dims.y + wave)
-        b[13].To = Vector2.new(dims.x + dims.w, dims.y + wave)
-        b[13].Color = color
-        b[13].Thickness = thick
-        b[13].Visible = true
-    end
-end
-
-function ESP:DrawGlow(b, dims, color, thick)
-    if not ESP.Settings.BoxGlow then return end
-    
-    local x, y, w, h = dims.x, dims.y, dims.w, dims.h
-    local glowThick = ESP.Settings.BoxGlowThickness
-    
-    b.Glow[1].From = Vector2.new(x - glowThick, y - glowThick)
-    b.Glow[1].To = Vector2.new(x + w + glowThick, y - glowThick)
-    b.Glow[1].Color = ESP.Settings.BoxGlowColor
-    b.Glow[1].Thickness = glowThick
-    b.Glow[1].Visible = true
-    
-    b.Glow[2].From = Vector2.new(x + w + glowThick, y - glowThick)
-    b.Glow[2].To = Vector2.new(x + w + glowThick, y + h + glowThick)
-    b.Glow[2].Color = ESP.Settings.BoxGlowColor
-    b.Glow[2].Thickness = glowThick
-    b.Glow[2].Visible = true
-    
-    b.Glow[3].From = Vector2.new(x + w + glowThick, y + h + glowThick)
-    b.Glow[3].To = Vector2.new(x - glowThick, y + h + glowThick)
-    b.Glow[3].Color = ESP.Settings.BoxGlowColor
-    b.Glow[3].Thickness = glowThick
-    b.Glow[3].Visible = true
-    
-    b.Glow[4].From = Vector2.new(x - glowThick, y + h + glowThick)
-    b.Glow[4].To = Vector2.new(x - glowThick, y - glowThick)
-    b.Glow[4].Color = ESP.Settings.BoxGlowColor
-    b.Glow[4].Thickness = glowThick
-    b.Glow[4].Visible = true
-end
-
--- =============================================
--- CHAMS
--- =============================================
-function ESP:UpdateChams(p, char, color)
-    if not ESP.Settings.Chams then
-        if ESP.Boxes[p] and ESP.Boxes[p].Chams then
-            ESP.Boxes[p].Chams:Destroy()
-            ESP.Boxes[p].Chams = nil
-        end
-        return
-    end
-    
-    if not ESP.Boxes[p] then return end
-    
-    if not ESP.Boxes[p].Chams then
-        local highlight = Instance.new("Highlight")
-        highlight.Name = "ESPChams"
-        highlight.Parent = char
-        ESP.Boxes[p].Chams = highlight
-    end
-    
-    local chams = ESP.Boxes[p].Chams
-    chams.FillColor = ESP.Settings.ChamsFillColor
-    chams.FillTransparency = ESP.Settings.ChamsFillTransparency
-    chams.OutlineColor = ESP.Settings.ChamsOutlineColor
-    chams.OutlineTransparency = ESP.Settings.ChamsOutlineTransparency
-    chams.Enabled = true
-end
-
--- =============================================
--- HEALTH BAR
--- =============================================
-function ESP:DrawHealthBar(b, dims, hum, pos, thick, scale)
-    if not hum then return end
-    
-    local pct = math.clamp(hum.Health / hum.MaxHealth, 0, 1)
-    local color = ESP:GetHPColor(pct)
-    local hpH = ESP.Settings.HPHeight * scale
-    local hpW = ESP.Settings.HPThick
-    
-    if pos == "Left" then
-        local hpx = dims.x - hpW - 4
-        b.HPBg.Size = Vector2.new(hpW, hpH)
-        b.HPBg.Position = Vector2.new(hpx, dims.y)
-        b.HPBg.Color = ESP.Settings.HPBG
-        b.HPBg.Visible = true
-        
-        b.HPFill.Size = Vector2.new(hpW, hpH * pct)
-        b.HPFill.Position = Vector2.new(hpx, dims.y + hpH * (1 - pct))
-        b.HPFill.Color = color
-        b.HPFill.Visible = true
-        
-        if ESP.Settings.HPText then
-            b.HPText.Text = math.floor(pct * 100) .. "%"
-            b.HPText.Color = ESP.Settings.HPTextColor
-            b.HPText.Size = ESP.Settings.HPTextSize
-            b.HPText.Position = Vector2.new(hpx - 20, dims.y + hpH / 2)
-            b.HPText.Visible = true
-        end
-    elseif pos == "Right" then
-        local hpx = dims.x + dims.w + 4
-        b.HPBg.Size = Vector2.new(hpW, hpH)
-        b.HPBg.Position = Vector2.new(hpx, dims.y)
-        b.HPBg.Color = ESP.Settings.HPBG
-        b.HPBg.Visible = true
-        
-        b.HPFill.Size = Vector2.new(hpW, hpH * pct)
-        b.HPFill.Position = Vector2.new(hpx, dims.y + hpH * (1 - pct))
-        b.HPFill.Color = color
-        b.HPFill.Visible = true
-        
-        if ESP.Settings.HPText then
-            b.HPText.Text = math.floor(pct * 100) .. "%"
-            b.HPText.Color = ESP.Settings.HPTextColor
-            b.HPText.Size = ESP.Settings.HPTextSize
-            b.HPText.Position = Vector2.new(hpx + hpW + 5, dims.y + hpH / 2)
-            b.HPText.Visible = true
-        end
-    elseif pos == "Top" then
-        local hpBarW = dims.w
-        local hpy = dims.y - 8
-        b.HPBg.Size = Vector2.new(hpBarW, 4)
-        b.HPBg.Position = Vector2.new(dims.x, hpy)
-        b.HPBg.Color = ESP.Settings.HPBG
-        b.HPBg.Visible = true
-        
-        b.HPFill.Size = Vector2.new(hpBarW * pct, 4)
-        b.HPFill.Position = Vector2.new(dims.x, hpy)
-        b.HPFill.Color = color
-        b.HPFill.Visible = true
-    elseif pos == "Bottom" then
-        local hpBarW = dims.w
-        local hpy = dims.y + dims.h + 4
-        b.HPBg.Size = Vector2.new(hpBarW, 4)
-        b.HPBg.Position = Vector2.new(dims.x, hpy)
-        b.HPBg.Color = ESP.Settings.HPBG
-        b.HPBg.Visible = true
-        
-        b.HPFill.Size = Vector2.new(hpBarW * pct, 4)
-        b.HPFill.Position = Vector2.new(dims.x, hpy)
-        b.HPFill.Color = color
-        b.HPFill.Visible = true
-    end
-end
-
--- =============================================
--- ARMOR BAR
--- =============================================
-function ESP:DrawArmorBar(b, dims, char, pos, thick, scale)
-    local armorVal = char:FindFirstChild("Armor") or char:FindFirstChild("Shield")
-    local armor = 0
-    local maxArmor = 100
-    
-    if armorVal then
-        if armorVal:IsA("IntValue") or armorVal:IsA("NumberValue") then
-            armor = armorVal.Value
-            maxArmor = armorVal:FindFirstChild("Max") and armorVal.Max.Value or 100
-        end
-    end
-    
-    if armor <= 0 then
-        b.ArmorBg.Visible = false
-        b.ArmorFill.Visible = false
-        b.ArmorText.Visible = false
-        return
-    end
-    
-    local pct = math.clamp(armor / maxArmor, 0, 1)
-    local armorH = ESP.Settings.HPHeight * scale
-    local armorW = ESP.Settings.ArmorThick
-    
-    if pos == "Left" then
-        local armorX = dims.x - armorW - 4
-        if ESP.Settings.HP and ESP.Settings.HPPos == "Left" then
-            armorX = armorX - armorW - 2
-        end
-        
-        b.ArmorBg.Size = Vector2.new(armorW, armorH)
-        b.ArmorBg.Position = Vector2.new(armorX, dims.y)
-        b.ArmorBg.Color = ESP.Settings.ArmorBG
-        b.ArmorBg.Visible = true
-        
-        b.ArmorFill.Size = Vector2.new(armorW, armorH * pct)
-        b.ArmorFill.Position = Vector2.new(armorX, dims.y + armorH * (1 - pct))
-        b.ArmorFill.Color = ESP.Settings.ArmorColor
-        b.ArmorFill.Visible = true
-        
-        if ESP.Settings.ArmorText then
-            b.ArmorText.Text = math.floor(pct * 100) .. "%"
-            b.ArmorText.Color = ESP.Settings.ArmorColor
-            b.ArmorText.Size = 10
-            b.ArmorText.Position = Vector2.new(armorX - 20, dims.y + armorH / 2)
-            b.ArmorText.Visible = true
-        end
-    elseif pos == "Right" then
-        local armorX = dims.x + dims.w + 4
-        if ESP.Settings.HP and ESP.Settings.HPPos == "Right" then
-            armorX = armorX + armorW + 2
-        end
-        
-        b.ArmorBg.Size = Vector2.new(armorW, armorH)
-        b.ArmorBg.Position = Vector2.new(armorX, dims.y)
-        b.ArmorBg.Color = ESP.Settings.ArmorBG
-        b.ArmorBg.Visible = true
-        
-        b.ArmorFill.Size = Vector2.new(armorW, armorH * pct)
-        b.ArmorFill.Position = Vector2.new(armorX, dims.y + armorH * (1 - pct))
-        b.ArmorFill.Color = ESP.Settings.ArmorColor
-        b.ArmorFill.Visible = true
-        
-        if ESP.Settings.ArmorText then
-            b.ArmorText.Text = math.floor(pct * 100) .. "%"
-            b.ArmorText.Color = ESP.Settings.ArmorColor
-            b.ArmorText.Size = 10
-            b.ArmorText.Position = Vector2.new(armorX + armorW + 5, dims.y + armorH / 2)
-            b.ArmorText.Visible = true
-        end
-    end
-end
-
--- =============================================
--- STAMINA BAR
--- =============================================
-function ESP:DrawStaminaBar(b, dims, char, scale)
-    local staminaVal = char:FindFirstChild("Stamina") or char:FindFirstChild("Energy")
-    local stamina = 100
-    local maxStamina = 100
-    
-    if staminaVal then
-        if staminaVal:IsA("IntValue") or staminaVal:IsA("NumberValue") then
-            stamina = staminaVal.Value
-            maxStamina = staminaVal:FindFirstChild("Max") and staminaVal.Max.Value or 100
-        end
-    end
-    
-    local pct = math.clamp(stamina / maxStamina, 0, 1)
-    local barW = dims.w
-    local barH = 3
-    
-    local barY = dims.y + dims.h + 4
-    if ESP.Settings.HP and ESP.Settings.HPPos == "Bottom" then
-        barY = barY + 8
-    end
-    
-    b.StaminaBg.Size = Vector2.new(barW, barH)
-    b.StaminaBg.Position = Vector2.new(dims.x, barY)
-    b.StaminaBg.Color = ESP.Settings.StaminaBG
-    b.StaminaBg.Visible = true
-    
-    b.StaminaFill.Size = Vector2.new(barW * pct, barH)
-    b.StaminaFill.Position = Vector2.new(dims.x, barY)
-    b.StaminaFill.Color = ESP.Settings.StaminaColor
-    b.StaminaFill.Visible = true
-end
-
--- =============================================
--- HEAD DOT
--- =============================================
-function ESP:DrawHeadDot(b, head, color, scale)
-    if not head then return end
-    
-    local sp, _, onScreen = ESP:WorldToScreen(head.Position)
-    if not onScreen then
-        b.HeadDot.Visible = false
-        return
-    end
-    
-    local size = ESP.Settings.HeadDotSize * scale
-    
-    b.HeadDot.Position = sp
-    b.HeadDot.Radius = size
-    b.HeadDot.Color = color
-    b.HeadDot.Filled = ESP.Settings.HeadDotFilled
-    b.HeadDot.Thickness = ESP.Settings.HeadDotOutline and 1 or 0
-    b.HeadDot.Visible = true
-end
-
--- =============================================
--- LOOK DIRECTION
--- =============================================
-function ESP:DrawLookDir(b, head, color, thick)
-    if not head then return end
-    
-    local origin = head.Position
-    local dir = head.CFrame.LookVector * ESP.Settings.LookDirLength
-    local endPos = origin + dir
-    
-    local sp1, _, onScreen1 = ESP:WorldToScreen(origin)
-    local sp2, _, onScreen2 = ESP:WorldToScreen(endPos)
-    
-    if not onScreen1 or not onScreen2 then
-        b.LookDir.Visible = false
-        return
-    end
-    
-    b.LookDir.From = sp1
-    b.LookDir.To = sp2
-    b.LookDir.Color = color
-    b.LookDir.Thickness = thick
-    b.LookDir.Visible = true
-end
-
--- =============================================
--- VELOCITY VECTOR
--- =============================================
-function ESP:DrawVelocity(b, root, color, thick)
-    if not root then return end
-    
-    local vel = root.Velocity
-    if vel.Magnitude < 0.1 then
-        b.Velocity.Visible = false
-        return
-    end
-    
-    local origin = root.Position
-    local endPos = origin + vel.Unit * ESP.Settings.VelocityLength
-    
-    local sp1, _, onScreen1 = ESP:WorldToScreen(origin)
-    local sp2, _, onScreen2 = ESP:WorldToScreen(endPos)
-    
-    if not onScreen1 or not onScreen2 then
-        b.Velocity.Visible = false
-        return
-    end
-    
-    b.Velocity.From = sp1
-    b.Velocity.To = sp2
-    b.Velocity.Color = color
-    b.Velocity.Thickness = thick
-    b.Velocity.Visible = true
-end
-
--- =============================================
--- TRACER
--- =============================================
-function ESP:DrawTracer(b, targetPos, color, thick, style)
-    local vp = Camera.ViewportSize
-    local cx, cy = vp.X / 2, vp.Y
-    
-    local origin
-    if ESP.Settings.TracerOrigin == "Bottom" then
-        origin = Vector2.new(cx, cy)
-    elseif ESP.Settings.TracerOrigin == "Top" then
-        origin = Vector2.new(cx, 0)
-    elseif ESP.Settings.TracerOrigin == "Middle" then
-        origin = Vector2.new(cx, cy / 2)
-    elseif ESP.Settings.TracerOrigin == "Mouse" then
-        local mousePos = UserInputService:GetMouseLocation()
-        origin = mousePos
-    elseif ESP.Settings.TracerOrigin == "Center" then
-        origin = Vector2.new(cx, cy / 2)
-    end
-    
-    if style == "Line" then
-        b.Tracer.From = origin
-        b.Tracer.To = targetPos
-        b.Tracer.Color = color
-        b.Tracer.Thickness = thick
-        b.Tracer.Visible = true
-    elseif style == "Bezier" then
-        local mid = (origin + targetPos) / 2
-        mid = mid + Vector2.new(0, math.abs(origin.Y - targetPos.Y) * 0.3)
-        
-        b.Tracer.From = origin
-        b.Tracer.To = mid
-        b.Tracer.Color = color
-        b.Tracer.Thickness = thick
-        b.Tracer.Visible = true
-        
-        b[20].From = mid
-        b[20].To = targetPos
-        b[20].Color = color
-        b[20].Thickness = thick
-        b[20].Visible = true
-    elseif style == "Dashed" then
-        local dir = (targetPos - origin)
-        local dist = dir.Magnitude
-        local unit = dir.Unit
-        local dashLen = ESP.Settings.TracerDashLength
-        local gapLen = ESP.Settings.TracerGapLength
-        local total = dashLen + gapLen
-        local segments = math.floor(dist / total)
-        
-        local idx = 20
-        for i = 0, segments - 1 do
-            local startPos = origin + unit * (i * total)
-            local endPos = origin + unit * (i * total + dashLen)
-            if b[idx] then
-                b[idx].From = startPos
-                b[idx].To = endPos
-                b[idx].Color = color
-                b[idx].Thickness = thick
-                b[idx].Visible = true
-            end
-            idx = idx + 1
-        end
-    end
-end
-
--- =============================================
--- SNAPLINE
--- =============================================
-function ESP:DrawSnapline(b, targetPos, color, thick)
-    local vp = Camera.ViewportSize
-    local origin = Vector2.new(vp.X / 2, vp.Y)
-    
-    b.Snap.From = origin
-    b.Snap.To = targetPos
-    b.Snap.Color = color
-    b.Snap.Thickness = thick
-    b.Snap.Visible = true
-end
-
--- =============================================
--- OFF-SCREEN ARROW
--- =============================================
-function ESP:DrawOffScreenArrow(b, char, color, dist)
-    local hrp = char:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
-    
-    local pos = hrp.Position
-    local sp, _, onScreen = ESP:WorldToScreen(pos)
-    
-    if onScreen and ESP:IsOnScreen({X = sp.X, Y = sp.Y, Z = 1}) then
-        b.OffScreenArrow.Visible = false
-        b.OffScreenDist.Visible = false
-        return
-    end
-    
-    local vp = Camera.ViewportSize
-    local cx, cy = vp.X / 2, vp.Y / 2
-    
-    local camCF = Camera.CFrame
-    local relativePos = camCF:PointToObjectSpace(pos)
-    local angle = math.atan2(relativePos.Z, relativePos.X)
-    
-    local edgeDist = math.min(vp.X, vp.Y) * 0.4
-    local arrowX = cx + math.cos(angle - math.pi/2) * edgeDist
-    local arrowY = cy + math.sin(angle - math.pi/2) * edgeDist
-    
-    arrowX = math.clamp(arrowX, 30, vp.X - 30)
-    arrowY = math.clamp(arrowY, 30, vp.Y - 30)
-    
-    local size = ESP.Settings.OffScreenSize
-    
-    b.OffScreenArrow.PointA = Vector2.new(arrowX + math.cos(angle) * size, arrowY + math.sin(angle) * size)
-    b.OffScreenArrow.PointB = Vector2.new(arrowX + math.cos(angle + 2.5) * size, arrowY + math.sin(angle + 2.5) * size)
-    b.OffScreenArrow.PointC = Vector2.new(arrowX + math.cos(angle - 2.5) * size, arrowY + math.sin(angle - 2.5) * size)
-    b.OffScreenArrow.Color = color
-    b.OffScreenArrow.Filled = true
-    b.OffScreenArrow.Visible = true
-    
-    if ESP.Settings.OffScreenDist then
-        b.OffScreenDist.Text = math.floor(dist) .. ESP.Settings.DistUnits
-        b.OffScreenDist.Color = ESP.Settings.OffScreenDistColor
-        b.OffScreenDist.Size = ESP.Settings.OffScreenDistSize
-        b.OffScreenDist.Position = Vector2.new(arrowX, arrowY + size + 10)
-        b.OffScreenDist.Visible = true
-    end
-end
-
--- =============================================
--- FOV CIRCLE
--- =============================================
-function ESP:DrawFOV(b, targetPos, color)
-    if not ESP.Settings.FOV then
-        b.FOV.Visible = false
-        return
-    end
-    
-    local vp = Camera.ViewportSize
-    local center = Vector2.new(vp.X / 2, vp.Y / 2)
-    
-    b.FOV.Position = center
-    b.FOV.Radius = ESP.Settings.FOVRadius
-    b.FOV.Color = color
-    b.FOV.Thickness = ESP.Settings.FOVThick
-    b.FOV.Filled = ESP.Settings.FOVFilled
-    b.FOV.Transparency = ESP.Settings.FOVFillTransparency
-    b.FOV.Visible = true
-end
-
--- =============================================
--- INFO PANEL
--- =============================================
-function ESP:DrawInfoPanel(b, dims, p, char, hum, dist)
-    if not ESP.Settings.InfoPanel then return end
-    
-    local info = ""
-    local items = ESP.Settings.InfoItems
-    
-    for _, item in ipairs(items) do
-        if item == "Name" then
-            info = info .. "Name: " .. p.DisplayName .. "\n"
-        elseif item == "Health" and hum then
-            info = info .. "HP: " .. math.floor(hum.Health) .. "/" .. hum.MaxHealth .. "\n"
-        elseif item == "Distance" then
-            info = info .. "Dist: " .. math.floor(dist) .. ESP.Settings.DistUnits .. "\n"
-        elseif item == "Weapon" then
-            local wep = nil
-            for _, tool in ipairs(char:GetChildren()) do
-                if tool:IsA("Tool") then wep = tool.Name break end
-            end
-            if wep then info = info .. "Wep: " .. wep .. "\n" end
-        elseif item == "Armor" then
-            local armor = char:FindFirstChild("Armor")
-            if armor then info = info .. "Armor: " .. armor.Value .. "\n" end
-        elseif item == "Rank" then
-            local rank = p:FindFirstChild("leaderstats") and p.leaderstats:FindFirstChild("Rank")
-            if rank then info = info .. "Rank: " .. rank.Value .. "\n" end
-        end
-    end
-    
-    b.Info.Text = info
-    b.Info.Color = ESP.Settings.InfoColor
-    b.Info.Size = ESP.Settings.InfoSize
-    b.Info.Position = Vector2.new(dims.x + dims.w + 10, dims.y)
-    b.Info.Visible = true
-    
-    if ESP.Settings.InfoBG then
-        local textBounds = b.Info.TextBounds or Vector2.new(100, 60)
-        b.InfoBG.Size = textBounds + Vector2.new(10, 10)
-        b.InfoBG.Position = Vector2.new(dims.x + dims.w + 5, dims.y - 5)
-        b.InfoBG.Color = ESP.Settings.InfoBG
-        b.InfoBG.Transparency = ESP.Settings.InfoBGTransparency
-        b.InfoBG.Visible = true
-    end
-end
-
--- =============================================
--- RANK/LEVEL
--- =============================================
-function ESP:DrawRank(b, dims, p)
-    if not ESP.Settings.Rank then return end
-    
-    local rank = p:FindFirstChild("leaderstats") and p.leaderstats:FindFirstChild("Rank")
-    local level = p:FindFirstChild("leaderstats") and p.leaderstats:FindFirstChild("Level")
-    
-    local text = ""
-    if rank then text = "[" .. rank.Value .. "]" end
-    if level then text = text .. " Lv." .. level.Value end
-    
-    if text ~= "" then
-        b.Rank.Text = text
-        b.Rank.Color = ESP.Settings.RankColor
-        b.Rank.Size = ESP.Settings.RankSize
-        b.Rank.Position = Vector2.new(dims.centerX, dims.y - 30)
-        b.Rank.Visible = true
-    end
-end
-
--- =============================================
--- STATUS
--- =============================================
-function ESP:DrawStatus(b, dims, char, hum)
-    if not ESP.Settings.Status then return end
-    
-    local statuses = {}
-    
-    if hum then
-        if hum.Health <= 0 then table.insert(statuses, "DEAD")
-        elseif hum.Health < hum.MaxHealth * 0.25 then table.insert(statuses, "CRITICAL")
-        end
-        
-        if hum:GetState() == Enum.HumanoidStateType.Jumping then table.insert(statuses, "Jumping")
-        elseif hum:GetState() == Enum.HumanoidStateType.Freefall then table.insert(statuses, "Falling")
-        elseif hum:GetState() == Enum.HumanoidStateType.Ragdoll then table.insert(statuses, "Ragdoll")
-        end
-    end
-    
-    if char:FindFirstChild("Crouching") then table.insert(statuses, "Crouching") end
-    if char:FindFirstChild("Sprinting") then table.insert(statuses, "Sprinting") end
-    if char:FindFirstChild("Reloading") then table.insert(statuses, "Reloading") end
-    
-    if #statuses > 0 then
-        b.Status.Text = table.concat(statuses, " | ")
-        b.Status.Color = ESP.Settings.StatusColor
-        b.Status.Size = ESP.Settings.StatusSize
-        b.Status.Position = Vector2.new(dims.centerX, dims.y + dims.h + 40)
-        b.Status.Visible = true
-    end
-end
-
--- =============================================
--- SKELETON
--- =============================================
-function ESP:DrawSkeleton(b, char, color, thick, colorByBone)
-    local si = 25
-    
-    for _, bone in ipairs(SkeletonBones) do
-        local p1 = char:FindFirstChild(bone[1])
-        local p2 = char:FindFirstChild(bone[2])
-        
-        if p1 and p2 then
-            local sp1, _, onScreen1 = ESP:WorldToScreen(p1.Position)
-            local sp2, _, onScreen2 = ESP:WorldToScreen(p2.Position)
-            
-            if ESP:IsOnScreen({X = sp1.X, Y = sp1.Y, Z = 1}) and ESP:IsOnScreen({X = sp2.X, Y = sp2.Y, Z = 1}) then
-                local boneColor = color
-                if colorByBone then
-                    boneColor = BoneColors[bone[1]] or color
-                end
-                
-                if b[si] then
-                    b[si].From = sp1
-                    b[si].To = sp2
-                    b[si].Color = boneColor
-                    b[si].Thickness = thick
-                    b[si].Visible = true
-                    si = si + 1
-                end
-            end
-        end
-    end
-    
-    if ESP.Settings.SkeletonDynamic then
-        local pulse = (math.sin(tick() * 2) + 1) / 2
-        for i = 25, si - 1 do
-            if b[i] then
-                b[i].Color = b[i].Color:Lerp(Color3.fromRGB(255, 255, 255), pulse * 0.3)
-            end
-        end
-    end
-end
-
--- =============================================
--- MAIN UPDATE LOOP
--- =============================================
 function ESP:Update()
-    ESP.FrameCount = ESP.FrameCount + 1
-    if ESP.Settings.UpdateRate > 0 and ESP.FrameCount % (ESP.Settings.UpdateRate + 1) ~= 0 then return end
-    
-    local mt = LocalPlayer.Team
-    local cp = Camera.CFrame.Position
-    local vp = Camera.ViewportSize
-    local proc = {}
-    local renderCount = 0
-    
-    for _, p in ipairs(Players:GetPlayers()) do
-        if renderCount >= ESP.Settings.MaxRender then break end
-        if p == LocalPlayer then ESP:HidePlayerDrawings(p) continue end
-        if ESP.Settings.TeamCheck and p.Team == mt then ESP:HidePlayerDrawings(p) continue end
-        
-        local c = p.Character
+    local mt=LocalPlayer.Team local cp=Camera.CFrame.Position local vp=Camera.ViewportSize local cx,cy=vp.X/2,vp.Y local proc={}
+
+    for _,p in ipairs(Players:GetPlayers()) do
+        if p==LocalPlayer then ESP:HidePlayerDrawings(p) continue end
+        if ESP.Settings.TeamCheck and p.Team==mt then ESP:HidePlayerDrawings(p) continue end
+
+        local c=p.Character
         if not c then ESP:HidePlayerDrawings(p) continue end
-        
-        local h = ESP:FindHead(c)
-        local r = ESP:FindRoot(c)
-        local hum = c:FindFirstChildOfClass("Humanoid")
+
+        local h=ESP:FindHead(c) local r=ESP:FindRoot(c) local hum=c:FindFirstChildOfClass("Humanoid")
         if not h or not r then ESP:HidePlayerDrawings(p) continue end
-        
-        local rp = r.Position
-        local dist = (cp - rp).Magnitude
-        if dist > ESP.Settings.MaxDist then ESP:HidePlayerDrawings(p) continue end
-        
-        if not ESP:CheckVisible(p) then ESP:HidePlayerDrawings(p) continue end
-        if not ESP:CheckWall(p) then ESP:HidePlayerDrawings(p) continue end
-        
-        local rsp, _, ronScreen = ESP:WorldToScreen(rp)
-        if not ronScreen then ESP:HidePlayerDrawings(p) continue end
-        
-        local scale = ESP:GetScale(dist)
-        local dims = ESP:GetBoxDimensions(h, r, scale)
-        if not dims then ESP:HidePlayerDrawings(p) continue end
-        
+
+        local rp=r.Position local dist=(cp-rp).Magnitude
+        if dist>ESP.Settings.MaxDist then ESP:HidePlayerDrawings(p) continue end
+
+        local rsp=Camera:WorldToViewportPoint(rp)
+        local hsp=Camera:WorldToViewportPoint(h.Position+Vector3.new(0,0.5,0))
+        local lsp=Camera:WorldToViewportPoint(rp-Vector3.new(0,3.5,0))
+        if not ESP:IsOnScreen(rsp) then ESP:HidePlayerDrawings(p) continue end
+
+        local bh=math.abs(hsp.Y-lsp.Y) local bw=bh*0.5 local x=rsp.X-bw/2 local y=hsp.Y
+
         if not ESP.Boxes[p] then ESP:CreatePlayer(p) end
-        local b = ESP.Boxes[p]
-        
-        for i = 1, 50 do if b[i] and b[i].Remove then b[i].Visible = false end end
-        
-        local color = ESP:GetColor(p)
-        local thick = ESP.Settings.BoxThickness
-        
-        -- Box Style
-        if ESP.Settings.BoxStyle == "Corner" then
-            ESP:DrawCornerBox(b, dims, color, thick, ESP.Settings.CornerStyle, ESP.Settings.CornerGap, ESP.Settings.BoxAnimated)
-        elseif ESP.Settings.BoxStyle == "Full" then
-            ESP:DrawFullBox(b, dims, color, thick, ESP.Settings.BoxFill, ESP.Settings.BoxFillColor, ESP.Settings.BoxFillTransparency)
-        elseif ESP.Settings.BoxStyle == "3D" then
-            ESP:Draw3DBox(b, c, ESP.Settings.Box3DColor, ESP.Settings.Box3DThickness, ESP.Settings.Box3DFill, ESP.Settings.Box3DFillColor, ESP.Settings.Box3DFillTransparency)
-        elseif ESP.Settings.BoxStyle == "Circle" then
-            ESP:DrawCircleBox(b, dims, color, thick, ESP.Settings.CircleSegments)
-        elseif ESP.Settings.BoxStyle == "Diamond" then
-            ESP:DrawDiamondBox(b, dims, color, thick)
-        elseif ESP
+        local b=ESP.Boxes[p]
+
+        for i=1,50 do if b[i] and b[i].Remove then b[i].Visible=false end end
+
+        local color=ESP:GetColor(p)
+        local dims={x=x,y=y,w=bw,h=bh,centerX=rsp.X,centerY=rsp.Y}
+
+        ESP:DrawBox(b,dims,color,ESP.Settings.BoxThickness,ESP.Settings.BoxStyle)
+
+        if ESP.Settings.BoxGlow then
+            local gt=ESP.Settings.BoxThickness+3
+            b.Glow[1].From,b.Glow[1].To=Vector2.new(x-3,y-3),Vector2.new(x+bw+3,y-3) b.Glow[1].Color,b.Glow[1].Thickness,b.Glow[1].Visible,b.Glow[1].Transparency=color,gt,true,0.6
+            b.Glow[2].From,b.Glow[2].To=Vector2.new(x+bw+3,y-3),Vector2.new(x+bw+3,y+bh+3) b.Glow[2].Color,b.Glow[2].Thickness,b.Glow[2].Visible,b.Glow[2].Transparency=color,gt,true,0.6
+            b.Glow[3].From,b.Glow[3].To=Vector2.new(x+bw+3,y+bh+3),Vector2.new(x-3,y+bh+3) b.Glow[3].Color,b.Glow[3].Thickness,b.Glow[3].Visible,b.Glow[3].Transparency=color,gt,true,0.6
+            b.Glow[4].From,b.Glow[4].To=Vector2.new(x-3,y+bh+3),Vector2.new(x-3,y-3) b.Glow[4].Color,b.Glow[4].Thickness,b.Glow[4].Visible,b.Glow[4].Transparency=color,gt,true,0.6
+        else for i=1,4 do b.Glow[i].Visible=false end end
+
+        if ESP.Settings.Chams then
+            if not b.Chams then b.Chams=Instance.new("Highlight") b.Chams.Name="ESPChams" b.Chams.Parent=c end
+            b.Chams.FillColor=ESP.Settings.ChamsFillColor b.Chams.FillTransparency=ESP.Settings.ChamsFillTransparency b.Chams.Enabled=true
+        elseif b.Chams then b.Chams:Destroy() b.Chams=nil end
+
+        if ESP.Settings.Name then
+            b.Name.Text=p.DisplayName b.Name.Color=ESP.Settings.NameColor b.Name.Size=ESP.Settings.NameSize
+            b.Name.Position=Vector2.new(rsp.X,y-16) b.Name.Visible=true
+        else b.Name.Visible=false end
+
+        if ESP.Settings.Dist then
+            b.Dist.Text=ESP.Settings.DistBrackets and"["..math.floor(dist).."m]"or math.floor(dist).."m"
+            b.Dist.Color=ESP.Settings.DistColor b.Dist.Size=ESP.Settings.DistSize
+            b.Dist.Position=Vector2.new(rsp.X,y+bh+14) b.Dist.Visible=true
+        else b.Dist.Visible=false end
+
+        if ESP.Settings.HP and hum then
+            local pct=math.clamp(hum.Health/hum.MaxHealth,0,1)
+            local hc=pct>0.5 and Color3.fromRGB(50,200,50)or pct>0.25 and Color3.fromRGB(255,170,0)or Color3.fromRGB(255,50,50)
+            local bw2=ESP.Settings.HPThick
+            local hpx=ESP.Settings.HPPos=="Left"and x-bw2-4 or x+bw+4
+            b.HPBg.Size,b.HPBg.Position=Vector2.new(bw2,bh),Vector2.new(hpx,y)
+            b.HPBg.Color,b.HPBg.Visible=ESP.Settings.HPBG,true
+            b.HPFill.Size,b.HPFill.Position=Vector2.new(bw2,bh*pct),Vector2.new(hpx,y+bh*(1-pct))
+            b.HPFill.Color,b.HPFill.Visible=hc,true
+        else b.HPBg.Visible=false b.HPFill.Visible=false end
+
+        if ESP.Settings.Tracer then
+            local sx=cx local sy=ESP.Settings.TracerOrigin=="Bottom"and cy or ESP.Settings.TracerOrigin=="Top"and 0 or cy/2
+            b.Tracer.From,b.Tracer.To=Vector2.new(sx,sy),Vector2.new(rsp.X,rsp.Y)
+            b.Tracer.Color,b.Tracer.Thickness,b.Tracer.Visible=ESP.Settings.TracerColor,ESP.Settings.TracerThick,true
+        else b.Tracer.Visible=false end
+
+        if ESP.Settings.Snap then
+            b.Snap.From,b.Snap.To=Vector2.new(cx,cy),Vector2.new(rsp.X,rsp.Y)
+            b.Snap.Color,b.Snap.Thickness,b.Snap.Visible=ESP.Settings.SnapColor,ESP.Settings.SnapThick,true
+        else b.Snap.Visible=false end
+
+        if ESP.Settings.Weapon then
+            local wep=nil
+            for _,tool in ipairs(c:GetChildren()) do if tool:IsA("Tool")and tool:FindFirstChild("Handle")then wep=tool.Name break end end
+            if wep then b.Weapon.Text="["..wep.."]" b.Weapon.Color=ESP.Settings.WeaponColor b.Weapon.Size=11 b.Weapon.Position=Vector2.new(rsp.X,y+bh+28) b.Weapon.Visible=true end
+        else b.Weapon.Visible=false end
+
+        if ESP.Settings.Skeleton then
+            local si=20
+            for _,bone in ipairs(SkeletonBones) do
+                local p1=c:FindFirstChild(bone[1]) local p2=c:FindFirstChild(bone[2])
+                if p1 and p2 then
+                    local sp1=Camera:WorldToViewportPoint(p1.Position) local sp2=Camera:WorldToViewportPoint(p2.Position)
+                    if ESP:IsOnScreen(sp1) and ESP:IsOnScreen(sp2) then
+                        b[si].From,b[si].To=Vector2.new(sp1.X,sp1.Y),Vector2.new(sp2.X,sp2.Y)
+                        b[si].Color,b[si].Thickness,b[si].Visible=ESP.Settings.SkeletonColor,ESP.Settings.SkeletonThick,true
+                        si=si+1
+                    end
+                end
+            end
+        end
+
+        if ESP.Settings.HeadDot then
+            local hcsp=Camera:WorldToViewportPoint(h.Position)
+            if ESP:IsOnScreen(hcsp) then
+                b.HeadDot.Position=Vector2.new(hcsp.X,hcsp.Y) b.HeadDot.Radius=ESP.Settings.HeadDotSize
+                b.HeadDot.Color=ESP.Settings.HeadDotColor b.HeadDot.Filled=true b.HeadDot.Visible=true
+            else b.HeadDot.Visible=false end
+        else b.HeadDot.Visible=false end
+
+        if ESP.Settings.LookDir then
+            local origin=h.Position local dir=h.CFrame.LookVector*50 local endPos=origin+dir
+            local sp1,_,on1=ESP:WorldToScreen(origin) local sp2,_,on2=ESP:WorldToScreen(endPos)
+            if on1 and on2 then b.LookDir.From,b.LookDir.To=sp1,sp2 b.LookDir.Color,b.LookDir.Thickness,b.LookDir.Visible=color,1,true else b.LookDir.Visible=false end
+        else b.LookDir.Visible=false end
+
+        if ESP.Settings.Velocity then
+            local vel=r.Velocity
+            if vel.Magnitude>0.1 then
+                local origin=rp local endPos=rp+vel.Unit*30
+                local sp1,_,on1=ESP:WorldToScreen(origin) local sp2,_,on2=ESP:WorldToScreen(endPos)
+                if on1 and on2 then b.Velocity.From,b.Velocity.To=sp1,sp2 b.Velocity.Color,b.Velocity.Thickness,b.Velocity.Visible=Color3.fromRGB(255,255,0),1,true else b.Velocity.Visible=false end
+            else b.Velocity.Visible=false end
+        else b.Velocity.Visible=false end
+
+        proc[p]=true
+    end
+
+    for p in pairs(ESP.Boxes) do if not proc[p] then ESP:HidePlayerDrawings(p) end end
+end
+
+function ESP:Start()
+    ESP:CleanAll()
+    ESP.Conn=RunService.RenderStepped:Connect(ESP.Update)
+end
+
+function ESP:Stop()
+    if ESP.Conn then ESP.Conn:Disconnect() ESP.Conn=nil end
+    ESP:CleanAll()
+end
+
+Players.PlayerRemoving:Connect(function(p) ESP:CleanPlayer(p) end)
+
+function ESP:Init(tab, library, flags)
+    local self=setmetatable({},ESP)
+    self.Tab=tab
+    self.Library=library
+    self.Flags=flags
+
+    local Sec=tab:Section({Title="ESP",Icon="eye",Opened=true})
+    Sec:Toggle({Title="Enable",Value=false,Callback=function(v)ESP.Settings.Enabled=v if v then ESP:Start()else ESP:Stop()end end})
+    Sec:Slider({Title="Max Distance",Step=100,Value={Min=100,Max=10000,Default=3000},Callback=function(v)ESP.Settings.MaxDist=v end})
+    Sec:Toggle({Title="Team Check",Value=false,Callback=function(v)ESP.Settings.TeamCheck=v end})
+    Sec:Toggle({Title="Team Color",Value=false,Callback=function(v)ESP.Settings.TeamColor=v end})
+    Sec:Toggle({Title="Rainbow",Value=false,Callback=function(v)ESP.Settings.Rainbow=v end})
+    Sec:Toggle({Title="Vis Check",Value=false,Callback=function(v)ESP.Settings.VisCheck=v end})
+    Sec:Toggle({Title="Wall Check",Value=true,Callback=function(v)ESP.Settings.WallCheck=v end})
+
+    local SecBox=tab:Section({Title="Box",Icon="square",Opened=true})
+    SecBox:Dropdown({Title="Style",Values={"Corner","Full","Circle","Diamond","Crosshair"},Value="Corner",Callback=function(v)ESP.Settings.BoxStyle=v end})
+    SecBox:Colorpicker({Title="Color",Default=ESP.Settings.BoxColor,Transparency=0,Callback=function(v)ESP.Settings.BoxColor=v end})
+    SecBox:Slider({Title="Thickness",Step=0.5,Value={Min=1,Max=6,Default=2},Callback=function(v)ESP.Settings.BoxThickness=v end})
+    SecBox:Toggle({Title="Fill Box",Value=false,Callback=function(v)ESP.Settings.BoxFill=v end})
+    SecBox:Toggle({Title="Glow",Value=false,Callback=function(v)ESP.Settings.BoxGlow=v end})
+    SecBox:Slider({Title="Corner Length",Step=1,Value={Min=6,Max=40,Default=22},Callback=function(v)ESP.Settings.CornerLen=v end})
+
+    local SecChams=tab:Section({Title="Chams",Icon="shirt",Opened=true})
+    SecChams:Toggle({Title="Enable",Value=false,Callback=function(v)ESP.Settings.Chams=v end})
+    SecChams:Colorpicker({Title="Fill Color",Default=ESP.Settings.ChamsFillColor,
