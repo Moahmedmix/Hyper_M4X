@@ -1,6 +1,6 @@
 --[[
     ╔══════════════════════════════════════════════════════════════╗
-    ║           HYPER UI - ESP SYSTEM - WORKING                    ║
+    ║           HYPER UI - ESP SYSTEM - NO GHOST                   ║
     ║         Corner Box | Full Customization                      ║
     ║              By M4X | EVA | AMAL                            ║
     ╚══════════════════════════════════════════════════════════════╝
@@ -67,6 +67,11 @@ function ESP:GetColor(p)
     return ESP.Settings.BoxColor
 end
 
+function ESP:IsOnScreen(sp)
+    local vp = Camera.ViewportSize
+    return sp.Z > 0 and sp.X >= -100 and sp.X <= vp.X + 100 and sp.Y >= -100 and sp.Y <= vp.Y + 100
+end
+
 function ESP:CreatePlayer(p)
     local b={}
     for i=1,30 do b[i]=Drawing.new("Line") b[i].Visible=false end
@@ -81,21 +86,13 @@ function ESP:CreatePlayer(p)
     ESP.Boxes[p]=b
 end
 
-function ESP:HidePlayer(p)
-    local b=ESP.Boxes[p] if not b then return end
-    for i=1,30 do if b[i] then b[i].Visible=false end end
-    if b.Name then b.Name.Visible=false end
-    if b.Dist then b.Dist.Visible=false end
-    if b.Weapon then b.Weapon.Visible=false end
-    if b.HPBg then b.HPBg.Visible=false end
-    if b.HPFill then b.HPFill.Visible=false end
-    if b.Tracer then b.Tracer.Visible=false end
-    if b.Snap then b.Snap.Visible=false end
-    if b.HeadDot then b.HeadDot.Visible=false end
-end
-
 function ESP:CleanPlayer(p)
-    if ESP.Boxes[p] then for _,v in pairs(ESP.Boxes[p]) do if type(v)=="table" and v.Remove then v.Visible=false v:Remove() end end ESP.Boxes[p]=nil end
+    if ESP.Boxes[p] then
+        for _,v in pairs(ESP.Boxes[p]) do
+            if type(v)=="table" and v.Remove then v.Visible=false v:Remove() end
+        end
+        ESP.Boxes[p]=nil
+    end
 end
 
 function ESP:CleanAll()
@@ -104,30 +101,38 @@ function ESP:CleanAll()
 end
 
 function ESP:Update()
-    local mt=LocalPlayer.Team local cp=Camera.CFrame.Position local vp=Camera.ViewportSize local cx,cy=vp.X/2,vp.Y local proc={}
+    local mt=LocalPlayer.Team
+    local cp=Camera.CFrame.Position
+    local vp=Camera.ViewportSize
+    local cx,cy=vp.X/2,vp.Y
+    local proc={}
 
     for _,p in ipairs(Players:GetPlayers()) do
-        if p==LocalPlayer then ESP:HidePlayer(p) continue end
-        if ESP.Settings.TeamCheck and p.Team==mt then ESP:HidePlayer(p) continue end
+        if p==LocalPlayer then ESP:CleanPlayer(p) continue end
+        if ESP.Settings.TeamCheck and p.Team==mt then ESP:CleanPlayer(p) continue end
 
         local c=p.Character
-        if not c then ESP:HidePlayer(p) continue end
+        if not c then ESP:CleanPlayer(p) continue end
 
         local h=c:FindFirstChild("Head")
         local r=c:FindFirstChild("HumanoidRootPart")
         local hum=c:FindFirstChildOfClass("Humanoid")
-        if not h or not r then ESP:HidePlayer(p) continue end
+        if not h or not r then ESP:CleanPlayer(p) continue end
 
-        local rp=r.Position local dist=(cp-rp).Magnitude
-        if dist>ESP.Settings.MaxDist then ESP:HidePlayer(p) continue end
+        local rp=r.Position
+        local dist=(cp-rp).Magnitude
+        if dist>ESP.Settings.MaxDist then ESP:CleanPlayer(p) continue end
 
         local rsp=Camera:WorldToViewportPoint(rp)
-        if rsp.Z<=0 then ESP:HidePlayer(p) continue end
+        if not ESP:IsOnScreen(rsp) then ESP:CleanPlayer(p) continue end
 
         local hsp=Camera:WorldToViewportPoint(h.Position+Vector3.new(0,0.5,0))
         local lsp=Camera:WorldToViewportPoint(rp-Vector3.new(0,3.5,0))
 
-        local bh=math.abs(hsp.Y-lsp.Y) local bw=bh*0.5 local x=rsp.X-bw/2 local y=hsp.Y
+        local bh=math.abs(hsp.Y-lsp.Y)
+        local bw=bh*0.5
+        local x=rsp.X-bw/2
+        local y=hsp.Y
 
         if not ESP.Boxes[p] then ESP:CreatePlayer(p) end
         local b=ESP.Boxes[p]
@@ -220,7 +225,7 @@ function ESP:Update()
         proc[p]=true
     end
 
-    for p in pairs(ESP.Boxes) do if not proc[p] then ESP:HidePlayer(p) end end
+    for p in pairs(ESP.Boxes) do if not proc[p] then ESP:CleanPlayer(p) end end
 end
 
 function ESP:Start()
