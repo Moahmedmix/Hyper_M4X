@@ -31,6 +31,83 @@ else
     return
 end
 
+--[[
+    Arabic: سكريبت معادلة لإخفاء جميع مخرجات الطباعة وحماية السكريبت الأصلي من الكشف
+    English: Equivalence script to hide all print outputs and protect original script from detection
+--]]
+
+-- 1: تعطيل جميع دوال الطباعة والإخراج قبل تشغيل السكريبت الأصلي
+local original_print = print
+local original_warn = warn
+local original_error = error
+
+print = function(...) end
+warn = function(...) end
+error = function(...) return nil end
+
+-- 2: إخفاء أي محاولات كتابة إلى الـ Console عبر دوال النظام المخفية
+local old_rconsoleprint = rawget(_G, "rconsoleprint") or function() end
+rawset(_G, "rconsoleprint", function(...) end)
+
+-- 3: تعطيل الـ logging الخاص بـ Hyper نفسه بشكل جذري
+local hyper_logger_methods = {"Log", "Info", "Good", "Warn", "Error", "Skip", "Dead", "Blank", "Separator", "DoubleSeparator", "Header", "Box", "KeyValue", "PrintSummary"}
+for _, method in pairs(hyper_logger_methods) do
+    rawset(_G, "Hyper_Logger_" .. method, function() end)
+end
+
+-- 4: استبدال ModuleLoader بالكامل بآخر لا يطبع شيئًا
+local SilentModuleLoader = {
+    Loaded = {}, Failed = {}, Skipped = {}, Stats = {Total=0, Loaded=0, Failed=0, Skipped=0},
+    LoadFromURL = function(self, url, name, required, retry)
+        local ok, content = pcall(game.HttpGet, game, url)
+        if not ok then return nil end
+        local fn, err = loadstring(content)
+        if not fn then return nil end
+        local success, result = pcall(fn)
+        if not success then return nil end
+        table.insert(self.Loaded, {Name=name, Module=result})
+        self.Stats.Loaded = self.Stats.Loaded + 1
+        return result
+    end,
+    LoadFromRepo = function(self, path, required) return self:LoadFromURL(REPO_URL .. path, path:match("([^/]+)%.lua$") or path, required) end
+}
+
+-- 5: تشغيل السكريبت الأصلي داخل بيئة معزولة (setfenv) تمنع أي وصول إلى دوال الطباعة
+local original_environment = getfenv()
+local sandbox_env = {}
+for k, v in pairs(original_environment) do
+    if k ~= "print" and k ~= "warn" and k ~= "error" and k ~= "rconsoleprint" then
+        sandbox_env[k] = v
+    else
+        sandbox_env[k] = function() end
+    end
+end
+
+-- 6: استدعاء السكريبت الأصلي (المفترض أنه محفوظ كمتغير `original_script_code`)
+-- ضع هنا الكود الأصلي كسلسلة نصية (string)
+local original_script_code = [[
+-- ضع كود Hyper UI الأصلي هنا بالكامل
+-- مثال: loadstring(game:HttpGet("YOUR_RAW_URL"))()
+]]
+
+local sandboxed_fn, compile_err = loadstring(original_script_code)
+if sandboxed_fn then
+    setfenv(sandboxed_fn, sandbox_env)
+    local success, err = pcall(sandboxed_fn)
+    if not success then
+        -- السكوت التام حتى في حالة الخطأ
+    end
+else
+    -- السكوت التام
+end
+
+-- 7: استعادة دوال الطباعة بعد الانتهاء (اختياري، يُفضل عدم استعادتها)
+-- print = original_print
+-- warn = original_warn
+
+-- 8: منع أي سكريبت آخر من الطباعة بعد هذا السكريبت
+hookfunction(original_print, function() end)
+hookfunction(original_warn, function() end)
 -- =============================================
 -- ENVIRONMENT SETUP
 -- =============================================
