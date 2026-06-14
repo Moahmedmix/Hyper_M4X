@@ -60,11 +60,23 @@ local SilentModuleLoader = {
     Loaded = {}, Failed = {}, Skipped = {}, Stats = {Total=0, Loaded=0, Failed=0, Skipped=0},
     LoadFromURL = function(self, url, name, required, retry)
         local ok, content = pcall(game.HttpGet, game, url)
-        if not ok then return nil end
-        local fn, err = loadstring(content)
-        if not fn then return nil end
+        if not ok then
+            self.Stats.Failed = self.Stats.Failed + 1
+            table.insert(self.Failed, {Name=name, Reason="Network: " .. tostring(content)})
+            return nil
+        end
+        local fn, compileErr = loadstring(content)
+        if not fn then
+            self.Stats.Failed = self.Stats.Failed + 1
+            table.insert(self.Failed, {Name=name, Reason="Syntax: " .. tostring(compileErr)})
+            return nil
+        end
         local success, result = pcall(fn)
-        if not success then return nil end
+        if not success then
+            self.Stats.Failed = self.Stats.Failed + 1
+            table.insert(self.Failed, {Name=name, Reason="Runtime: " .. tostring(result)})
+            return nil
+        end
         table.insert(self.Loaded, {Name=name, Module=result})
         self.Stats.Loaded = self.Stats.Loaded + 1
         return result
@@ -95,10 +107,10 @@ if sandboxed_fn then
     setfenv(sandboxed_fn, sandbox_env)
     local success, err = pcall(sandboxed_fn)
     if not success then
-        -- السكوت التام حتى في حالة الخطأ
+        original_warn("[Hyper] Sandbox runtime error: " .. tostring(err))
     end
 else
-    -- السكوت التام
+    original_warn("[Hyper] Sandbox compile error: " .. tostring(compile_err))
 end
 
 -- 7: استعادة دوال الطباعة بعد الانتهاء (اختياري، يُفضل عدم استعادتها)
@@ -106,8 +118,8 @@ end
 -- warn = original_warn
 
 -- 8: منع أي سكريبت آخر من الطباعة بعد هذا السكريبت
-hookfunction(original_print, function() end)
-hookfunction(original_warn, function() end)
+pcall(function() hookfunction(original_print, function() end) end)
+pcall(function() hookfunction(original_warn, function() end) end)
 -- =============================================
 -- ENVIRONMENT SETUP
 -- =============================================
@@ -385,7 +397,8 @@ else
 end
 
 Logger:Info("Place ID: " .. game.PlaceId)
-Logger:Info("Executor: " .. (pcall(function() return identifyexecutor() end) and identifyexecutor() or "Unknown"))
+local execOk, execName = pcall(identifyexecutor)
+Logger:Info("Executor: " .. (execOk and tostring(execName) or "Unknown"))
 
 if #ServicesFailed > 0 then
     Logger:Warn("Failed Services: " .. table.concat(ServicesFailed, ", "))
@@ -415,7 +428,10 @@ function Flags:Create(name, default)
         local old = self.Value
         self.Value = newValue
         for _, cb in ipairs(self.Connections) do
-            pcall(cb, newValue, old)
+            local cbOk, cbErr = pcall(cb, newValue, old)
+            if not cbOk then
+                warn("[Hyper] Flag '" .. name .. "' callback error: " .. tostring(cbErr))
+            end
         end
     end
     function flag:Toggle() self:Set(not self.Value) end
@@ -478,7 +494,7 @@ if not windowCreated then
     Logger:Dead("Failed to create window: " .. tostring(windowError))
     Logger:Dead("Attempting simplified window...")
     
-    pcall(function()
+    local fallbackOk, fallbackErr = pcall(function()
         Window = WindUI:CreateWindow({
             Title = "Hyper",
             Author = "M4X | EVA | AMAL | Jana",
@@ -496,6 +512,11 @@ if not windowCreated then
         windowCreated = true
         Logger:Good("Simplified window created!")
     end)
+    
+    if not windowCreated then
+        Logger:Dead("All window creation attempts failed: " .. tostring(fallbackErr))
+        return
+    end
 end
 -- =============================================
 -- CREATE TABS
@@ -560,11 +581,20 @@ if Tabs.Home then
         WindUI:Notify({ Title = "Hyper", Description = "Cleaned " .. count .. " objects!", Duration = 3 })
     end })
     quickSec:Button({ Title = "Copy Discord", Callback = function()
-        pcall(function() setclipboard("discord.gg/hyper") end)
-        WindUI:Notify({ Title = "Hyper", Description = "Discord copied!", Duration = 3 })
+        local clipOk, clipErr = pcall(function() setclipboard("discord.gg/hyper") end)
+        if clipOk then
+            WindUI:Notify({ Title = "Hyper", Description = "Discord copied!", Duration = 3 })
+        else
+            WindUI:Notify({ Title = "Hyper", Description = "Copy failed: " .. tostring(clipErr), Duration = 3 })
+        end
     end })
     quickSec:Button({ Title = "Refresh UI", Callback = function()
-        loadstring(game:HttpGet(REPO_URL .. "Main.lua"))()
+        local refreshOk, refreshErr = pcall(function()
+            loadstring(game:HttpGet(REPO_URL .. "Main.lua"))()
+        end)
+        if not refreshOk then
+            WindUI:Notify({ Title = "Hyper", Description = "Refresh failed: " .. tostring(refreshErr), Duration = 5 })
+        end
     end })
     quickSec:Button({ Title = "Destroy UI", Callback = function()
         pcall(function() Window:Destroy() end)

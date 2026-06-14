@@ -55,15 +55,21 @@ end
 
 -- Check if Theme can be passed in CreateWindow
 print("\n--- CreateWindow Theme Check ---")
-local testWindow = WindUI:CreateWindow({
-    Title = "Theme Test",
-    Author = "Test",
-    Folder = "Test",
-    Icon = "zap",
-    Theme = "Dark",
-    KeySystem = false,
-})
+local winOk, testWindow = pcall(function()
+    return WindUI:CreateWindow({
+        Title = "Theme Test",
+        Author = "Test",
+        Folder = "Test",
+        Icon = "zap",
+        Theme = "Dark",
+        KeySystem = false,
+    })
+end)
 
+if not winOk or not testWindow then
+    print("Failed to create test window: " .. tostring(testWindow))
+    return
+end
 print("Window created with Theme='Dark'")
 
 -- Check available themes in WindUI
@@ -84,7 +90,7 @@ for _, theme in ipairs(builtInThemes) do
     end
 end
 
-testWindow:Destroy()
+pcall(function() testWindow:Destroy() end)
 print("\n=================================")
 print("Check Complete!")
 print("=================================")
