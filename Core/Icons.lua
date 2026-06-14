@@ -14,14 +14,31 @@ function Config:Save(flags)
     if flags then
         for name, flag in pairs(flags) do
             if type(flag) == "table" and flag.Get then
-                data[name] = flag:Get()
+                local getOk, val = pcall(function() return flag:Get() end)
+                if getOk then
+                    data[name] = val
+                end
             end
         end
     end
-    local json = HttpService:JSONEncode(data)
+    local encodeOk, json = pcall(function() return HttpService:JSONEncode(data) end)
+    if not encodeOk then
+        warn("[Hyper] Config save failed (encode): " .. tostring(json))
+        return false
+    end
     if writefile and isfolder then
-        if not isfolder(Config.Folder) then makefolder(Config.Folder) end
-        writefile(Config.Folder .. "/" .. Config.File, json)
+        local mkOk, mkErr = pcall(function()
+            if not isfolder(Config.Folder) then makefolder(Config.Folder) end
+        end)
+        if not mkOk then
+            warn("[Hyper] Config save failed (mkdir): " .. tostring(mkErr))
+            return false
+        end
+        local writeOk, writeErr = pcall(function() writefile(Config.Folder .. "/" .. Config.File, json) end)
+        if not writeOk then
+            warn("[Hyper] Config save failed (write): " .. tostring(writeErr))
+            return false
+        end
     end
     return true
 end
@@ -44,7 +61,14 @@ end
 
 function Config:Delete()
     local path = Config.Folder .. "/" .. Config.File
-    if isfile and isfile(path) then delfile(path) return true end
+    if isfile and isfile(path) then
+        local delOk, delErr = pcall(function() delfile(path) end)
+        if not delOk then
+            warn("[Hyper] Config delete failed: " .. tostring(delErr))
+            return false
+        end
+        return true
+    end
     return false
 end
 
@@ -52,7 +76,10 @@ function Config:StartAutoSave(flags)
     if Config.AutoSaveConn then Config.AutoSaveConn:Disconnect() end
     Config.AutoSaveConn = RunService.Heartbeat:Connect(function()
         if tick() % Config.Interval < 0.016 then
-            Config:Save(flags)
+            local saveOk, saveErr = pcall(function() Config:Save(flags) end)
+            if not saveOk then
+                warn("[Hyper] Auto-save error: " .. tostring(saveErr))
+            end
         end
     end)
 end
@@ -70,8 +97,12 @@ function Config:Init(tab, library, flags)
     local Sec = tab:Section({ Title = "Config", Icon = "save", Opened = true })
     
     Sec:Button({ Title = "Save", Callback = function()
-        Config:Save(flags)
-        library:Notify({ Title = "Config", Description = "Saved!", Duration = 2 })
+        local ok = Config:Save(flags)
+        if ok then
+            library:Notify({ Title = "Config", Description = "Saved!", Duration = 2 })
+        else
+            library:Notify({ Title = "Config", Description = "Save failed! Check console.", Duration = 3 })
+        end
     end })
     
     Sec:Button({ Title = "Load", Callback = function()

@@ -58,7 +58,7 @@ function Fly:Start()
         local root = char:FindFirstChild("HumanoidRootPart")
         if not root then return end
 
-        if Fly.Settings.AntiKick then root.Velocity = Vector3.zero; root.RotVelocity = Vector3.zero end
+        if Fly.Settings.AntiKick then pcall(function() root.Velocity = Vector3.zero; root.RotVelocity = Vector3.zero end) end
 
         local dir = Vector3.zero
         local cam = Camera.CFrame

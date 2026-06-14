@@ -51,19 +51,29 @@ function Aimbot:Init(tab, library, flags)
     
     -- Create FOV Circle
     local screenSize = Camera.ViewportSize
-    FOVCircle = Drawing.new("Circle")
-    FOVCircle.Visible = false
-    FOVCircle.Color = Aimbot.Settings.FOVColor
-    FOVCircle.Thickness = Aimbot.Settings.FOVThickness
-    FOVCircle.NumSides = Aimbot.Settings.FOVNumSides
-    FOVCircle.Radius = Aimbot.Settings.FOV
-    FOVCircle.Filled = false
-    FOVCircle.Position = Vector2.new(screenSize.X / 2, screenSize.Y / 2)
-    FOVCircle.ZIndex = 10
+    local drawOk, drawErr = pcall(function()
+        FOVCircle = Drawing.new("Circle")
+        FOVCircle.Visible = false
+        FOVCircle.Color = Aimbot.Settings.FOVColor
+        FOVCircle.Thickness = Aimbot.Settings.FOVThickness
+        FOVCircle.NumSides = Aimbot.Settings.FOVNumSides
+        FOVCircle.Radius = Aimbot.Settings.FOV
+        FOVCircle.Filled = false
+        FOVCircle.Position = Vector2.new(screenSize.X / 2, screenSize.Y / 2)
+        FOVCircle.ZIndex = 10
+    end)
+    
+    if not drawOk then
+        warn("[Hyper] FOV circle creation failed: " .. tostring(drawErr))
+    end
 
-    Camera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
-        local ss = Camera.ViewportSize
-        FOVCircle.Position = Vector2.new(ss.X / 2, ss.Y / 2)
+    pcall(function()
+        Camera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
+            if FOVCircle then
+                local ss = Camera.ViewportSize
+                FOVCircle.Position = Vector2.new(ss.X / 2, ss.Y / 2)
+            end
+        end)
     end)
 
     self:BuildUI()
@@ -120,7 +130,7 @@ end
 
 function Aimbot:Update()
     if not Aimbot.Settings.Enabled then
-        FOVCircle.Visible = false
+        if FOVCircle then FOVCircle.Visible = false end
         return
     end
 

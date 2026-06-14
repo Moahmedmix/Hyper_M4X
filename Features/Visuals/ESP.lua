@@ -208,12 +208,23 @@ function ESP:Update()
 end
 
 function ESP:Start()
-    if ESP.ScreenGui then ESP.ScreenGui:Destroy() end
-    ESP.ScreenGui = Instance.new("ScreenGui", CoreGui)
-    ESP.ScreenGui.Name = "Hyper_ESP"
-    ESP.ScreenGui.ResetOnSpawn = false
+    if ESP.ScreenGui then pcall(function() ESP.ScreenGui:Destroy() end) end
+    local guiOk, guiErr = pcall(function()
+        ESP.ScreenGui = Instance.new("ScreenGui", CoreGui)
+        ESP.ScreenGui.Name = "Hyper_ESP"
+        ESP.ScreenGui.ResetOnSpawn = false
+    end)
+    if not guiOk then
+        warn("[Hyper] ESP ScreenGui creation failed: " .. tostring(guiErr))
+        return
+    end
     ESP.Active = {}
-    ESP.Conn = RunService.RenderStepped:Connect(ESP.Update)
+    ESP.Conn = RunService.RenderStepped:Connect(function()
+        local ok, err = pcall(ESP.Update)
+        if not ok then
+            warn("[Hyper] ESP update error: " .. tostring(err))
+        end
+    end)
 end
 
 function ESP:Stop()
