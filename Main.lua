@@ -108,9 +108,13 @@ end
 -- 8: منع أي سكريبت آخر من الطباعة بعد هذا السكريبت
 hookfunction(original_print, function() end)
 hookfunction(original_warn, function() end)
+
+local REPO_URL = "https://raw.githubusercontent.com/Moahmedmix/Hyper_M4X/main/"
+
 -- =============================================
--- ENVIRONMENT SETUP
+-- ENVIRONMENT SETUP (via shared Core/Services)
 -- =============================================
+local ServicesModule = loadstring(game:HttpGet(REPO_URL .. "Core/Services.lua"))()
 local Services = {}
 local ServicesFailed = {}
 
@@ -121,24 +125,22 @@ local requiredServices = {
 }
 
 for _, name in ipairs(requiredServices) do
-    local ok, service = pcall(function() return game:GetService(name) end)
-    if ok and service then
-        Services[name] = service
+    local svc = ServicesModule:Get(name)
+    if svc then
+        Services[name] = svc
     else
         table.insert(ServicesFailed, name)
     end
 end
 
-local Players = Services.Players
-local LocalPlayer = Players and Players.LocalPlayer
+local Players = ServicesModule.Players
+local LocalPlayer = ServicesModule.LocalPlayer
 local HttpService = Services.HttpService
-local TeleportService = Services.TeleportService
-local RunService = Services.RunService
-local TweenService = Services.TweenService
-local UserInputService = Services.UserInputService
-local CoreGui = Services.CoreGui
-
-local REPO_URL = "https://raw.githubusercontent.com/Moahmedmix/Hyper_M4X/main/"
+local TeleportService = ServicesModule.TeleportService
+local RunService = ServicesModule.RunService
+local TweenService = ServicesModule.TweenService
+local UserInputService = ServicesModule.UserInputService
+local CoreGui = ServicesModule.CoreGui
 
 
 -- =============================================
@@ -705,4 +707,5 @@ return {
     FeatureInitializer = FeatureInitializer,
     Tabs = Tabs,
     Services = Services,
+    ServicesModule = ServicesModule,
 }

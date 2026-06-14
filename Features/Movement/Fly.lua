@@ -6,15 +6,17 @@
     ╚══════════════════════════════════════════════════════════════╝
 --]]
 
+local Services = require(script.Parent.Parent.Core.Services)
+local PlayerUtils = require(script.Parent.Parent.Core.PlayerUtils)
+local ConnectionManager = require(script.Parent.Parent.Core.ConnectionManager)
+
 local Fly = {}
 Fly.__index = Fly
 
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
-local LocalPlayer = Players.LocalPlayer
-local Camera = workspace.CurrentCamera
+local UserInputService = Services.UserInputService
+local TweenService = Services.TweenService
+local LocalPlayer = Services.LocalPlayer
+local Camera = Services.Camera
 
 Fly.Settings = {
     Enabled = false,
@@ -26,9 +28,7 @@ Fly.Settings = {
 }
 
 Fly.Keys = { W = false, S = false, A = false, D = false, Space = false, Ctrl = false, Shift = false }
-Fly.Conns = {}
 
--- Key handlers
 UserInputService.InputBegan:Connect(function(input, gp)
     if gp then return end
     local k = input.KeyCode
@@ -51,11 +51,10 @@ function Fly:Start()
     local hum = char:FindFirstChildOfClass("Humanoid") or char:WaitForChild("Humanoid")
     pcall(function() hum.PlatformStand = true end)
 
-    Fly.Conns.Main = RunService.Heartbeat:Connect(function()
+    if not Fly.ConnManager then Fly.ConnManager = ConnectionManager.new() end
+    Fly.ConnManager:OnHeartbeat("fly_loop", function()
         if not Fly.Settings.Enabled then return end
-        local char = LocalPlayer.Character
-        if not char then return end
-        local root = char:FindFirstChild("HumanoidRootPart")
+        local char, root = PlayerUtils.GetLocalCharacterParts()
         if not root then return end
 
         if Fly.Settings.AntiKick then root.Velocity = Vector3.zero; root.RotVelocity = Vector3.zero end
@@ -92,18 +91,14 @@ function Fly:Start()
 end
 
 function Fly:Stop()
-    for _, c in pairs(Fly.Conns) do c:Disconnect() end
-    Fly.Conns = {}
-    local char = LocalPlayer.Character
-    if char then
-        local root = char:FindFirstChild("HumanoidRootPart")
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if root and root:FindFirstChild("FlyBV") then root.FlyBV:Destroy() end
-        if hum then hum.PlatformStand = false end
-    end
+    if Fly.ConnManager then Fly.ConnManager:DisconnectAll() end
+    local char, root, _, hum = PlayerUtils.GetLocalCharacterParts()
+    if root and root:FindFirstChild("FlyBV") then root.FlyBV:Destroy() end
+    if hum then hum.PlatformStand = false end
 end
 
 function Fly:Init(tab, library, flags)
+    Fly.ConnManager = ConnectionManager.new()
     local Sec = tab:Section({ Title = "Fly", Icon = "feather", Opened = true })
     Sec:Toggle({ Title = "Enable", Value = false, Callback = function(v) Fly.Settings.Enabled = v; if v then Fly:Start() else Fly:Stop() end end })
     Sec:Slider({ Title = "Speed", Step = 1, Value = { Min = 10, Max = 500, Default = 50 }, Callback = function(v) Fly.Settings.Speed = v end })

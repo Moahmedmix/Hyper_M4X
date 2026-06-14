@@ -6,23 +6,22 @@
     ╚══════════════════════════════════════════════════════════════╝
 --]]
 
+local Services = require(script.Parent.Parent.Core.Services)
+local PlayerUtils = require(script.Parent.Parent.Core.PlayerUtils)
+local ConnectionManager = require(script.Parent.Parent.Core.ConnectionManager)
+
 local Speed = {}
 Speed.__index = Speed
 
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local LocalPlayer = Players.LocalPlayer
+local LocalPlayer = Services.LocalPlayer
 
 Speed.Settings = { Enabled = false, Value = 50, BHop = false }
-Speed.Conn = nil
 
 function Speed:Start()
-    Speed.Conn = RunService.Heartbeat:Connect(function()
+    if not Speed.ConnManager then Speed.ConnManager = ConnectionManager.new() end
+    Speed.ConnManager:OnHeartbeat("speed_loop", function()
         if not Speed.Settings.Enabled then return end
-        local char = LocalPlayer.Character
-        if not char then return end
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        local root = char:FindFirstChild("HumanoidRootPart")
+        local char, root, _, hum = PlayerUtils.GetLocalCharacterParts()
         if not hum then return end
 
         hum.WalkSpeed = Speed.Settings.Value
@@ -35,15 +34,13 @@ function Speed:Start()
 end
 
 function Speed:Stop()
-    if Speed.Conn then Speed.Conn:Disconnect(); Speed.Conn = nil end
-    local char = LocalPlayer.Character
-    if char then
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then hum.WalkSpeed = 16 end
-    end
+    if Speed.ConnManager then Speed.ConnManager:DisconnectAll() end
+    local char, _, _, hum = PlayerUtils.GetLocalCharacterParts()
+    if hum then hum.WalkSpeed = 16 end
 end
 
 function Speed:Init(tab, library, flags)
+    Speed.ConnManager = ConnectionManager.new()
     local Sec = tab:Section({ Title = "Speed", Icon = "gauge", Opened = true })
     Sec:Toggle({ Title = "Enable", Value = false, Callback = function(v) Speed.Settings.Enabled = v; if v then Speed:Start() else Speed:Stop() end end })
     Sec:Slider({ Title = "Speed", Step = 1, Value = { Min = 16, Max = 1000, Default = 50 }, Callback = function(v) Speed.Settings.Value = v end })

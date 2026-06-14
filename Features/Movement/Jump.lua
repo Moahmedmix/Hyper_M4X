@@ -6,22 +6,21 @@
     ╚══════════════════════════════════════════════════════════════╝
 --]]
 
+local Services = require(script.Parent.Parent.Core.Services)
+local PlayerUtils = require(script.Parent.Parent.Core.PlayerUtils)
+
 local Jump = {}
 Jump.__index = Jump
 
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-local LocalPlayer = Players.LocalPlayer
+local UserInputService = Services.UserInputService
+local RunService = Services.RunService
 
 Jump.Settings = { Enabled = false, Power = 100, MultiJump = false, MaxJumps = 5 }
 Jump.JumpCount = 0
 
 UserInputService.JumpRequest:Connect(function()
     if not Jump.Settings.Enabled then return end
-    local char = LocalPlayer.Character
-    if not char then return end
-    local root = char:FindFirstChild("HumanoidRootPart")
+    local char, root = PlayerUtils.GetLocalCharacterParts()
     if not root then return end
 
     if Jump.Settings.MultiJump then
@@ -41,9 +40,7 @@ end)
 
 RunService.Heartbeat:Connect(function()
     if not Jump.Settings.Enabled then return end
-    local char = LocalPlayer.Character
-    if not char then return end
-    local root = char:FindFirstChild("HumanoidRootPart")
+    local char, root = PlayerUtils.GetLocalCharacterParts()
     if root and root.Velocity.Y == 0 then Jump.JumpCount = 0 end
 end)
 
