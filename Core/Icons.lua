@@ -30,13 +30,20 @@ function Config:Load(flags)
     if not readfile or not isfile then return false end
     local path = Config.Folder .. "/" .. Config.File
     if not isfile(path) then return false end
-    local ok, data = pcall(function() return HttpService:JSONDecode(readfile(path)) end)
-    if not ok or not data then return false end
+    local raw = readfile(path)
+    if #raw > 1048576 then return false end -- reject files > 1MB
+    local ok, data = pcall(function() return HttpService:JSONDecode(raw) end)
+    if not ok or type(data) ~= "table" then return false end
     local count = 0
     if flags then
         for name, value in pairs(data) do
+            if type(name) ~= "string" then continue end
             local flag = flags[name]
-            if flag and flag.Set then flag:Set(value) count = count + 1 end
+            if not flag or not flag.Set then continue end
+            local current = flag:Get()
+            if current ~= nil and type(value) ~= type(current) then continue end
+            flag:Set(value)
+            count = count + 1
         end
     end
     return true, count

@@ -43,7 +43,7 @@ local original_error = error
 
 print = function(...) end
 warn = function(...) end
-error = function(...) return nil end
+-- error is intentionally NOT suppressed to avoid masking security-relevant failures
 
 -- 2: إخفاء أي محاولات كتابة إلى الـ Console عبر دوال النظام المخفية
 local old_rconsoleprint = rawget(_G, "rconsoleprint") or function() end
@@ -139,6 +139,23 @@ local UserInputService = Services.UserInputService
 local CoreGui = Services.CoreGui
 
 local REPO_URL = "https://raw.githubusercontent.com/Moahmedmix/Hyper_M4X/main/"
+
+-- Load keys from external config file instead of hardcoding them in source
+local HYPER_KEYS = {}
+local function LoadKeys()
+    local keyPath = "Hyper_M4X/keys.json"
+    if readfile and isfile and isfile(keyPath) then
+        local ok, data = pcall(function()
+            return game:GetService("HttpService"):JSONDecode(readfile(keyPath))
+        end)
+        if ok and type(data) == "table" then
+            return data
+        end
+    end
+    return nil
+end
+
+HYPER_KEYS = LoadKeys() or {"CHANGE_ME"}
 
 
 -- =============================================
@@ -467,7 +484,7 @@ local windowSuccess, windowError = pcall(function()
         Discord = { Enabled = false },
         KeySystem = {
             Note = "Enter your Hyper key to continue.",
-            Key = { "MIX", "M4X", "MIX-M4X", },
+            Key = HYPER_KEYS,
             SaveKey = true,
         },
     })
@@ -489,7 +506,7 @@ if not windowCreated then
             Discord = { Enabled = false },
             KeySystem = {
                 Note = "Enter your Hyper key to continue.",
-                Key = { "MIX", "M4X", "MIX-M4X", },
+                Key = HYPER_KEYS,
                 SaveKey = false,
             },
         })
@@ -534,7 +551,7 @@ if Tabs.Home then
     local infoSec = Tabs.Home:Section({ Title = "Information", Icon = "info", Opened = true })
     infoSec:Button({ Title = "Hyper UI Framework v1.0.0", Callback = function() end })
     infoSec:Button({ Title = "By M4X | EVA | AMAL", Callback = function() end })
-    infoSec:Button({ Title = "Key: MIX-M4X", Callback = function() end })
+    infoSec:Button({ Title = "Key: Authorized", Callback = function() end })
     infoSec:Button({ Title = "Welcome, " .. (LocalPlayer and LocalPlayer.Name or "User") .. "!", Callback = function() end })
 
     local sysSec = Tabs.Home:Section({ Title = "System", Icon = "monitor", Opened = true })

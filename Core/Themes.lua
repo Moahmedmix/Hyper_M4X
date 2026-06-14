@@ -1,90 +1,35 @@
--- Theme Test - Check WindUI Version & Available Methods
-local success, WindUI = pcall(function()
-    return loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
-end)
+--[[
+    Hyper UI - Themes Module
+    Provides theme selection UI for the Settings tab.
+--]]
 
-if not success or not WindUI then
-    print("WindUI failed to load")
-    return
+local Themes = {}
+Themes.__index = Themes
+
+local AvailableThemes = {
+    "Dark", "Light", "Red", "Crimson", "Midnight",
+    "Ocean", "Green", "Purple", "Sunset", "Forest",
+    "Arctic", "Neon", "Gold", "Rose",
+}
+
+function Themes:Init(tab, library, flags)
+    local self = setmetatable({}, Themes)
+    self.Tab = tab
+    self.Library = library
+    self.Flags = flags
+
+    local Sec = tab:Section({ Title = "Themes", Icon = "palette", Opened = true })
+
+    Sec:Dropdown({
+        Title = "Select Theme",
+        Values = AvailableThemes,
+        Value = "Dark",
+        Callback = function(v)
+            pcall(function() library:SetTheme(v) end)
+        end,
+    })
+
+    return self
 end
 
-print("=================================")
-print("WindUI Version Check")
-print("=================================")
-
--- Check if WindUI is a table
-print("WindUI type: " .. type(WindUI))
-
--- List all available functions
-print("\n--- WindUI Functions ---")
-for k, v in pairs(WindUI) do
-    print("  " .. k .. " = " .. type(v))
-end
-
--- Check AddTheme
-print("\n--- AddTheme Check ---")
-if WindUI.AddTheme then
-    print("AddTheme: EXISTS")
-    
-    -- Try to add a test theme
-    local ok, err = pcall(function()
-        WindUI:AddTheme({
-            Name = "TestTheme",
-            Accent = Color3.fromRGB(255, 0, 0),
-            Background = Color3.fromRGB(0, 0, 0),
-            Text = Color3.fromRGB(255, 255, 255),
-        })
-    end)
-    
-    if ok then
-        print("AddTheme: WORKS!")
-    else
-        print("AddTheme: ERROR - " .. tostring(err))
-    end
-else
-    print("AddTheme: NOT FOUND")
-end
-
--- Check SetTheme
-print("\n--- SetTheme Check ---")
-if WindUI.SetTheme then
-    print("SetTheme: EXISTS")
-else
-    print("SetTheme: NOT FOUND")
-end
-
--- Check if Theme can be passed in CreateWindow
-print("\n--- CreateWindow Theme Check ---")
-local testWindow = WindUI:CreateWindow({
-    Title = "Theme Test",
-    Author = "Test",
-    Folder = "Test",
-    Icon = "zap",
-    Theme = "Dark",
-    KeySystem = false,
-})
-
-print("Window created with Theme='Dark'")
-
--- Check available themes in WindUI
-print("\n--- Built-in Themes ---")
-local builtInThemes = {"Dark", "Light", "Red", "Crimson", "Midnight", "Ocean", "Green", "Purple", "Sunset", "Forest", "Arctic", "Neon", "Gold", "Rose"}
-for _, theme in ipairs(builtInThemes) do
-    local ok, err = pcall(function()
-        WindUI:CreateWindow({
-            Title = "Test",
-            Theme = theme,
-            KeySystem = false,
-        }):Destroy()
-    end)
-    if ok then
-        print("  [+] " .. theme .. " - Available")
-    else
-        print("  [-] " .. theme .. " - Not Available")
-    end
-end
-
-testWindow:Destroy()
-print("\n=================================")
-print("Check Complete!")
-print("=================================")
+return Themes
