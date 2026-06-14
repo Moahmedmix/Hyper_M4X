@@ -5,14 +5,17 @@
     ╚══════════════════════════════════════════════════════════════╝
 --]]
 
+local Services = require(script.Parent.Parent.Core.Services)
+local PlayerUtils = require(script.Parent.Parent.Core.PlayerUtils)
+local ConnectionManager = require(script.Parent.Parent.Core.ConnectionManager)
+
 local ESP = {}
 ESP.__index = ESP
 
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local Camera = workspace.CurrentCamera
-local LocalPlayer = Players.LocalPlayer
-local CoreGui = game:GetService("CoreGui")
+local Players = Services.Players
+local Camera = Services.Camera
+local LocalPlayer = Services.LocalPlayer
+local CoreGui = Services.CoreGui
 
 ESP.Settings = {
     Enabled = false, MaxDist = 3000, TeamCheck = false, TeamColor = false, Rainbow = false,
@@ -25,13 +28,13 @@ ESP.Settings = {
 
 ESP.Active = {}
 ESP.ScreenGui = nil
-ESP.Conn = nil
 ESP.RainbowHue = 0
 
 function ESP:GetColor(p)
     if ESP.Settings.Rainbow then ESP.RainbowHue=(ESP.RainbowHue+0.003)%1 return Color3.fromHSV(ESP.RainbowHue,1,1) end
-    if ESP.Settings.TeamColor and p.Team and LocalPlayer.Team then
-        if p.Team==LocalPlayer.Team then return Color3.fromRGB(50,255,50) end
+    if ESP.Settings.TeamColor and PlayerUtils.IsTeammate(p) then
+        return Color3.fromRGB(50,255,50)
+    elseif ESP.Settings.TeamColor and p.Team then
         return Color3.fromRGB(255,50,50)
     end
     return ESP.Settings.BoxColor
@@ -47,7 +50,6 @@ function ESP:CreateBillboard(player)
     bill.Parent = ESP.ScreenGui
     bill.Adornee = player.Character and player.Character:FindFirstChild("Head")
 
-    -- Name
     local name = Instance.new("TextLabel", bill)
     name.Name = "Name"
     name.Size = UDim2.new(1, 0, 0, 20)
@@ -59,7 +61,6 @@ function ESP:CreateBillboard(player)
     name.Font = Enum.Font.GothamBold
     name.TextStrokeTransparency = 0.5
 
-    -- Distance
     local dist = Instance.new("TextLabel", bill)
     dist.Name = "Dist"
     dist.Size = UDim2.new(1, 0, 0, 18)
@@ -71,7 +72,6 @@ function ESP:CreateBillboard(player)
     dist.Font = Enum.Font.Gotham
     dist.TextStrokeTransparency = 0.5
 
-    -- HP BG
     local hpBg = Instance.new("Frame", bill)
     hpBg.Name = "HPBg"
     hpBg.Size = UDim2.new(0, 4, 1, 0)
@@ -79,14 +79,12 @@ function ESP:CreateBillboard(player)
     hpBg.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     hpBg.BorderSizePixel = 0
 
-    -- HP Fill
     local hpFill = Instance.new("Frame", hpBg)
     hpFill.Name = "HPFill"
     hpFill.Size = UDim2.new(1, 0, 1, 0)
     hpFill.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
     hpFill.BorderSizePixel = 0
 
-    -- Corner lines (4 lines around the billboard)
     local box = Instance.new("Frame", bill)
     box.Name = "Box"
     box.Size = UDim2.new(1, 0, 1, 0)
@@ -103,28 +101,20 @@ function ESP:CreateBillboard(player)
 end
 
 function ESP:UpdateBillboard(player, bill)
-    local char = player.Character
-    if not char then return end
-
-    local head = char:FindFirstChild("Head")
-    local root = char:FindFirstChild("HumanoidRootPart")
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    if not head or not root then return end
+    local char, root, head, hum = PlayerUtils.GetCharacterParts(player)
+    if not char or not head or not root then return end
 
     local dist = (Camera.CFrame.Position - root.Position).Magnitude
 
-    -- Update adornee
     bill.Adornee = head
     bill.MaxDistance = ESP.Settings.MaxDist
 
-    -- Update distance
     local distLabel = bill:FindFirstChild("Dist")
     if distLabel then
         distLabel.Text = ESP.Settings.Dist and "[" .. math.floor(dist) .. "m]" or ""
         distLabel.TextColor3 = ESP.Settings.DistColor
     end
 
-    -- Update name
     local nameLabel = bill:FindFirstChild("Name")
     if nameLabel then
         nameLabel.Visible = ESP.Settings.Name
@@ -132,7 +122,6 @@ function ESP:UpdateBillboard(player, bill)
         nameLabel.TextSize = ESP.Settings.NameSize
     end
 
-    -- Update HP
     local hpBg = bill:FindFirstChild("HPBg")
     if hpBg then
         hpBg.Visible = ESP.Settings.HP and hum ~= nil
@@ -146,7 +135,6 @@ function ESP:UpdateBillboard(player, bill)
         end
     end
 
-    -- Update box stroke
     local box = bill:FindFirstChild("Box")
     if box then
         local stroke = box:FindFirstChild("Stroke")
@@ -157,36 +145,35 @@ function ESP:UpdateBillboard(player, bill)
     end
 end
 
+function ESP:CleanupPlayer(p)
+    if ESP.Active[p] then
+        ESP.Active[p]:Destroy()
+        ESP.Active[p] = nil
+    end
+end
+
 function ESP:Update()
-    local mt = LocalPlayer.Team
     local processed = {}
 
     for _, p in ipairs(Players:GetPlayers()) do
         if p == LocalPlayer then
-            if ESP.Active[p] then ESP.Active[p]:Destroy(); ESP.Active[p] = nil end
+            ESP:CleanupPlayer(p)
             continue
         end
-        if ESP.Settings.TeamCheck and p.Team == mt then
-            if ESP.Active[p] then ESP.Active[p]:Destroy(); ESP.Active[p] = nil end
-            continue
-        end
-
-        local char = p.Character
-        if not char then
-            if ESP.Active[p] then ESP.Active[p]:Destroy(); ESP.Active[p] = nil end
+        if ESP.Settings.TeamCheck and PlayerUtils.IsTeammate(p) then
+            ESP:CleanupPlayer(p)
             continue
         end
 
-        local head = char:FindFirstChild("Head")
-        local root = char:FindFirstChild("HumanoidRootPart")
-        if not head or not root then
-            if ESP.Active[p] then ESP.Active[p]:Destroy(); ESP.Active[p] = nil end
+        local char, root, head = PlayerUtils.GetCharacterParts(p)
+        if not char or not head or not root then
+            ESP:CleanupPlayer(p)
             continue
         end
 
         local dist = (Camera.CFrame.Position - root.Position).Magnitude
         if dist > ESP.Settings.MaxDist then
-            if ESP.Active[p] then ESP.Active[p]:Destroy(); ESP.Active[p] = nil end
+            ESP:CleanupPlayer(p)
             continue
         end
 
@@ -198,7 +185,6 @@ function ESP:Update()
         processed[p] = true
     end
 
-    -- Cleanup
     for p, bill in pairs(ESP.Active) do
         if not processed[p] then
             bill:Destroy()
@@ -213,22 +199,24 @@ function ESP:Start()
     ESP.ScreenGui.Name = "Hyper_ESP"
     ESP.ScreenGui.ResetOnSpawn = false
     ESP.Active = {}
-    ESP.Conn = RunService.RenderStepped:Connect(ESP.Update)
+    if not ESP.ConnManager then ESP.ConnManager = ConnectionManager.new() end
+    ESP.ConnManager:OnRenderStepped("esp_loop", function() ESP:Update() end)
 end
 
 function ESP:Stop()
-    if ESP.Conn then ESP.Conn:Disconnect(); ESP.Conn = nil end
+    if ESP.ConnManager then ESP.ConnManager:DisconnectAll() end
     if ESP.ScreenGui then ESP.ScreenGui:Destroy(); ESP.ScreenGui = nil end
     ESP.Active = {}
 end
 
 Players.PlayerRemoving:Connect(function(p)
-    if ESP.Active[p] then ESP.Active[p]:Destroy(); ESP.Active[p] = nil end
+    ESP:CleanupPlayer(p)
 end)
 
 function ESP:Init(tab, library, flags)
     local self = setmetatable({}, ESP)
     self.Tab = tab; self.Library = library; self.Flags = flags
+    ESP.ConnManager = ConnectionManager.new()
 
     local Sec = tab:Section({ Title = "ESP", Icon = "eye", Opened = true })
     Sec:Toggle({ Title = "Enable ESP", Value = false, Callback = function(v) ESP.Settings.Enabled = v; if v then ESP:Start() else ESP:Stop() end end })
