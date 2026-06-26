@@ -34,7 +34,7 @@ end
 --[[
     Arabic: سكريبت معادلة لإخفاء جميع مخرجات الطباعة وحماية السكريبت الأصلي من الكشف
     English: Equivalence script to hide all print outputs and protect original script from detection
---]]
+
 
 -- 1: تعطيل جميع دوال الطباعة والإخراج قبل تشغيل السكريبت الأصلي
 local original_print = print
@@ -89,7 +89,7 @@ local original_script_code = [[
 -- ضع كود Hyper UI الأصلي هنا بالكامل
 -- مثال: loadstring(game:HttpGet("YOUR_RAW_URL"))()
 ]]
-
+--[[
 local sandboxed_fn, compile_err = loadstring(original_script_code)
 if sandboxed_fn then
     setfenv(sandboxed_fn, sandbox_env)
@@ -108,6 +108,7 @@ end
 -- 8: منع أي سكريبت آخر من الطباعة بعد هذا السكريبت
 hookfunction(original_print, function() end)
 hookfunction(original_warn, function() end)
+--]]
 -- =============================================
 -- ENVIRONMENT SETUP
 -- =============================================
